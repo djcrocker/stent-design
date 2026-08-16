@@ -9,5 +9,8 @@ requires-python = ">=3.11"
 # Dependencies are managed by conda, not listed here —
 # `pip install -e .` should not try to resolve torch/gmsh/pyvista from PyPI.
 
+[tool.setuptools]
+py-modules = ["config"]
+
 [tool.setuptools.packages.find]
 include = ["geom*", "sim2d*", "sim3d*", "diffusion*", "screen*", "figures*"]
