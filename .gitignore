@@ -1,6 +1,12 @@
 # Data & outputs (keep the directory, ignore its contents)
 **/data/*
 !**/data/.gitkeep
+
+# Rendered figures; scripts tracked, outputs not
+figures/dev/*
+!figures/dev/.gitkeep
+figures/paper/*
+!figures/paper/.gitkeep
 *.npy
 *.parquet
 *.vtk

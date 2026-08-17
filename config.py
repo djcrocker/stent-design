@@ -7,6 +7,7 @@ Ansys has to be set to the mm-t-s system too.
 Values marked PROVISIONAL are placeholders that need a sourced value.
 """
 
+import math
 from pathlib import Path
 
 UNITS_BANNER = (
@@ -17,6 +18,8 @@ UNITS_BANNER = (
 # PATHS #
 PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / 'data'
+FIG_DEV_DIR = PROJECT_ROOT / 'figures' / 'dev'
+FIG_PAPER_DIR = PROJECT_ROOT / 'figures' / 'paper'
 
 # REPRESENTATION #
 GRID_N = 64  # unit cell is a GRID_N x GRID_N binary material/void field
@@ -27,8 +30,9 @@ D_CRIMPED_MM = 2.0           # crimped diameter
 STRUT_THICKNESS_MM = 0.22    # radial thickness t
 STRUT_WIDTH_MM = 0.20        # in-plane strut width w (also the min feature size)
 
-N_CIRC = None                # number of unit cells around the circumference
-AXIAL_PITCH_MM = None        # axial length of one unit cell
+N_CIRC = 12
+
+AXIAL_PITCH_MM = math.pi * D_DEPLOYED_MM / N_CIRC  # 1.5708 mm at D=6, n_circ=12
 
 # OBJECTIVE/CONDITIONING VECTOR #
 OBJECTIVE_KEYS = ('K_radial', 'eps_a_max', 'A_over_lim', 'f_metal')
@@ -44,7 +48,7 @@ MIN_FEATURE_MM = STRUT_WIDTH_MM  # min strut width a valid cell must sustain
 F_METAL_MIN = 0.15  # PROVISIONAL
 F_METAL_MAX = 0.60  # PROVISIONAL
 
-# NITINOL SUPERELASTIC (Auricchia) PARAMETERS #
+# NITINOL SUPERELASTIC (Auricchio) PARAMETERS #
 # Sources from the baseline paper's own parameter set, so using it makes our
 # Pareto comparison a like-for-like material comparison, so any difference comes 
 # from topology, not material constants.
@@ -91,17 +95,23 @@ PROVISIONAL = {
 }
 
 def cell_extent_mm():
-    """Physical size (circumferential, axial) of one unit cell, in mm.
-
-    Requires N_CIRC and AXIAL_PITCH_MM.
-    """
+    """Physical size (circumferential, axial) of one unit cell, in mm."""
     if N_CIRC is None or AXIAL_PITCH_MM is None:
-        raise ValueError(
-            "N_CIRC or AXIAL_PITCH_MM are unset"
-        )
-    import math
-
+        raise ValueError("N_CIRC or AXIAL_PITCH_MM are unset")
     return (math.pi * D_DEPLOYED_MM / N_CIRC, AXIAL_PITCH_MM)
+
+
+def mm_per_px():
+    """
+    Physical size of one grid pixel, in mm, as (circumferential, axial).
+    Equal in both directions while AXIAL_PITCH_MM is left at its square-cell default.
+    """
+    circ_mm, axial_mm = cell_extent_mm()
+    return (circ_mm / GRID_N, axial_mm / GRID_N)
+
+def min_feature_px():
+    """MIN_FEATURE_MM expressed in pixels (circumferential direction)."""
+    return MIN_FEATURE_MM / mm_per_px()[0]
 
 def summary():
     """Print the full configuration."""
@@ -119,8 +129,13 @@ def summary():
     print(f"D_CRIMPED_MM        {D_CRIMPED_MM}{mark('D_CRIMPED_MM')}")
     print(f"STRUT_THICKNESS_MM  {STRUT_THICKNESS_MM}{mark('STRUT_THICKNESS_MM')}")
     print(f"STRUT_WIDTH_MM      {STRUT_WIDTH_MM}{mark('STRUT_WIDTH_MM')}")
-    print(f"N_CIRC              {N_CIRC}  (locked at S2)")
-    print(f"AXIAL_PITCH_MM      {AXIAL_PITCH_MM}  (locked at S2)")
+    print(f"N_CIRC              {N_CIRC}")
+    print(f"AXIAL_PITCH_MM      {AXIAL_PITCH_MM:.4f}  (square-cell default)")
+    circ_mm, axial_mm = cell_extent_mm()
+    px_c, px_a = mm_per_px()
+    print(f"cell extent (mm)    {circ_mm:.4f} circ x {axial_mm:.4f} axial")
+    print(f"mm per pixel        {px_c:.5f} circ x {px_a:.5f} axial")
+    print(f"min feature (px)    {min_feature_px():.1f}")
     print()
     print(f"OBJECTIVE_KEYS      {OBJECTIVE_KEYS}")
     print(f"EPS_A_LIM           {EPS_A_LIM}{mark('EPS_A_LIM')}")
