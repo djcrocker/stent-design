@@ -45,8 +45,12 @@ EPS_A_LIM = 0.004
 
 # VALIDITY THRESHOLDS #
 MIN_FEATURE_MM = STRUT_WIDTH_MM  # min strut width a valid cell must sustain
-F_METAL_MIN = 0.15  # PROVISIONAL
-F_METAL_MAX = 0.60  # PROVISIONAL
+# Degeneracy guards, not design targets. Conventional self-expanding nitinol stents cover
+# ~19-26% of the vessel wall (see sources); these span roughly half to twice that band so
+# generative designs may leave conventional practice, while near-empty and near-solid
+# fields are still rejected.
+F_METAL_MIN = 0.10
+F_METAL_MAX = 0.50
 
 # NITINOL SUPERELASTIC (Auricchio) PARAMETERS #
 # Sources from the baseline paper's own parameter set, so using it makes our
@@ -74,6 +78,13 @@ SOURCES = {
         "for the Femoropopliteal Artery. Ann Biomed Eng. 2026;54(5):1287-1305. "
         "doi:10.1007/s10439-025-03968-9 (Table 2; values adopted there from Gokgol et al.)"
     ),
+    'F_METAL_MIN': (
+        "Vessel wall coverage of conventional self-expanding nitinol stents: SX 19.2+/-2.9%, "
+        "Micro-SX 25.9+/-2.9%. Histopathologic evaluation of nitinol self-expanding stents in "
+        "an animal model of advanced atherosclerotic lesions. EuroIntervention 2010; "
+        "PMID 20142227. Rabbit aortic model, not femoropopliteal - used as an order-of-"
+        "magnitude anchor for the guard rails, not as a design target."
+    ),
     'EPS_A_LIM': (
         "Pelton AR, Schroeder V, Mitchell MR, Gong X-Y, Barney M, Robertson SW. Fatigue "
         "and durability of Nitinol stents. J Mech Behav Biomed Mater. 2008;1(2):153-164. "
@@ -90,8 +101,6 @@ PROVISIONAL = {
     'D_CRIMPED_MM': "confirm against delivery-system sizing",
     'STRUT_THICKNESS_MM': "confirm at G2; sits inside Kamenskiy 2026 DOE1 (100-250 um)",
     'STRUT_WIDTH_MM': "confirm at G2; inside Kamenskiy DOE1 (100-250 um); sets MIN_FEATURE_MM",
-    'F_METAL_MIN': "no source yet; tune against the S3 parametric family",
-    'F_METAL_MAX': "no source yet; tune against the S3 parametric family",
 }
 
 def cell_extent_mm():

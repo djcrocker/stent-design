@@ -42,7 +42,7 @@ def test_diamond_is_one_component(cell):
     _, count = periodic.label(cell)
     assert count == 1
 
-def test_label_counts_a_genuinely_split_field():
+def test_label_counts_a_split_field():
     """Two isolated blobs stay two."""
     a = np.zeros((32, 32), dtype=bool)
     a[4:8, 4:8] = True
