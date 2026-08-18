@@ -43,3 +43,25 @@ def plot_tiling(cell, n_circ=3, n_axial=3, ax=None, title=None, boundaries=True)
 
     ax.set_title(title or f"{n_circ} x {n_axial} tiling")
     return ax
+
+def plot_change(before, after, ax=None, title=None):
+    """Show a repair: material kept in grey, removed in red, added in blue."""
+    import numpy as np
+    if ax is None:
+        _, ax = plt.subplots(figsize=(4, 4))
+
+    b = before.to_array() if hasattr(before, 'to_array') else np.asarray(before, dtype=bool)
+    a = after.to_array() if hasattr(after, 'to_array') else np.asarray(after, dtype=bool)
+
+    rgb = np.ones(b.shape + (3,))
+    rgb[b & a] = (0.25, 0.25, 0.25)      # Kept
+    rgb[b & ~a] = (0.85, 0.20, 0.20)     # Removed
+    rgb[~b & a] = (0.20, 0.40, 0.85)     # Added
+
+    circ_mm, axial_mm = config.cell_extent_mm()
+    ax.imshow(rgb, origin='lower', extent=(0.0, circ_mm, 0.0, axial_mm),
+              interpolation='nearest')
+    ax.set_aspect('equal')
+    changed = float((a != b).mean())
+    ax.set_title(title or f'changed {changed:.1%}')
+    return ax
