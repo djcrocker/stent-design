@@ -14,3 +14,12 @@ py-modules = ["config"]
 
 [tool.setuptools.packages.find]
 include = ["geom*", "sim2d*", "sim3d*", "diffusion*", "screen*", "figures*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    # VTK sets .shape on a NumPy array, deprecated in NumPy 2.5. Third-party, fires ~19x
+    # per tube test, and nothing we can fix. Silenced narrowly by message so that warnings
+    # from our own code stay visible - the whole point of not blanket-ignoring.
+    "ignore:Setting the shape on a NumPy array has been deprecated:DeprecationWarning",
+]
