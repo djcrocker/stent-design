@@ -26,6 +26,7 @@ figures/paper/*
 *.lock
 *_files/
 file*.*
+ansys_output/
 
 # Python
 __pycache__/

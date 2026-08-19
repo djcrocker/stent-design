@@ -1,0 +1,38 @@
+S5.1 mesh verification - spikeA_fullring
+Ansys MAPDL 2026 R1 (Build 26.1), Ansys Student, 2026-08-19
+Deck: sim3d/decks/spikeA_fullring.inp   (regenerate: python -m sim3d.mesh3d)
+Loaded in 21 s. 48768 elements + 73020 nodes = 121788 total.
+========================================================================
+
+ PARAMETER STATUS- NE  (     17 PARAMETERS DEFINED)
+                  (INCLUDING       15 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NE                                48768.0000                  SCALAR
+
+ PARAMETER STATUS- NN  (     17 PARAMETERS DEFINED)
+                  (INCLUDING       15 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NN                                73020.0000                  SCALAR
+
+ SUMMARIZE SHAPE TESTING FOR ALL SELECTED ELEMENTS
+
+ ------------------------------------------------------------------------------
+            <<<<<<          SHAPE TESTING SUMMARY           >>>>>>
+            <<<<<<        FOR ALL SELECTED ELEMENTS         >>>>>>
+ ------------------------------------------------------------------------------
+                    --------------------------------------
+                    |  Element count     48768 SOLID185  |
+                    --------------------------------------
+
+  Test                Number tested  Warning count  Error count    Warn+Err %
+  ----                -------------  -------------  -----------    ----------
+  Aspect Ratio              48768              0             0         0.00 %
+  Parallel Deviation        48768              0             0         0.00 %
+  Maximum Angle             48768              0             0         0.00 %
+  Jacobian Ratio            48768              0             0         0.00 %
+  Warping Factor            48768              0             0         0.00 %
+
+  Any                       48768              0             0         0.00 %
+ ------------------------------------------------------------------------------

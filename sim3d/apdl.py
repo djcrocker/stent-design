@@ -41,7 +41,7 @@ TBDATA,1,{n['sigma_start_loading_MPa']},{n['sigma_finish_loading_MPa']},\
 {n['sigma_start_unloading_MPa']},{n['sigma_finish_unloading_MPa']},\
 {n['eps_transformation']},{alpha():.6f}"""
 
-def single_element_spike(strain=0.05, substeps=60, out_stem='sma_spike'):
+def single_element_spike(strain=0.05, substeps=60, out_stem='s0_2_spike_sma'):
     """
     One element, tension load-unload, dumping stress-strain to CSV.
 
