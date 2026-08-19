@@ -2,6 +2,10 @@
 **/data/*
 !**/data/.gitkeep
 
+# Generated Ansys decks
+sim3d/decks/*
+!sim3d/decks/.gitkeep
+
 # Rendered figures; scripts tracked, outputs not
 figures/dev/*
 !figures/dev/.gitkeep
