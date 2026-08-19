@@ -43,6 +43,29 @@ OBJECTIVE_KEYS = ('K_radial', 'eps_a_max', 'A_over_lim', 'f_metal')
 # reports >97% of optimized elements below it.
 EPS_A_LIM = 0.004
 
+# LIMB-FLEXION LOADING #
+# The cyclic deformation the fatigue surrogate imposes. Segment choice matters: the FPA 
+# isn't one loading environment. Default is the proximal SFA, matching where D_DEPLOYED_MM
+# came from; FLEX_AXIAL_COMPRESSION_BY_SEGMENT holds the others so the harsher popliteal
+# case can be run.
+FLEX_SEGMENT = 'SFA'
+FLEX_AXIAL_COMPRESSION_BY_SEGMENT = {   # (walking, most-flexed) peak axial compression
+    'SFA': (0.09, 0.15),
+    'AH': (0.11, 0.19),                 # adductor hiatus
+    'PA': (0.13, 0.25),                 # popliteal
+}
+# Walking is the high-cycle case, and Pelton's limit is a 10^7-cycle limit, so the fatigue
+# screen uses the walking value. Sitting and gardening are low-cycle and belong to a
+# separate, static-strength question.
+FLEX_AXIAL_COMPRESSION = FLEX_AXIAL_COMPRESSION_BY_SEGMENT[FLEX_SEGMENT][0]
+
+# Fatigue is driven by the alternating component. The artery cycles between the standing
+# baseline and the flexed state, so the amplitude is half the peak-to-peak range and the
+# mean is compressive at the same magnitude. EPS_A_LIM is an amplitude limit, so this is
+# the quantity that must be compared against it.
+FLEX_AXIAL_AMPLITUDE = FLEX_AXIAL_COMPRESSION / 2.0
+FLEX_AXIAL_MEAN = -FLEX_AXIAL_COMPRESSION / 2.0
+
 # VALIDITY THRESHOLDS #
 MIN_FEATURE_MM = 0.10
 # Degeneracy guards, not design targets. Conventional self-expanding nitinol stents cover
@@ -90,6 +113,15 @@ SOURCES = {
         "(industry trend is 110 um down to 60-85 um) and laser kerf is 12-50 um "
         "(femtosecond ~12 um, fiber 15-50 um), so 100 um is comfortably producible. Also "
         "the lower bound of Kamenskiy 2026 DOE1 (100-250 um); their DOE2 explores to 50 um."
+    ),
+    'FLEX_AXIAL_COMPRESSION': (
+        "Poulson W, Kamenskiy A, Seas A, Deegan P, Lomneth C, MacTaggart J. Limb "
+        "flexion-induced axial compression and bending in human femoropopliteal artery "
+        "segments. J Vasc Surg. 2018;67(2):607-613. doi:10.1016/j.jvs.2017.01.071 "
+        "(PMID 28526560). Nitinol markers in 28 in-situ FPAs from 14 human cadavers, CT at "
+        "standing 180deg / walking 110deg / sitting 90deg / gardening 60deg. Axial "
+        "compression: SFA 9-15%, adductor hiatus 11-19%, popliteal 13-25%. Bending sphere "
+        "radii 21-27 / 10-18 / 8-19 mm. Same group as the Kamenskiy 2026 baseline."
     ),
     'EPS_A_LIM': (
         "Pelton AR, Schroeder V, Mitchell MR, Gong X-Y, Barney M, Robertson SW. Fatigue "
