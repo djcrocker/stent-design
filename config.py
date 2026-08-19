@@ -44,7 +44,7 @@ OBJECTIVE_KEYS = ('K_radial', 'eps_a_max', 'A_over_lim', 'f_metal')
 EPS_A_LIM = 0.004
 
 # VALIDITY THRESHOLDS #
-MIN_FEATURE_MM = STRUT_WIDTH_MM  # min strut width a valid cell must sustain
+MIN_FEATURE_MM = 0.10
 # Degeneracy guards, not design targets. Conventional self-expanding nitinol stents cover
 # ~19-26% of the vessel wall (see sources); these span roughly half to twice that band so
 # generative designs may leave conventional practice, while near-empty and near-solid
@@ -84,6 +84,12 @@ SOURCES = {
         "an animal model of advanced atherosclerotic lesions. EuroIntervention 2010; "
         "PMID 20142227. Rabbit aortic model, not femoropopliteal - used as an order-of-"
         "magnitude anchor for the guard rails, not as a design target."
+    ),
+    'MIN_FEATURE_MM': (
+        "Conservative manufacturing floor. Modern nitinol stent struts run ~60-110 um "
+        "(industry trend is 110 um down to 60-85 um) and laser kerf is 12-50 um "
+        "(femtosecond ~12 um, fiber 15-50 um), so 100 um is comfortably producible. Also "
+        "the lower bound of Kamenskiy 2026 DOE1 (100-250 um); their DOE2 explores to 50 um."
     ),
     'EPS_A_LIM': (
         "Pelton AR, Schroeder V, Mitchell MR, Gong X-Y, Barney M, Robertson SW. Fatigue "
