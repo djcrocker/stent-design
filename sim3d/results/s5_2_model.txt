@@ -1,0 +1,40 @@
+S5.2 material on the Spike A mesh
+Ansys MAPDL 2026 R1, Ansys Student, 2026-08-19
+Deck: sim3d/decks/s5_2_model.inp   (regenerate: python -m sim3d.apdl)
+
+Superelastic card bound to all 8128 elements of spikeA_sector; 0.2% axial stretch.
+Peak von Mises 66.5 MPa, so the response is elastic and hand-checkable.
+
+66.5 MPa is ~0.51x the nominal E*strain = 130 MPa. Expected: a cellular
+structure accommodates global strain by strut bending rather than stretching,
+so local material strain sits below the applied global strain. Implied attenuation
+~2.0x, consistent with the 1.49-2.09x the 2D screen measures (sim2d/fatigue.py).
+
+Note that the sector cut faces are free in this run: no cyclic symmetry constraints
+are applied yet. This is fine for proving the material binds; must be added or the
+model is a free strip rather than 1/12 of a ring.
+========================================================================
+
+ PARAMETER STATUS- NE  (      8 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NE                                8128.00000                  SCALAR
+
+ PARAMETER STATUS- NN  (      8 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NN                                12385.0000                  SCALAR
+
+ PARAMETER STATUS- SMAXV  (      8 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ SMAXV                             66.4583925                  SCALAR
+
+ PARAMETER STATUS- UMAXV  (      8 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ UMAXV                            6.364280457E-003             SCALAR

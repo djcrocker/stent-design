@@ -253,16 +253,17 @@ def write_apdl_mesh(points, hexes, path, etype=185, mat=1):
         f'! {points.shape[0]} nodes, {hexes.shape[0]} hexahedra',
         '/PREP7',
         f'ET,1,SOLID{etype}',
+        # Enhanced strain formulation. The default B-bar formulation shear-locks in
+        # bending. Locking would inflate stiffness and distort the strain field, hitting
+        # eps_a_max.
+        'KEYOPT,1,2,2',
         f'TYPE,1 $ MAT,{mat}',
     ]
     lines += [f'N,{i + 1},{x:.6f},{y:.6f},{z:.6f}'
               for i, (x, y, z) in enumerate(points)]
     lines += ['EN,{},{}'.format(k + 1, ','.join(str(n + 1) for n in row))
               for k, row in enumerate(hexes)]
-    # Self-documenting import: echo off while the ~20k N/EN commands stream in (the GUI
-    # echoing every one made a 5.7 s CPU import take 532 s wall clock), then capture the
-    # counts and Ansys's own shape check to a file. Without this the verification exists
-    # only in the GUI scrollback.
+    # Self-documenting import: echo off while the ~20k N/EN commands stream in.
     stem = path.stem
     lines.insert(3, '/NOPR')
     lines += [
