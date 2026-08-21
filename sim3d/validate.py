@@ -22,6 +22,8 @@ PROCESSOR_ONLY = {
 PROCESSOR_STARTS = {'/PREP7': 'PREP7', '/SOLU': 'SOLU', '/POST1': 'POST1',
                     '/POST26': 'POST26'}
 
+BEGIN_ONLY = {'/FILNAME', '/CLEAR', '/CWD', '/CONFIG'}
+
 def check(text):
     """Return a list of problems found in an APDL deck."""
     problems = []
@@ -37,6 +39,13 @@ def check(text):
             continue
         if head == 'FINISH':
             processor = None
+            continue
+
+        if head in BEGIN_ONLY and processor is not None:
+            problems.append(
+                f'Line {lineno}: {head} is only valid at the Begin level but appears '
+                f'in /{processor}.'
+            )
             continue
 
         for owner, commands in PROCESSOR_ONLY.items():

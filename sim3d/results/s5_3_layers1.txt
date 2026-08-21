@@ -1,0 +1,24 @@
+
+ PARAMETER STATUS- NELEM  (     10 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NELEM                             92.0000000                  SCALAR
+
+ PARAMETER STATUS- UZTIP  (     10 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ UZTIP                            4.810889464E-002             SCALAR
+
+ PARAMETER STATUS- ANALYTIC  (     10 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ ANALYTIC                         4.816120519E-002             SCALAR
+
+ PARAMETER STATUS- RATIO  (     10 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ RATIO                            0.998913845                  SCALAR

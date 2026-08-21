@@ -1,0 +1,48 @@
+
+ PARAMETER STATUS- NELEM  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NELEM                             184.000000                  SCALAR
+
+ PARAMETER STATUS- NESEL  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NESEL                             8.00000000                  SCALAR
+
+ PARAMETER STATUS- NNSEL  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NNSEL                             3.00000000                  SCALAR
+
+ PARAMETER STATUS- EPSSURF  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ EPSSURF                          3.178639542E-004             SCALAR
+
+ PARAMETER STATUS- ECENTR  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ ECENTR                           1.625649145E-004             SCALAR
+
+ PARAMETER STATUS- ENODAL  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ ENODAL                          -3.178639454E-004             SCALAR
+
+ PARAMETER STATUS- RCENTR  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ RCENTR                           0.511429221                  SCALAR
+
+ PARAMETER STATUS- RNODAL  (     13 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ RNODAL                          -0.999999972                  SCALAR
