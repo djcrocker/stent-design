@@ -1,0 +1,17 @@
+{
+  "K_radial_3D": 27.128284367006266,
+  "eps_a_max_3D": 0.03404637532,
+  "A_over_lim_3D": 0.1831655152809939,
+  "eps_a_lim": 0.004,
+  "mesh": {
+    "nodes": 12385,
+    "hexes": 8128,
+    "n_axial": 2,
+    "n_circ": 1,
+    "layers": 4
+  },
+  "source": {
+    "status": "s5_3_loadsteps.txt",
+    "amplitudes": "s5_3_loadsteps_amp.txt"
+  }
+}

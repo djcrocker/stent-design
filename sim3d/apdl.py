@@ -566,6 +566,12 @@ SET,4,LAST
 *VSCFUN,EPSRANGE,MAX,AD(1)
 EPSAMP = 0.5*EPSRANGE
 
+! ---- The whole per-node strain range field, for the volume-weighted A_over_lim.
+/OUTPUT,{out_stem}_amp,txt
+*VWRITE,AD(1)
+(E16.8)
+/OUTPUT
+
 /OUTPUT,{out_stem},txt
 *STATUS,NOUTER
 *STATUS,ZMAX

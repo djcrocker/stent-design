@@ -5,8 +5,12 @@ Ansys reports raw quantities: imposed displacement, reaction force, per-element 
 Everything derived is computed here instead, where it can be unit-tested.
 """
 
+import json
+import pathlib
 import re
+
 import numpy as np
+
 import config
 
 def read_status(path):
@@ -54,6 +58,90 @@ def summarise(status_path, radial_mm=0.01, n_axial=2, n_circ=1):
     if 'EPS3ETAB' in v and v.get('EPS3'):
         result['eps_etable_over_nodal'] = v['EPS3ETAB'] / v['EPS3']
     return result
+
+
+# Hex -> tets, for exact element volumes.
+_TETS = [(0, 1, 3, 4), (1, 2, 3, 6), (1, 3, 4, 6), (3, 4, 6, 7), (1, 4, 5, 6)]
+
+def read_node_amplitudes(path, halve=True):
+    """
+    Per-node strain amplitude from the deck's `*VWRITE` dump.
+
+    The deck writes the strain range between the flexed and released states; the amplitude
+    is half of it. Values are indexed by APDL node number, so index 0 is node 1.
+    """
+    values = []
+    for line in pathlib.Path(path).read_text(errors='ignore').splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            values.append(float(line))
+        except ValueError:
+            continue        # Header or banner text
+    out = np.array(values, dtype=float)
+    return 0.5 * out if halve else out
+
+def element_volumes(points, hexes):
+    """Exact hex volumes by tetrahedral decomposition."""
+    P = points[hexes]
+    vol = np.zeros(len(hexes))
+    for a, b, c, d in _TETS:
+        vol += np.abs(np.einsum('ij,ij->i', P[:, b] - P[:, a], np.cross(P[:, c] - P[:, a], P[:, d] - P[:, a]))) / 6.0
+    return vol
+
+def lumped_node_volumes(points, hexes):
+    """
+    Volume attributed to each node: each element donates vol/8 to each of its nodes.
+
+    This is the discrete analogue of the 2D screen's quadrature weights, which is what
+    makes A_over_lim_3D the same quantity as A_over_lim.
+    """
+    vol = element_volumes(points, hexes)
+    lumped = np.zeros(points.shape[0])
+    np.add.at(lumped, hexes.ravel(), np.repeat(vol / 8.0, hexes.shape[1]))
+    return lumped
+
+def a_over_lim_3d(amplitudes, points, hexes, limit=None):
+    """
+    Volume fraction of the structure whose strain amplitude exceeds the nitinol limit.
+
+    Same definition as sim2d.fatigue.A_over_lim, with volume in place of area.
+    """
+    limit = config.EPS_A_LIM if limit is None else limit
+    lumped = lumped_node_volumes(points, hexes)
+    amp = amplitudes[:points.shape[0]]
+    if amp.shape[0] != points.shape[0]:
+        raise ValueError(f'{amp.shape[0]} amplitudes for {points.shape[0]} nodes')
+    over = amp > limit
+    return float(lumped[over].sum() / lumped.sum())
+
+def extract_scalars(status_path=None, amp_path=None, n_axial=2, n_circ=1, layers=4, radial_mm=0.01, out_path=None):
+    """The three 3D scalars for the reference cell."""
+    from geom import reference
+    from sim3d import mesh3d
+
+    results = config.PROJECT_ROOT / 'sim3d' / 'results'
+    status_path = results / 's5_3_loadsteps.txt' if status_path is None else status_path
+    amp_path = results / 's5_3_loadsteps_amp.txt' if amp_path is None else amp_path
+    out_path = results / 's5_4_scalars.json' if out_path is None else out_path
+
+    summary = summarise(status_path, radial_mm, n_axial, n_circ)
+    cell = reference.build()
+    points, hexes, _ = mesh3d.tube_hex_mesh(cell, n_circ=n_circ, n_axial=n_axial, layers=layers)
+    amp = read_node_amplitudes(amp_path)
+    scalars = {
+        'K_radial_3D': summary['K_radial_3D'],
+        'eps_a_max_3D': summary['eps_a_max_3D'],
+        'A_over_lim_3D': a_over_lim_3d(amp, points, hexes),
+        'eps_a_lim': config.EPS_A_LIM,
+        'mesh': {'nodes': int(points.shape[0]), 'hexes': int(hexes.shape[0]),
+                 'n_axial': n_axial, 'n_circ': n_circ, 'layers': layers},
+        'source': {'status': str(pathlib.Path(status_path).name),
+                   'amplitudes': str(pathlib.Path(amp_path).name)},
+    }
+    pathlib.Path(out_path).write_text(json.dumps(scalars, indent=2), encoding='utf-8')
+    return scalars
 
 def read_prvar_history(path, n_columns=5, offset=1, width=14):
     """Parse a POST26 PRVAR table into an (n, n_columns) array."""
