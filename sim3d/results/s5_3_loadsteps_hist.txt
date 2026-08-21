@@ -1,9 +1,3 @@
-S5.3 (Part 1) - radial stiffness and axial compression cycle (Spike A sector)
-Ansys MAPDL 2026 R1, Ansys Student, 2026-08-20
-Deck: sim3d/decks/s5_3_loadsteps.inp   (regenerate: python -m sim3d.apdl)
-Sector 1/12 x 2 cells, cyclic symmetry, no crimp.
-LS1 radial displacement -0.01 mm | LS2 release | LS3 axial -9% | LS4 release
-========================================================================
 
  STORAGE COMPLETE FOR     48 DATA POINTS 
 

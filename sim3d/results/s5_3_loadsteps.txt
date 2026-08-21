@@ -1,48 +1,60 @@
-S5.3 (Part 1) - radial stiffness and axial compression cycle (Spike A sector)
-Ansys MAPDL 2026 R1, Ansys Student, 2026-08-20
-Deck: sim3d/decks/s5_3_loadsteps.inp   (regenerate: python -m sim3d.apdl)
-Sector 1/12 x 2 cells, cyclic symmetry, no crimp.
-LS1 radial displacement -0.01 mm | LS2 release | LS3 axial -9% | LS4 release
-========================================================================
 
- PARAMETER STATUS- NOUTER  (     14 PARAMETERS DEFINED)
+ PARAMETER STATUS- NOUTER  (     21 PARAMETERS DEFINED)
                   (INCLUDING        3 INTERNAL PARAMETERS)
 
  NAME                              VALUE                        TYPE  DIMENSIONS
  NOUTER                            2477.00000                  SCALAR
 
- PARAMETER STATUS- ZMAX  (     14 PARAMETERS DEFINED)
+ PARAMETER STATUS- ZMAX  (     21 PARAMETERS DEFINED)
                   (INCLUDING        3 INTERNAL PARAMETERS)
 
  NAME                              VALUE                        TYPE  DIMENSIONS
  ZMAX                              3.14159300                  SCALAR
 
- PARAMETER STATUS- DAXIAL  (     14 PARAMETERS DEFINED)
+ PARAMETER STATUS- DAXIAL  (     21 PARAMETERS DEFINED)
                   (INCLUDING        3 INTERNAL PARAMETERS)
 
  NAME                              VALUE                        TYPE  DIMENSIONS
  DAXIAL                          -0.282743370                  SCALAR
 
- PARAMETER STATUS- FRADIAL  (     14 PARAMETERS DEFINED)
+ PARAMETER STATUS- FRADIAL  (     21 PARAMETERS DEFINED)
                   (INCLUDING        3 INTERNAL PARAMETERS)
 
  NAME                              VALUE                        TYPE  DIMENSIONS
  FRADIAL                           1.43690050                  SCALAR
 
- PARAMETER STATUS- EPS3  (     14 PARAMETERS DEFINED)
+ PARAMETER STATUS- EPS3  (     21 PARAMETERS DEFINED)
                   (INCLUDING        3 INTERNAL PARAMETERS)
 
  NAME                              VALUE                        TYPE  DIMENSIONS
- EPS3                             6.074327857E-002             SCALAR
+ EPS3                             6.811916055E-002             SCALAR
 
- PARAMETER STATUS- EPS4  (     14 PARAMETERS DEFINED)
+ PARAMETER STATUS- EPS4  (     21 PARAMETERS DEFINED)
                   (INCLUDING        3 INTERNAL PARAMETERS)
 
  NAME                              VALUE                        TYPE  DIMENSIONS
- EPS4                             7.068358028E-005             SCALAR
+ EPS4                             1.578588053E-004             SCALAR
 
- PARAMETER STATUS- EPSAMP  (     14 PARAMETERS DEFINED)
+ PARAMETER STATUS- EPS3ETAB  (     21 PARAMETERS DEFINED)
                   (INCLUDING        3 INTERNAL PARAMETERS)
 
  NAME                              VALUE                        TYPE  DIMENSIONS
- EPSAMP                           3.036444695E-002             SCALAR
+ EPS3ETAB                         6.074327857E-002             SCALAR
+
+ PARAMETER STATUS- RATIO3  (     21 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ RATIO3                           0.891720892                  SCALAR
+
+ PARAMETER STATUS- EPSRANGE  (     21 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ EPSRANGE                         6.809275063E-002             SCALAR
+
+ PARAMETER STATUS- EPSAMP  (     21 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ EPSAMP                           3.404637532E-002             SCALAR

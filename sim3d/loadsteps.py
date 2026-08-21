@@ -51,6 +51,8 @@ def summarise(status_path, radial_mm=0.01, n_axial=2, n_circ=1):
     if 'EPSAMP' in v:
         result['eps_a_max_3D'] = v['EPSAMP']
         result['over_limit'] = v['EPSAMP'] > config.EPS_A_LIM
+    if 'EPS3ETAB' in v and v.get('EPS3'):
+        result['eps_etable_over_nodal'] = v['EPS3ETAB'] / v['EPS3']
     return result
 
 def read_prvar_history(path, n_columns=5, offset=1, width=14):
@@ -93,7 +95,8 @@ if __name__ == "__main__":
             else str(config.PROJECT_ROOT / 'sim3d' / 'results' / 's5_3_loadsteps.txt'))
     result = summarise(path)
     print(f'Reading {path}\n')
-    for key in ('NOUTER', 'ZMAX', 'DAXIAL', 'FRADIAL', 'EPS3', 'EPS4', 'EPSAMP'):
+    for key in ('NOUTER', 'ZMAX', 'DAXIAL', 'FRADIAL', 'EPS3', 'EPS4',
+                'EPS3ETAB', 'EPSRANGE', 'EPSAMP'):
         if key in result:
             print(f'  {key:16} {result[key]:.6g}')
     print()
@@ -103,6 +106,11 @@ if __name__ == "__main__":
     if 'eps_a_max_3D' in result:
         print(f'  {"eps_a_max_3D":16} {result["eps_a_max_3D"]:.6f}'
               f'   over the {config.EPS_A_LIM} limit: {result["over_limit"]}')
+    if 'eps_etable_over_nodal' in result:
+        r = result['eps_etable_over_nodal']
+        print(f'  {"ETABLE/nodal":16} {r:.4f}   '
+              f'(cantilever measured 0.7665 at 4 layers)')
+        print(f'  {"":16} centroidal sampling was low by {100*(1-r):.1f} % on this mesh')
 
     from geom import reference
     from sim2d.fatigue import fatigue

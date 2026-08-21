@@ -11,7 +11,9 @@ import config
 # Commands valid only in the processor named. Not exhaustive.
 PROCESSOR_ONLY = {
     'POST1': {'FSUM', 'NSORT', 'ESORT', 'ETABLE', 'SADD', 'SET', 'PLNSOL', 'PLESOL',
-              'PRNSOL', 'PRESOL', 'NSEL_RESULT', 'SUMTYPE'},
+              'PRNSOL', 'PRESOL', 'NSEL_RESULT', 'SUMTYPE',
+              'LCDEF', 'LCWRITE', 'LCASE', 'LCOPER', 'LCZERO', 'LCFILE',
+              'FILE'},
     'POST26': {'NSOL', 'ESOL', 'RFORCE', 'PRVAR', 'PLVAR', 'NUMVAR', 'XVAR', 'STORE'},
     'SOLU': {'SOLVE', 'ANTYPE', 'NLGEOM', 'NSUBST', 'AUTOTS', 'CNVTOL', 'OUTRES',
              'LNSRCH', 'TIME', 'DELTIM', 'NEQIT', 'RESCONTROL'},
@@ -22,7 +24,7 @@ PROCESSOR_ONLY = {
 PROCESSOR_STARTS = {'/PREP7': 'PREP7', '/SOLU': 'SOLU', '/POST1': 'POST1',
                     '/POST26': 'POST26'}
 
-BEGIN_ONLY = {'/FILNAME', '/CLEAR', '/CWD', '/CONFIG'}
+BEGIN_ONLY = {'/FILNAME', '/CLEAR', '/CWD', '/CONFIG', 'RESUME'}
 
 def check(text):
     """Return a list of problems found in an APDL deck."""

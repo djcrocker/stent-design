@@ -147,8 +147,7 @@ def relax_interior(nodes_px, quads, boundary, n_t, iterations=30, factor=0.3, pe
             out[interior, 1] %= n_t
     return out
 
-def tube_hex_mesh(cell, n_circ=None, n_axial=1, layers=4, sigma_px=0.8,
-                  project=True, relax=40, passes=8):
+def tube_hex_mesh(cell, n_circ=None, n_axial=1, layers=4, sigma_px=0.8, project=True, relax=40, passes=8):
     """
     Hexahedral tube mesh. Returns (points_mm, hexes, info).
 
@@ -197,11 +196,11 @@ def tube_hex_mesh(cell, n_circ=None, n_axial=1, layers=4, sigma_px=0.8,
     return points, hexes, info
 
 def max_face_angle(points, hexes):
-    """Largest interior face angle per element, in degrees.
+    """
+    Largest interior face angle per element, in degrees.
 
-    This is the criterion Ansys's own shape checker warns on (>155 deg for bricks), so it is
-    what the smoothing should be tuned against: a scaled Jacobian can look acceptable while
-    one face is nearly folded flat.
+    This is the criterion Ansys's shape checker warns on (>155 deg for bricks), so it's
+    what the smoothing should be tuned against.
     """
     faces = ((0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4),
              (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7))
@@ -292,14 +291,16 @@ def build_and_write(cell, path, n_circ=None, n_axial=1, layers=4, sigma_px=0.8, 
     return info, q
 
 # Meshes this module emits: filename -> (n_circ, n_axial, note).
+# name -> (n_circ, n_axial, layers, note)
 MESHES = {
-    'spikeA_sector.inp': (1, 2, '1/12 sector, cyclic symmetry'),
-    'spikeA_fullring.inp': (None, 1, 'full ring'),
+    'spikeA_sector.inp': (1, 2, 4, '1/12 sector, cyclic symmetry'),
+    'spikeA_fullring.inp': (None, 1, 4, 'full ring'),
+    'spikeA_fullring_L2.inp': (None, 1, 2, 'full ring, 2 layers, for self-contact'),
 }
 
 DECK_DIR = config.PROJECT_ROOT / 'sim3d' / 'decks'
 
-def write_meshes(directory=None, layers=4):
+def write_meshes(directory=None, layers=None):
     """Write every mesh in MESHES. Returns a list of (path, info, quality)."""
     from geom import reference
 
@@ -307,9 +308,9 @@ def write_meshes(directory=None, layers=4):
     directory.mkdir(parents=True, exist_ok=True)
     cell = reference.build()
     written = []
-    for name, (n_circ, n_axial, _) in MESHES.items():
-        info, q = build_and_write(cell, directory / name, n_circ=n_circ,
-                                  n_axial=n_axial, layers=layers)
+    for name, (n_circ, n_axial, n_layers, _) in MESHES.items():
+        info, q = build_and_write(cell, directory / name, n_circ=n_circ, n_axial=n_axial,
+                                  layers=n_layers if layers is None else layers)
         written.append((directory / name, info, q))
     return written
 
@@ -320,7 +321,7 @@ if __name__ == "__main__":
     print(f'Generating from the reference cell  (f_metal={cell.f_metal:.4f}, '
           f'GRID_N={config.GRID_N}, N_CIRC={config.N_CIRC})')
     for path, info, q in write_meshes():
-        note = MESHES[path.name][2]
+        note = MESHES[path.name][3]
         print(f'\n  {path.relative_to(config.PROJECT_ROOT)}  ({info["bytes"] / 1e6:.1f} MB)')
         print(f'    {note}')
         print(f'    {info["n_hexes"]:,} hexes / {info["n_points"]:,} nodes, '

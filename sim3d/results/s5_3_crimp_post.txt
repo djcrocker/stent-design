@@ -1,0 +1,15 @@
+
+ PARAMETER STATUS- NSETS  (     19 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NSETS                             1.00000000                  SCALAR
+
+ PARAMETER STATUS- NOUT1  (     19 PARAMETERS DEFINED)
+                  (INCLUDING        3 INTERNAL PARAMETERS)
+
+ NAME                              VALUE                        TYPE  DIMENSIONS
+ NOUT1                             29209.0000                  SCALAR
+  
+  LSTEP     TIME       EPS_MAX      P_CRIMPER      P_SELF         UR_OUTER
+    1.     1.00000     0.17625E+00     0.48634E+03     0.00000E+00    -0.77927E+00
