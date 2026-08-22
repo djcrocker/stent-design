@@ -1,0 +1,139 @@
+{
+  "n_converged": 56,
+  "n_total": 60,
+  "gate_rho": 0.7,
+  "gate_metrics": [
+    "K_radial",
+    "eps_a_max"
+  ],
+  "overall": {
+    "K_radial": {
+      "metric": "K_radial",
+      "n": 56,
+      "rho": 0.8950066646160155,
+      "p": 1.4023519144717184e-20,
+      "ci95": [
+        0.797175386844728,
+        0.9467979027286825
+      ],
+      "higher_is_better": true,
+      "retention": {
+        "5": 0.6,
+        "10": 0.9,
+        "20": 0.85,
+        "30": 0.8333333333333334
+      },
+      "gates": true,
+      "passes": true
+    },
+    "eps_a_max": {
+      "metric": "eps_a_max",
+      "n": 56,
+      "rho": 0.8602139512628592,
+      "p": 2.0052216363169414e-17,
+      "ci95": [
+        0.716545165819849,
+        0.936632772819052
+      ],
+      "higher_is_better": false,
+      "retention": {
+        "5": 1.0,
+        "10": 0.9,
+        "20": 0.85,
+        "30": 0.9
+      },
+      "gates": true,
+      "passes": true
+    },
+    "A_over_lim": {
+      "metric": "A_over_lim",
+      "n": 56,
+      "rho": 0.8393656652653884,
+      "p": 6.460406337132902e-16,
+      "ci95": [
+        0.6958526050683296,
+        0.9273805026872961
+      ],
+      "higher_is_better": false,
+      "retention": {
+        "5": 0.8,
+        "10": 1.0,
+        "20": 0.9,
+        "30": 0.8333333333333334
+      },
+      "gates": false,
+      "passes": false
+    }
+  },
+  "by_family": {
+    "crown": {
+      "K_radial": {
+        "metric": "K_radial",
+        "n": 52,
+        "rho": 0.8949030991206351,
+        "p": 3.765971113536848e-19,
+        "ci95": [
+          0.7942724955430641,
+          0.9463366701433831
+        ],
+        "higher_is_better": true,
+        "retention": {
+          "5": 0.6,
+          "10": 1.0,
+          "20": 0.8,
+          "30": 0.8666666666666667
+        },
+        "gates": true,
+        "passes": true
+      },
+      "eps_a_max": {
+        "metric": "eps_a_max",
+        "n": 52,
+        "rho": 0.8290788013318535,
+        "p": 3.1891460306314594e-14,
+        "ci95": [
+          0.6624964745791785,
+          0.9230526709268434
+        ],
+        "higher_is_better": false,
+        "retention": {
+          "5": 1.0,
+          "10": 0.9,
+          "20": 0.95,
+          "30": 0.8333333333333334
+        },
+        "gates": true,
+        "passes": true
+      },
+      "A_over_lim": {
+        "metric": "A_over_lim",
+        "n": 52,
+        "rho": 0.8221634081789464,
+        "p": 7.881659343557914e-14,
+        "ci95": [
+          0.6586142406933123,
+          0.9233369370979377
+        ],
+        "higher_is_better": false,
+        "retention": {
+          "5": 0.8,
+          "10": 1.0,
+          "20": 0.95,
+          "30": 0.8666666666666667
+        },
+        "gates": false,
+        "passes": false
+      }
+    },
+    "handmade": {
+      "n": 3,
+      "note": "too few cells for a rho"
+    },
+    "reference": {
+      "n": 1,
+      "note": "too few cells for a rho"
+    }
+  },
+  "gate_passed": true,
+  "gate_ci_clears": true
+}
