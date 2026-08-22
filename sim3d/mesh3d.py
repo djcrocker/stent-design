@@ -66,7 +66,7 @@ def quad_mesh_2d(cell, n_circ=None, n_axial=1):
     boundary[np.unique(boundary_edges)] = True
     return nodes, quads, boundary, full_ring
 
-def project_to_level_set(nodes_px, boundary, cell, sigma_px=0.8, n_circ=None, n_axial=1, iterations=3):
+def project_to_level_set(nodes_px, boundary, cell, sigma_px=0.8, n_circ=None, n_axial=1, iterations=3, limit=0.30):
     """
     Move boundary nodes onto the smooth 0.5 isocontour, by Newton steps along the gradient.
 
@@ -101,7 +101,6 @@ def project_to_level_set(nodes_px, boundary, cell, sigma_px=0.8, n_circ=None, n_
 
     # A projection step must never move a node further than the smoothing length.
     moved = np.linalg.norm(out - nodes_px, axis=1)
-    limit = 0.30
     clamp = moved > limit
     if clamp.any():
         scale = limit / moved[clamp]
@@ -147,7 +146,7 @@ def relax_interior(nodes_px, quads, boundary, n_t, iterations=30, factor=0.3, pe
             out[interior, 1] %= n_t
     return out
 
-def tube_hex_mesh(cell, n_circ=None, n_axial=1, layers=4, sigma_px=0.8, project=True, relax=40, passes=8):
+def tube_hex_mesh(cell, n_circ=None, n_axial=1, layers=4, sigma_px=0.8, project=True, relax=40, passes=8, limit=0.30):
     """
     Hexahedral tube mesh. Returns (points_mm, hexes, info).
 
@@ -158,7 +157,7 @@ def tube_hex_mesh(cell, n_circ=None, n_axial=1, layers=4, sigma_px=0.8, project=
     nodes_px, quads, boundary, full_ring = quad_mesh_2d(cell, n_circ, n_axial)
     if project:
         # Project the boundary onto the level set, then relax the interior only.
-        nodes_px = project_to_level_set(nodes_px, boundary, cell, sigma_px, n_circ, n_axial)
+        nodes_px = project_to_level_set(nodes_px, boundary, cell, sigma_px, n_circ, n_axial, limit=limit)
         nodes_px = relax_interior(nodes_px, quads, boundary, n_t=cell.n * n_circ, iterations=relax, periodic=full_ring)
 
     mm = config.mm_per_px()[0]
@@ -279,10 +278,9 @@ def write_apdl_mesh(points, hexes, path, etype=185, mat=1):
     path.write_text(chr(10).join(lines) + chr(10), encoding='utf-8')
     return path
 
-def build_and_write(cell, path, n_circ=None, n_axial=1, layers=4, sigma_px=0.8, project=True, relax=40, passes=8):
+def build_and_write(cell, path, n_circ=None, n_axial=1, layers=4, sigma_px=0.8, project=True, relax=40, passes=8, limit=0.30):
     """Mesh a cell and write the APDL deck. Returns (info, quality)."""
-    points, hexes, info = tube_hex_mesh(cell, n_circ, n_axial, layers, sigma_px,
-                                        project, relax, passes)
+    points, hexes, info = tube_hex_mesh(cell, n_circ, n_axial, layers, sigma_px, project, relax, passes, limit=limit)
     info['orphan_nodes'] = orphan_nodes(points, hexes)
     q = quality(points, hexes)
     write_apdl_mesh(points, hexes, path)

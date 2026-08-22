@@ -412,7 +412,9 @@ NSORT,U,SUM
 FINISH
 """
 
-def spike_a_loadsteps(mesh='spikeA_sector', deck_dir=None, radial_mm=0.01, out_stem='s5_3_loadsteps'):
+def spike_a_loadsteps(mesh='spikeA_sector', deck_dir=None, radial_mm=0.01,
+                      out_stem='s5_3_loadsteps', outres='ALL,ALL',
+                      nsubst='20,200,10'):
     """
     Cyclic symmetry, radial stiffness, and a full axial compression cycle.
 
@@ -486,7 +488,7 @@ ANTYPE,STATIC
 NLGEOM,ON
 LNSRCH,ON
 AUTOTS,ON
-OUTRES,ALL,ALL
+OUTRES,{outres}
 ! MINREF: LS2 and LS4 return to zero load, where the reference force collapses and
 ! Newton-Raphson would otherwise check against an internal floor.
 CNVTOL,F,,0.005,,1.0E-4
@@ -496,7 +498,7 @@ CNVTOL,U,,0.05,,1.0E-6
 CMSEL,S,OUTER
 D,ALL,UX,-{radial_mm}
 NSEL,ALL
-NSUBST,20,200,10
+NSUBST,{nsubst}
 TIME,1
 SOLVE
 
@@ -504,7 +506,7 @@ SOLVE
 CMSEL,S,OUTER
 DDELE,ALL,UX
 NSEL,ALL
-NSUBST,20,200,10
+NSUBST,{nsubst}
 TIME,2
 SOLVE
 
@@ -513,7 +515,7 @@ DAXIAL = -{compression}*ZMAX
 NSEL,S,LOC,Z,ZMAX
 D,ALL,UZ,DAXIAL
 NSEL,ALL
-NSUBST,20,200,10
+NSUBST,{nsubst}
 TIME,3
 SOLVE
 
@@ -521,7 +523,7 @@ SOLVE
 NSEL,S,LOC,Z,ZMAX
 D,ALL,UZ,0
 NSEL,ALL
-NSUBST,20,200,10
+NSUBST,{nsubst}
 TIME,4
 SOLVE
 FINISH
