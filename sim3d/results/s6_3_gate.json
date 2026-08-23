@@ -1,0 +1,137 @@
+{
+  "step": "S6.3",
+  "verdict": "PASSED",
+  "proceed_to_stage_7": true,
+  "threshold": 0.7,
+  "gate_metrics": [
+    "K_radial",
+    "eps_a_max"
+  ],
+  "gate_passed": true,
+  "gate_ci_clears": true,
+  "n_converged": 56,
+  "n_total": 60,
+  "metrics": {
+    "K_radial": {
+      "rho": 0.8950066646160155,
+      "ci95": [
+        0.797175386844728,
+        0.9467979027286825
+      ],
+      "gates": true,
+      "passes": true,
+      "retention": {
+        "5": 0.6,
+        "10": 0.9,
+        "20": 0.85,
+        "30": 0.8333333333333334
+      }
+    },
+    "eps_a_max": {
+      "rho": 0.8602139512628592,
+      "ci95": [
+        0.716545165819849,
+        0.936632772819052
+      ],
+      "gates": true,
+      "passes": true,
+      "retention": {
+        "5": 1.0,
+        "10": 0.9,
+        "20": 0.85,
+        "30": 0.9
+      }
+    },
+    "A_over_lim": {
+      "rho": 0.8393656652653884,
+      "ci95": [
+        0.6958526050683296,
+        0.9273805026872961
+      ],
+      "gates": false,
+      "passes": false,
+      "retention": {
+        "5": 0.8,
+        "10": 1.0,
+        "20": 0.9,
+        "30": 0.8333333333333334
+      }
+    }
+  },
+  "by_family_n": {
+    "crown": 52,
+    "handmade": 3,
+    "reference": 1
+  },
+  "difficulty_coupling": {
+    "K_radial": {
+      "rho": -0.0805203199486111,
+      "p": 0.5552391009276005
+    },
+    "eps_a_max": {
+      "rho": 0.3663026175859418,
+      "p": 0.0054938898541206415
+    },
+    "A_over_lim": {
+      "rho": 0.5646406770029393,
+      "p": 5.8180611578979784e-06
+    }
+  },
+  "caveats": [
+    {
+      "id": "generalization_untested",
+      "detail": "Only 3 cells from a different topology family survived, too few for a per-family rho.",
+      "evidence": {
+        "by_family": {
+          "crown": 52,
+          "handmade": 3,
+          "reference": 1
+        },
+        "surviving_other_family": [
+          "s6_hand00",
+          "s6_hand01",
+          "s6_hand02"
+        ],
+        "excluded": [
+          "s6_cell43",
+          "s6_cell47",
+          "s6_hand03",
+          "s6_hand04"
+        ]
+      }
+    },
+    {
+      "id": "error_tracks_solver_difficulty",
+      "detail": "Rank disagreement rises with the number of bisection retries, so on hard cells neither the surrogate nor the 3D truth is fully trustworthy.",
+      "evidence": {
+        "eps_a_max": {
+          "rho": 0.3663026175859418,
+          "p": 0.0054938898541206415
+        },
+        "A_over_lim": {
+          "rho": 0.5646406770029393,
+          "p": 5.8180611578979784e-06
+        }
+      }
+    },
+    {
+      "id": "ci_close_to_threshold",
+      "detail": "A gate metric clears only narrowly once sampling error is accounted for.",
+      "evidence": {
+        "eps_a_max": 0.716545165819849
+      }
+    },
+    {
+      "id": "excluded_cells_not_random",
+      "detail": "4 of 60 cells have no 3D result, and they skew to harder designs.",
+      "evidence": {
+        "excluded": [
+          "s6_cell43",
+          "s6_cell47",
+          "s6_hand03",
+          "s6_hand04"
+        ]
+      }
+    }
+  ]
+}

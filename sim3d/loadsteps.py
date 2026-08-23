@@ -45,7 +45,7 @@ def k_radial_3d(radial_force_N, radial_disp_mm, n_axial=2, n_circ=1):
     pressure = abs(radial_force_N) / sector_outer_area_mm2(n_axial, n_circ)
     return pressure / abs(radial_disp_mm)
 
-def summarise(status_path, radial_mm=0.01, n_axial=2, n_circ=1):
+def summarize(status_path, radial_mm=0.01, n_axial=2, n_circ=1):
     """Deck's *STATUS dump."""
     v = read_status(status_path)
     result = dict(v)
@@ -126,7 +126,7 @@ def extract_scalars(status_path=None, amp_path=None, n_axial=2, n_circ=1, layers
     amp_path = results / 's5_3_loadsteps_amp.txt' if amp_path is None else amp_path
     out_path = results / 's5_4_scalars.json' if out_path is None else out_path
 
-    summary = summarise(status_path, radial_mm, n_axial, n_circ)
+    summary = summarize(status_path, radial_mm, n_axial, n_circ)
     cell = reference.build()
     points, hexes, _ = mesh3d.tube_hex_mesh(cell, n_circ=n_circ, n_axial=n_axial, layers=layers)
     amp = read_node_amplitudes(amp_path)
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
     path = (sys.argv[1] if len(sys.argv) > 1
             else str(config.PROJECT_ROOT / 'sim3d' / 'results' / 's5_3_loadsteps.txt'))
-    result = summarise(path)
+    result = summarize(path)
     print(f'Reading {path}\n')
     for key in ('NOUTER', 'ZMAX', 'DAXIAL', 'FRADIAL', 'EPS3', 'EPS4',
                 'EPS3ETAB', 'EPSRANGE', 'EPSAMP'):

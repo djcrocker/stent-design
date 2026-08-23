@@ -59,12 +59,12 @@ def wraps(arr, structure=None):
     structure = periodic.CONN4 if structure is None else structure
     n = arr.shape[0]
     lab, _ = ndimage.label(np.tile(arr, (3, 3)), structure=structure)
-    centre = lab[n:2 * n, n:2 * n]
+    center = lab[n:2 * n, n:2 * n]
     right = lab[n:2 * n, 2 * n:3 * n]
     down = lab[2 * n:3 * n, n:2 * n]
-    solid = centre > 0
-    return (bool(np.any(solid & (centre == right))),
-            bool(np.any(solid & (centre == down))))
+    solid = center > 0
+    return (bool(np.any(solid & (center == right))),
+            bool(np.any(solid & (center == down))))
 
 @dataclass
 class Validity:

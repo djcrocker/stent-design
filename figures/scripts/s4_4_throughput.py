@@ -39,7 +39,7 @@ def main():
 
     total = seconds.sum()
     per_cell = seconds.mean()
-    print(f'labelled          {len(rows)} cells in {total:.1f} s')
+    print(f'labeled          {len(rows)} cells in {total:.1f} s')
     print(f'per cell          mean {per_cell * 1000:.0f} ms, '
           f'median {np.median(seconds) * 1000:.0f} ms, max {seconds.max() * 1000:.0f} ms')
     print(f'budget (S4.4)     5 s per cell -> {5.0 / per_cell:.0f}x headroom')
@@ -64,7 +64,7 @@ def main():
     ax.tick_params(colors=TEXT_SECONDARY, labelsize=9)
     ax.set_xlabel('elements in the cell', color=TEXT_SECONDARY)
     ax.set_ylabel('label time (ms)', color=TEXT_SECONDARY)
-    ax.set_title(f'Labelling cost scales with mesh size - mean {per_cell * 1000:.0f} ms/cell',
+    ax.set_title(f'Labeling cost scales with mesh size - mean {per_cell * 1000:.0f} ms/cell',
                  color=TEXT_PRIMARY, fontsize=12, loc='left')
     ax.annotate(f'{len(rows)} cells\n{S7_TARGET} cells ≈ '
                 f'{S7_TARGET * per_cell / 60:.0f} min single-core',

@@ -5,7 +5,7 @@ In a voxel tube, stair-stepped strut edges create artificial stress concentratio
 and necks, which is where eps_a_max is read, so meshing that way would bias the objective.
 
 Method: Gaussian-blur the binary field, then take the 0.5 level set. Smoothing the field
-rather than the extracted polygon is the standard topology-optimisation -> CAD route; it
+rather than the extracted polygon is the standard topology-optimization -> CAD route; it
 produces smooth contours by construction instead of trying to repair a staircase after the
 fact, and it can't fold a polygon through itself.
 
@@ -108,7 +108,7 @@ def polygon_area_mm2(poly):
     r, c = poly[:, 0] * mm_px, poly[:, 1] * mm_px
     return 0.5 * float(np.sum(r * np.roll(c, -1) - np.roll(r, -1) * c))
 
-def summarise(cell, sigma_px=0.8, n_circ=None, n_axial=1):
+def summarize(cell, sigma_px=0.8, n_circ=None, n_axial=1):
     """Contour statistics, for choosing sigma."""
     polys = contours(cell, sigma_px, n_circ, n_axial)
     smoothed = metal_fraction(cell, sigma_px, n_circ, n_axial)

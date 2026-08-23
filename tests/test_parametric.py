@@ -1,4 +1,4 @@
-"""The parametric crown family has to be valid across its sweep and labelled."""
+"""The parametric crown family has to be valid across its sweep and labeled."""
 
 import numpy as np
 import pytest
@@ -92,7 +92,7 @@ def test_sweep_spans_a_useful_coverage_range():
     assert coverage.max() > 0.40
 
 def test_sweep_levels_are_distinct_geometry():
-    """Snapping means distinct parameters give distinct cells, not relabelled duplicates."""
+    """Snapping means distinct parameters give distinct cells, not relabeled duplicates."""
     valid, _ = sweep(amplitudes=(0.2, 0.3), periods=(2,))
     arrays = {cell.to_array().tobytes() for _, cell in valid}
     assert len(arrays) == len(valid)

@@ -9,7 +9,7 @@ The cell set is two populations:
   - a stratified sample of the crown parametric family (the screen's home ground), and
   - the handmade diamond/grid cells, which are different topology families entirely.
 If the rank correlation holds only within the crown family, that is a finding about
-generalisation.
+generalization.
 """
 
 import json
@@ -32,7 +32,7 @@ RESULTS_DIR = config.PROJECT_ROOT / 'sim3d' / 'results'
 ANSYS_EXE = (r'C:\Program Files\ANSYS Inc\ANSYS Student\v261' r'\ansys\bin\winx64\ANSYS261.exe')
 
 def _param_matrix(entries):
-    """Parameters normalised to [0, 1] so distances weight each axis equally."""
+    """Parameters normalized to [0, 1] so distances weight each axis equally."""
     raw = np.array([[p['strut_width_mm'], p['crown_amplitude'], float(p['n_periods'])] for p, _ in entries])
     lo, hi = raw.min(axis=0), raw.max(axis=0)
     span = np.where(hi > lo, hi - lo, 1.0)
@@ -245,7 +245,7 @@ def collect(specs=None, results_dir=None, mesh=None, out_stem='s6_1_labels', out
             row.update({'converged': False, 'K_radial_3D': None, 'eps_a_max_3D': None, 'A_over_lim_3D': None})
             rows.append(row)
             continue
-        summary = loadsteps.summarise(status, n_axial=mesh['n_axial'], n_circ=mesh['n_circ'])
+        summary = loadsteps.summarize(status, n_axial=mesh['n_axial'], n_circ=mesh['n_circ'])
         points, hexes, _ = mesh3d.tube_hex_mesh(
             spec['cell'], n_circ=mesh['n_circ'], n_axial=mesh['n_axial'],
             layers=mesh['layers'], limit=mesh['limit'])

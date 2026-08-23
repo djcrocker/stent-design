@@ -61,7 +61,7 @@ def main():
     sigmas = np.array([0.2, 0.4, 0.6, 0.8, 1.0, 1.25, 1.5])
     width, frac = [], []
     for s in sigmas:
-        r = contour.summarise(cell, sigma_px=float(s))
+        r = contour.summarize(cell, sigma_px=float(s))
         width.append(r['min_width_mm'])
         frac.append(100 * (r['f_metal_smoothed'] - r['f_metal_voxel']) / r['f_metal_voxel'])
     width, frac = np.array(width), np.array(frac)
@@ -98,7 +98,7 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, dpi=140, bbox_inches='tight', facecolor='white')
 
-    r = contour.summarise(cell, sigma_px=SIGMA)
+    r = contour.summarize(cell, sigma_px=SIGMA)
     print(f'chosen sigma      {SIGMA} px = {SIGMA * mm * 1000:.1f} um')
     print(f'polygons          {r["n_polygons"]} ({r["n_points"]} points) over {config.N_CIRC} cells')
     print(f'narrowest (p1)    {r["min_width_mm"]:.4f} mm   floor {r["min_feature_mm"]:.2f} mm')

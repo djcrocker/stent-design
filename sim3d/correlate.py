@@ -79,7 +79,7 @@ def retention_curve(pred, truth, higher_is_better=True):
     return [(k, topk_retention(pred, truth, k, higher_is_better))
             for k in range(1, len(pred) + 1)]
 
-def analyse_metric(rows, metric, n_boot=10000, seed=0):
+def analyze_metric(rows, metric, n_boot=10000, seed=0):
     """rho, CI, p, n and retention for one metric across the given rows."""
     x = [r[f'{metric}_2D'] for r in rows]
     y = [r[f'{metric}_3D'] for r in rows]
@@ -100,7 +100,7 @@ def analyze(path=None, metrics=('K_radial', 'eps_a_max', 'A_over_lim'), n_boot=1
            'gate_rho': GATE_RHO, 'gate_metrics': list(GATE_METRICS),
            'overall': {}, 'by_family': {}}
     for m in metrics:
-        out['overall'][m] = analyse_metric(rows, m, n_boot, seed)
+        out['overall'][m] = analyze_metric(rows, m, n_boot, seed)
 
     families = sorted({r['family'] for r in rows})
     for fam in families:
@@ -108,7 +108,7 @@ def analyze(path=None, metrics=('K_radial', 'eps_a_max', 'A_over_lim'), n_boot=1
         if len(sub) < 4:
             out['by_family'][fam] = {'n': len(sub), 'note': 'too few cells for a rho'}
             continue
-        out['by_family'][fam] = {m: analyse_metric(sub, m, n_boot, seed) for m in metrics}
+        out['by_family'][fam] = {m: analyze_metric(sub, m, n_boot, seed) for m in metrics}
 
     gated = [out['overall'][m] for m in GATE_METRICS if m in out['overall']]
     out['gate_passed'] = bool(gated) and all(g['passes'] for g in gated)
@@ -120,4 +120,92 @@ def write(result, path=None):
     path = (config.PROJECT_ROOT / 'sim3d' / 'results' / 's6_2_correlation.json') \
         if path is None else pathlib.Path(path)
     path.write_text(json.dumps(result, indent=2), encoding='utf-8')
+    return path
+
+def difficulty_coupling(rows, metric):
+    """Does the screen disagree most on the cells the solver found hardest?"""
+    x = np.array([r[f'{metric}_2D'] for r in rows], float)
+    y = np.array([r[f'{metric}_3D'] for r in rows], float)
+    retries = np.array([r.get('retries') or 0 for r in rows], float)
+    if len(np.unique(retries)) < 2:
+        return {'rho': float('nan'), 'p': float('nan'), 'note': 'no variation in retries'}
+    disagreement = np.abs(stats.rankdata(x) - stats.rankdata(y))
+    result = stats.spearmanr(retries, disagreement)
+    return {'rho': float(result.statistic), 'p': float(result.pvalue)}
+
+def gate_record(path=None, n_boot=10000, seed=0):
+    """The gate verdict and the conditions attached to it."""
+    result = analyze(path, n_boot=n_boot, seed=seed)
+    rows, all_rows = load_labels(path)
+
+    families = {}
+    for fam in sorted({r['family'] for r in rows}):
+        n = sum(1 for r in rows if r['family'] == fam)
+        families[fam] = n
+
+    excluded = [r['name'] for r in all_rows if not r.get('converged')]
+    coupling = {m: difficulty_coupling(rows, m) for m in result['overall']}
+
+    caveats = []
+    # 'reference' is a crown geometry carried separately for continuity with S5, so it's
+    # not evidence of topological diversity. Only handmade is a different family.
+    n_other_family = families.get('handmade', 0)
+    if n_other_family < 4:
+        survivors = sorted(r['name'] for r in rows if r['family'] == 'handmade')
+        caveats.append({
+            'id': 'generalization_untested',
+            'detail': (f'Only {n_other_family} cells from a different topology family '
+                       f'survived, too few for a per-family rho.'),
+            'evidence': {'by_family': families, 'surviving_other_family': survivors,
+                         'excluded': excluded},
+        })
+    coupled = {m: c for m, c in coupling.items()
+               if c.get('p') is not None and c['p'] < 0.05 and c['rho'] > 0}
+    if coupled:
+        caveats.append({
+            'id': 'error_tracks_solver_difficulty',
+            'detail': ('Rank disagreement rises with the number of bisection retries, so on '
+                       'hard cells neither the surrogate nor the 3D truth is fully trustworthy.'),
+            'evidence': coupled,
+        })
+    marginal = {m: d['ci95'][0] for m, d in result['overall'].items()
+                if d['gates'] and d['ci95'][0] < GATE_RHO + 0.05}
+    if marginal:
+        caveats.append({
+            'id': 'ci_close_to_threshold',
+            'detail': ('A gate metric clears only narrowly once sampling error is accounted for.'),
+            'evidence': marginal,
+        })
+    if excluded:
+        caveats.append({
+            'id': 'excluded_cells_not_random',
+            'detail': (f'{len(excluded)} of {len(all_rows)} cells have no 3D result, and they '
+                       f'skew to harder designs.'),
+            'evidence': {'excluded': excluded},
+        })
+
+    verdict = 'PASSED' if result['gate_passed'] else 'FAILED'
+    return {
+        'step': 'S6.3',
+        'verdict': verdict,
+        'proceed_to_stage_7': result['gate_passed'],
+        'threshold': GATE_RHO,
+        'gate_metrics': list(GATE_METRICS),
+        'gate_passed': result['gate_passed'],
+        'gate_ci_clears': result['gate_ci_clears'],
+        'n_converged': result['n_converged'],
+        'n_total': result['n_total'],
+        'metrics': {m: {'rho': d['rho'], 'ci95': d['ci95'], 'gates': d['gates'],
+                        'passes': d['passes'], 'retention': d['retention']}
+                    for m, d in result['overall'].items()},
+        'by_family_n': families,
+        'difficulty_coupling': coupling,
+        'caveats': caveats,
+    }
+
+def write_gate(record=None, path=None):
+    record = gate_record() if record is None else record
+    path = (config.PROJECT_ROOT / 'sim3d' / 'results' / 's6_3_gate.json') \
+        if path is None else pathlib.Path(path)
+    path.write_text(json.dumps(record, indent=2), encoding='utf-8')
     return path

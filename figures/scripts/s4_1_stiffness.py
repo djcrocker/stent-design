@@ -1,6 +1,6 @@
 """
 Left  - K_radial across the family's six pixel-exact strut widths, log-log, with the fitted
-        power-law exponent labelled. Bending-dominated cellular solids scale near w^3, 
+        power-law exponent labeled. Bending-dominated cellular solids scale near w^3, 
         stretch-dominated near w^1; where this lands says which regime the cell is in.
 Right - Relative error against closed-form answers the homogenisation: a solid cell 
         (no holes means no homogenisation) and aligned bars (rule of mixtures). 

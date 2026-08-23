@@ -24,7 +24,7 @@ Widths snap to the pixel lattice. One pixel is ~0.0245 mm at GRID_N=64, so a
 0.10 mm strut can only render as 4 or 5 px, a 10-25% quantisation across the useful range,
 and distinct requests collapse to identical geometry (0.14 and 0.16 mm render the same
 cell). Snapping makes the recorded parameter equal to the geometry actually produced, so
-nothing downstream is labelled with a precision the pixels do not have. `snap_width_mm`
+nothing downstream is labeled with a precision the pixels do not have. `snap_width_mm`
 reports the achievable value; `achievable_widths` enumerates the sweep levels.
 """
 

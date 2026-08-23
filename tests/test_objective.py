@@ -45,22 +45,22 @@ from sim2d.fatigue import fatigue       # noqa: E402
 from sim2d.label import UNITS, Label, describe, label  # noqa: E402
 
 @pytest.fixture(scope='module')
-def labelled():
+def labeled():
     return label(reference.build())
 
-def test_valid_cell_yields_the_full_objective_vector(labelled):
-    assert labelled.valid
-    assert labelled.y.shape == (len(config.OBJECTIVE_KEYS),)
-    assert np.all(np.isfinite(labelled.y))
+def test_valid_cell_yields_the_full_objective_vector(labeled):
+    assert labeled.valid
+    assert labeled.y.shape == (len(config.OBJECTIVE_KEYS),)
+    assert np.all(np.isfinite(labeled.y))
 
-def test_vector_order_follows_the_config(labelled):
+def test_vector_order_follows_the_config(labeled):
     """y is built from OBJECTIVE_KEYS, so it can't drift from the config that names it."""
     cell = reference.build()
     h = homogenize(cell)
     f = fatigue(cell, h)
     expected = {'K_radial': h.K_radial, 'eps_a_max': f.eps_a_max,
                 'A_over_lim': f.A_over_lim, 'f_metal': cell.f_metal}
-    for key, value in zip(config.OBJECTIVE_KEYS, labelled.y):
+    for key, value in zip(config.OBJECTIVE_KEYS, labeled.y):
         assert value == pytest.approx(expected[key], rel=1e-12)
 
 def test_every_component_has_a_declared_unit():
@@ -84,17 +84,17 @@ def test_validity_check_can_be_bypassed():
     result = label(reference.build(), check_validity=False)
     assert result.valid and result.y is not None
 
-def test_p99_is_carried_alongside_for_spike_b(labelled):
-    """Which epsilon enters y is still open; storing both now avoids re-labelling later."""
-    assert 'eps_a_p99' in labelled.metrics
-    assert labelled.metrics['eps_a_p99'] <= labelled.y[1]
+def test_p99_is_carried_alongside_for_spike_b(labeled):
+    """Which epsilon enters y is still open; storing both now avoids re-labeling later."""
+    assert 'eps_a_p99' in labeled.metrics
+    assert labeled.metrics['eps_a_p99'] <= labeled.y[1]
 
-def test_result_unpacks_as_y_and_valid(labelled):
-    y, valid = labelled
-    assert valid and y is labelled.y
+def test_result_unpacks_as_y_and_valid(labeled):
+    y, valid = labeled
+    assert valid and y is labeled.y
 
-def test_as_dict_is_a_flat_record(labelled):
-    row = labelled.as_dict()
+def test_as_dict_is_a_flat_record(labeled):
+    row = labeled.as_dict()
     for key in config.OBJECTIVE_KEYS:
         assert isinstance(row[key], float)
     assert row['valid'] is True
@@ -107,12 +107,12 @@ def test_invalid_as_dict_nulls_the_solved_components_but_keeps_coverage():
     assert all(row[k] is None for k in ('K_radial', 'eps_a_max', 'A_over_lim'))
     assert row['f_metal'] == pytest.approx(H.tiny_blob().f_metal)
 
-def test_labelling_meets_the_time_budget(labelled):
+def test_labeling_meets_the_time_budget(labeled):
     """~5 s per cell."""
-    assert labelled.seconds < 5.0
+    assert labeled.seconds < 5.0
 
-def test_describe_reports_units(labelled):
-    text = describe(labelled)
+def test_describe_reports_units(labeled):
+    text = describe(labeled)
     for key in config.OBJECTIVE_KEYS:
         assert key in text
     assert 'N/mm^3' in text

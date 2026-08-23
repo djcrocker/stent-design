@@ -67,8 +67,8 @@ def test_retention_curve_covers_every_k():
 def test_only_gate_metrics_can_pass_or_fail_the_gate():
     rows = [{'K_radial_2D': i, 'K_radial_3D': i,
              'A_over_lim_2D': i, 'A_over_lim_3D': i} for i in range(1, 21)]
-    gated = correlate.analyse_metric(rows, 'K_radial', n_boot=200)
-    reported = correlate.analyse_metric(rows, 'A_over_lim', n_boot=200)
+    gated = correlate.analyze_metric(rows, 'K_radial', n_boot=200)
+    reported = correlate.analyze_metric(rows, 'A_over_lim', n_boot=200)
     assert gated['gates'] and gated['passes']
     # A_over_lim correlates perfectly here and still shouldn't count toward the gate.
     assert reported['rho'] == pytest.approx(1.0)
@@ -79,7 +79,7 @@ def test_a_weak_correlation_fails_the_gate():
     rng = np.random.default_rng(5)
     rows = [{'K_radial_2D': float(v), 'K_radial_3D': float(w)}
             for v, w in zip(rng.normal(size=40), rng.normal(size=40))]
-    assert not correlate.analyse_metric(rows, 'K_radial', n_boot=200)['passes']
+    assert not correlate.analyze_metric(rows, 'K_radial', n_boot=200)['passes']
 
 def test_load_labels_drops_unconverged_cells(tmp_path):
     import json
@@ -89,3 +89,50 @@ def test_load_labels_drops_unconverged_cells(tmp_path):
     rows, all_rows = correlate.load_labels(p)
     assert [r['name'] for r in rows] == ['a']
     assert len(all_rows) == 2
+
+def _rows(n=40, families=None, seed=0):
+    rng = np.random.default_rng(seed)
+    fams = families or (['crown'] * n)
+    base = rng.normal(size=n)
+    return [{'name': f'c{i}', 'family': fams[i], 'converged': True,
+             'retries': int(rng.integers(0, 4)),
+             'K_radial_2D': float(base[i]), 'K_radial_3D': float(base[i] + rng.normal(0, .2)),
+             'eps_a_max_2D': float(base[i]), 'eps_a_max_3D': float(base[i] + rng.normal(0, .2)),
+             'A_over_lim_2D': float(base[i]), 'A_over_lim_3D': float(base[i] + rng.normal(0, .2))}
+            for i in range(n)]
+
+def test_reference_cell_does_not_count_as_a_different_topology_family(tmp_path):
+    """The reference cell is a crown geometry, carried separately only for continuity with S5."""
+    import json
+    fams = ['crown'] * 39 + ['reference']
+    p = tmp_path / 'labels.json'
+    p.write_text(json.dumps(_rows(40, fams)))
+    rec = correlate.gate_record(p, n_boot=200)
+    ids = [c['id'] for c in rec['caveats']]
+    assert 'generalization_untested' in ids
+
+def test_generalization_caveat_clears_with_enough_other_family_cells(tmp_path):
+    import json
+    fams = ['crown'] * 30 + ['handmade'] * 10
+    p = tmp_path / 'labels.json'
+    p.write_text(json.dumps(_rows(40, fams)))
+    rec = correlate.gate_record(p, n_boot=200)
+    assert 'generalization_untested' not in [c['id'] for c in rec['caveats']]
+
+def test_gate_record_carries_the_verdict_and_its_conditions(tmp_path):
+    import json
+    p = tmp_path / 'labels.json'
+    p.write_text(json.dumps(_rows(40)))
+    rec = correlate.gate_record(p, n_boot=200)
+    assert rec['step'] == 'S6.3'
+    assert rec['verdict'] in ('PASSED', 'FAILED')
+    assert rec['proceed_to_stage_7'] is rec['gate_passed']
+    assert isinstance(rec['caveats'], list)
+    assert set(rec['gate_metrics']) == set(correlate.GATE_METRICS)
+
+def test_difficulty_coupling_is_measured_not_assumed():
+    rows = _rows(40)
+    out = correlate.difficulty_coupling(rows, 'K_radial')
+    assert 'rho' in out and 'p' in out
+    flat = [dict(r, retries=0) for r in rows]
+    assert 'note' in correlate.difficulty_coupling(flat, 'K_radial')

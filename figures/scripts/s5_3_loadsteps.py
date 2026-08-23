@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import config
-from sim3d.loadsteps import load_history, summarise
+from sim3d.loadsteps import load_history, summarize
 
 HIST = config.PROJECT_ROOT / 'sim3d' / 'results' / 's5_3_loadsteps_hist.txt'
 STATUS = config.PROJECT_ROOT / 'sim3d' / 'results' / 's5_3_loadsteps.txt'
@@ -46,7 +46,7 @@ def style(ax):
 
 def main():
     t, ux, uz, fx, fz = load_history(HIST)
-    status = summarise(STATUS)
+    status = summarize(STATUS)
 
     fig, axes = plt.subplots(3, 1, figsize=(11, 9.5), sharex=True)
 

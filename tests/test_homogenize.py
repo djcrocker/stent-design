@@ -90,6 +90,6 @@ def test_k_radial_follows_its_definition():
     assert h.K_radial == pytest.approx(
         h.E_circ * config.STRUT_THICKNESS_MM / R ** 2, rel=1e-12)
 
-def test_labelling_is_fast_enough():
+def test_labeling_is_fast_enough():
     """~5 s per cell for the whole vector; stiffness is three solves of it."""
     assert homogenize(reference.build()).seconds < 2.0

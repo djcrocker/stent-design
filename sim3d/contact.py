@@ -40,7 +40,7 @@ def classify_faces(points, owners, faces, hexes):
     """
     Split exterior faces into 'inner', 'outer' and 'side'.
 
-    Radial skins are recognised by radius, not by normal direction, because a face whose
+    Radial skins are recognized by radius, not by normal direction, because a face whose
     centroid sits at the inner or outer radius is a skin regardless of how it is oriented.
     """
     cen = points[faces].mean(axis=1)
