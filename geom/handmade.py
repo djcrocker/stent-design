@@ -107,12 +107,15 @@ def nearly_solid(n=None):
     return UnitCell(a)
 
 # Registries, so callers iterate one list rather than re-deriving it.
+# Factories take an optional resolution so the same design can be rebuilt at another
+# GRID_N (S6.4). n=None keeps the config default, so existing `factory()` calls are
+# unchanged.
 VALID_CELLS = {
-    'diamond w=0.20': lambda: diamond(),
-    'diamond w=0.25': lambda: diamond(width_mm=0.25),
-    'diamond w=0.30': lambda: diamond(width_mm=0.30),
-    'grid w=0.20': lambda: grid(),
-    'grid w=0.25': lambda: grid(width_mm=0.25),
+    'diamond w=0.20': lambda n=None: diamond(n=n),
+    'diamond w=0.25': lambda n=None: diamond(n=n, width_mm=0.25),
+    'diamond w=0.30': lambda n=None: diamond(n=n, width_mm=0.30),
+    'grid w=0.20': lambda n=None: grid(n=n),
+    'grid w=0.25': lambda n=None: grid(n=n, width_mm=0.25),
 }
 
 # name -> (builder, the reason code it must trip)

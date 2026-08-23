@@ -102,7 +102,7 @@ def _rows(n=40, families=None, seed=0):
             for i in range(n)]
 
 def test_reference_cell_does_not_count_as_a_different_topology_family(tmp_path):
-    """The reference cell is a crown geometry, carried separately only for continuity with S5."""
+    """The reference cell is a crown geometry."""
     import json
     fams = ['crown'] * 39 + ['reference']
     p = tmp_path / 'labels.json'
