@@ -1,0 +1,133 @@
+{
+  "targets": [
+    {
+      "name": "K100_A25",
+      "asked": {
+        "K_radial": 100.0,
+        "A_over_lim": 0.25
+      },
+      "target": {
+        "K_radial": 100.0,
+        "eps_a_max": 0.036327415399936835,
+        "A_over_lim": 0.25,
+        "f_metal": 0.307861328125
+      },
+      "support": 1008,
+      "well_supported": true
+    },
+    {
+      "name": "K200_A25",
+      "asked": {
+        "K_radial": 200.0,
+        "A_over_lim": 0.25
+      },
+      "target": {
+        "K_radial": 200.0,
+        "eps_a_max": 0.05616134763227896,
+        "A_over_lim": 0.25,
+        "f_metal": 0.380859375
+      },
+      "support": 521,
+      "well_supported": true
+    },
+    {
+      "name": "K300_A25",
+      "asked": {
+        "K_radial": 300.0,
+        "A_over_lim": 0.25
+      },
+      "target": {
+        "K_radial": 300.0,
+        "eps_a_max": 0.06018370156096316,
+        "A_over_lim": 0.25,
+        "f_metal": 0.437255859375
+      },
+      "support": 368,
+      "well_supported": true
+    },
+    {
+      "name": "K100_A10",
+      "asked": {
+        "K_radial": 100.0,
+        "A_over_lim": 0.1
+      },
+      "target": {
+        "K_radial": 100.0,
+        "eps_a_max": 0.031099395226206993,
+        "A_over_lim": 0.1,
+        "f_metal": 0.32666015625
+      },
+      "support": 358,
+      "well_supported": true
+    },
+    {
+      "name": "K200_A10",
+      "asked": {
+        "K_radial": 200.0,
+        "A_over_lim": 0.1
+      },
+      "target": {
+        "K_radial": 200.0,
+        "eps_a_max": 0.04336524464550841,
+        "A_over_lim": 0.1,
+        "f_metal": 0.35791015625
+      },
+      "support": 262,
+      "well_supported": true
+    },
+    {
+      "name": "K300_A10",
+      "asked": {
+        "K_radial": 300.0,
+        "A_over_lim": 0.1
+      },
+      "target": {
+        "K_radial": 300.0,
+        "eps_a_max": 0.044858508907631864,
+        "A_over_lim": 0.1,
+        "f_metal": 0.4183349609375
+      },
+      "support": 152,
+      "well_supported": true
+    },
+    {
+      "name": "control_mid",
+      "asked": {
+        "K_radial": 58.0,
+        "A_over_lim": 0.54
+      },
+      "target": {
+        "K_radial": 58.0,
+        "eps_a_max": 0.06358453720825533,
+        "A_over_lim": 0.54,
+        "f_metal": 0.377197265625
+      },
+      "support": 1993,
+      "well_supported": true
+    },
+    {
+      "name": "control_soft",
+      "asked": {
+        "K_radial": 20.0,
+        "A_over_lim": 0.7
+      },
+      "target": {
+        "K_radial": 20.0,
+        "eps_a_max": 0.06744089963421984,
+        "A_over_lim": 0.7,
+        "f_metal": 0.3466796875
+      },
+      "support": 997,
+      "well_supported": true
+    }
+  ],
+  "guidance": 5.0,
+  "n_per_target": 64,
+  "steps": 50,
+  "normalizer_std": [
+    0.49618334446391893,
+    0.024513128063337362,
+    0.22104532333741356,
+    0.07829217475137869
+  ]
+}
