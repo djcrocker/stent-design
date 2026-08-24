@@ -28,6 +28,11 @@ figures/paper/*
 file*.*
 ansys_output/
 
+# Model checkpoints
+diffusion/checkpoints/*
+!diffusion/checkpoints/.gitkeep
+*.pt
+
 # Python
 __pycache__/
 *.py[cod]

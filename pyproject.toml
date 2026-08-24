@@ -17,6 +17,11 @@ include = ["geom*", "sim2d*", "sim3d*", "diffusion*", "screen*", "figures*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# torch and scipy each pull in a different OpenMP runtime (libomp.dll vs libiomp5md.dll),
+# and a process holding both aborts inside SuperLU with OMP Error #15. Run the torch tests 
+# with an explicit path: pytest tests/test_diffusion.py
+addopts = "--ignore=tests/test_diffusion.py"
+markers = ["torch: needs PyTorch; must run in its own process (OpenMP clash with scipy)"]
 filterwarnings = [
     # VTK sets .shape on a NumPy array, deprecated in NumPy 2.5. Third-party, fires ~19x
     # per tube test, and nothing we can fix. Silenced narrowly by message so that warnings
