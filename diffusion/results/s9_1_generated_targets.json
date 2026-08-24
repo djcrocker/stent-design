@@ -8,11 +8,11 @@
       },
       "target": {
         "K_radial": 100.0,
-        "eps_a_max": 0.036327415399936835,
+        "eps_a_max": 0.03666400736114996,
         "A_over_lim": 0.25,
-        "f_metal": 0.307861328125
+        "f_metal": 0.3096923828125
       },
-      "support": 1008,
+      "support": 1062,
       "well_supported": true
     },
     {
@@ -23,11 +23,11 @@
       },
       "target": {
         "K_radial": 200.0,
-        "eps_a_max": 0.05616134763227896,
+        "eps_a_max": 0.055285391320039165,
         "A_over_lim": 0.25,
-        "f_metal": 0.380859375
+        "f_metal": 0.381103515625
       },
-      "support": 521,
+      "support": 578,
       "well_supported": true
     },
     {
@@ -38,11 +38,26 @@
       },
       "target": {
         "K_radial": 300.0,
-        "eps_a_max": 0.06018370156096316,
+        "eps_a_max": 0.06014345327038075,
         "A_over_lim": 0.25,
-        "f_metal": 0.437255859375
+        "f_metal": 0.436767578125
       },
-      "support": 368,
+      "support": 411,
+      "well_supported": true
+    },
+    {
+      "name": "K400_A25",
+      "asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.25
+      },
+      "target": {
+        "K_radial": 400.0,
+        "eps_a_max": 0.06502016612197589,
+        "A_over_lim": 0.25,
+        "f_metal": 0.4580078125
+      },
+      "support": 175,
       "well_supported": true
     },
     {
@@ -53,11 +68,11 @@
       },
       "target": {
         "K_radial": 100.0,
-        "eps_a_max": 0.031099395226206993,
+        "eps_a_max": 0.02925073671343068,
         "A_over_lim": 0.1,
-        "f_metal": 0.32666015625
+        "f_metal": 0.322021484375
       },
-      "support": 358,
+      "support": 189,
       "well_supported": true
     },
     {
@@ -68,11 +83,11 @@
       },
       "target": {
         "K_radial": 200.0,
-        "eps_a_max": 0.04336524464550841,
+        "eps_a_max": 0.03975820849862498,
         "A_over_lim": 0.1,
-        "f_metal": 0.35791015625
+        "f_metal": 0.351806640625
       },
-      "support": 262,
+      "support": 131,
       "well_supported": true
     },
     {
@@ -83,11 +98,71 @@
       },
       "target": {
         "K_radial": 300.0,
-        "eps_a_max": 0.044858508907631864,
+        "eps_a_max": 0.043697693711151064,
         "A_over_lim": 0.1,
-        "f_metal": 0.4183349609375
+        "f_metal": 0.4188232421875
       },
-      "support": 152,
+      "support": 70,
+      "well_supported": true
+    },
+    {
+      "name": "K400_A10",
+      "asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.1
+      },
+      "target": {
+        "K_radial": 400.0,
+        "eps_a_max": 0.05027615867563415,
+        "A_over_lim": 0.1,
+        "f_metal": 0.447998046875
+      },
+      "support": 25,
+      "well_supported": true
+    },
+    {
+      "name": "K100_A05",
+      "asked": {
+        "K_radial": 100.0,
+        "A_over_lim": 0.05
+      },
+      "target": {
+        "K_radial": 100.0,
+        "eps_a_max": 0.023149056011380828,
+        "A_over_lim": 0.05,
+        "f_metal": 0.301025390625
+      },
+      "support": 35,
+      "well_supported": true
+    },
+    {
+      "name": "K200_A05",
+      "asked": {
+        "K_radial": 200.0,
+        "A_over_lim": 0.05
+      },
+      "target": {
+        "K_radial": 200.0,
+        "eps_a_max": 0.03242270926743188,
+        "A_over_lim": 0.05,
+        "f_metal": 0.351318359375
+      },
+      "support": 23,
+      "well_supported": true
+    },
+    {
+      "name": "K300_A05",
+      "asked": {
+        "K_radial": 300.0,
+        "A_over_lim": 0.05
+      },
+      "target": {
+        "K_radial": 300.0,
+        "eps_a_max": 0.02941319083574679,
+        "A_over_lim": 0.05,
+        "f_metal": 0.40478515625
+      },
+      "support": 9,
       "well_supported": true
     },
     {
@@ -98,11 +173,11 @@
       },
       "target": {
         "K_radial": 58.0,
-        "eps_a_max": 0.06358453720825533,
+        "eps_a_max": 0.06274528055718873,
         "A_over_lim": 0.54,
-        "f_metal": 0.377197265625
+        "f_metal": 0.38623046875
       },
-      "support": 1993,
+      "support": 4264,
       "well_supported": true
     },
     {
@@ -113,16 +188,16 @@
       },
       "target": {
         "K_radial": 20.0,
-        "eps_a_max": 0.06744089963421984,
+        "eps_a_max": 0.07238049218080052,
         "A_over_lim": 0.7,
-        "f_metal": 0.3466796875
+        "f_metal": 0.3515625
       },
-      "support": 997,
+      "support": 2995,
       "well_supported": true
     }
   ],
   "guidance": 5.0,
-  "n_per_target": 64,
+  "n_per_target": 96,
   "steps": 50,
   "normalizer_std": [
     0.49618334446391893,

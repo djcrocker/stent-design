@@ -19,7 +19,7 @@ RESULTS_DIR = config.PROJECT_ROOT / 'diffusion' / 'results'
 
 # From S8.4: best fidelity, and diversity is flat across guidance so one-to-many pays nothing.
 GUIDANCE = 5.0
-N_PER_TARGET = 64
+N_PER_TARGET = 96
 
 # The desirable scope is high radial support, low area over the fatigue limit.
 # eps_a_max and f_metal are filled from the conditional median of the supporting cells.
@@ -27,9 +27,14 @@ TARGET_LADDER = (
     {'name': 'K100_A25', 'K_radial': 100.0, 'A_over_lim': 0.25},
     {'name': 'K200_A25', 'K_radial': 200.0, 'A_over_lim': 0.25},
     {'name': 'K300_A25', 'K_radial': 300.0, 'A_over_lim': 0.25},
+    {'name': 'K400_A25', 'K_radial': 400.0, 'A_over_lim': 0.25},
     {'name': 'K100_A10', 'K_radial': 100.0, 'A_over_lim': 0.10},
     {'name': 'K200_A10', 'K_radial': 200.0, 'A_over_lim': 0.10},
     {'name': 'K300_A10', 'K_radial': 300.0, 'A_over_lim': 0.10},
+    {'name': 'K400_A10', 'K_radial': 400.0, 'A_over_lim': 0.10},
+    {'name': 'K100_A05', 'K_radial': 100.0, 'A_over_lim': 0.05},
+    {'name': 'K200_A05', 'K_radial': 200.0, 'A_over_lim': 0.05},
+    {'name': 'K300_A05', 'K_radial': 300.0, 'A_over_lim': 0.05},
     # Controls: mid-distribution, where support is thick and conditioning should be easy.
     {'name': 'control_mid', 'K_radial': 58.0, 'A_over_lim': 0.54},
     {'name': 'control_soft', 'K_radial': 20.0, 'A_over_lim': 0.70},
@@ -39,8 +44,10 @@ def support(frame, target, rel=0.25, abs_tol=0.08):
     """
     How many training cells sit near this target.
 
-    A relative window on `K_radial` (it spans decades) and an absolute one on the fraction
-    metrics.
+    A relative window on `K_radial` (it spans decades) and a target-scaled one on the
+    fraction metrics. A fixed +/-0.08 would count every cell below 0.10 as support for an
+    `A_over_lim` target of 0.02, overstating what the model has seen near the good
+    corner; the absolute floor keeps the window from vanishing as the target nears zero.
     """
     mask = np.ones(len(frame), dtype=bool)
     for key, value in target.items():
@@ -51,7 +58,7 @@ def support(frame, target, rel=0.25, abs_tol=0.08):
             mask &= np.abs(np.log10(np.maximum(col, 1e-12)) - np.log10(max(value, 1e-12))) \
                 <= np.log10(1 + rel)
         else:
-            mask &= np.abs(col - value) <= abs_tol
+            mask &= np.abs(col - value) <= max(abs_tol * 0.375, rel * 1.4 * value)
     return int(mask.sum()), mask
 
 def complete_target(frame, target, rel=0.25, abs_tol=0.08):
