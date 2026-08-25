@@ -96,11 +96,10 @@ def select(objectives, k=DEFAULT_K):
 def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
     """Load the generated pool, label it, filter to valid, rank, and save the shortlist."""
     from diffusion import generate, splits
-    from diffusion.fidelity import label_fields
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     fields, which, meta = generate.load_samples(source_stem)
-    rows, dropped = label_fields(fields)
+    rows, dropped = generate.cached_labels(fields, source_stem)
 
     valid = np.array([i for i, r in enumerate(rows) if r is not None])
     if not len(valid):

@@ -128,13 +128,26 @@ def load_samples(out_stem='s9_1_generated'):
     meta = json.loads((RESULTS_DIR / f'{out_stem}_targets.json').read_text(encoding='utf-8'))
     return fields, blob['which'], meta
 
+def cached_labels(fields, out_stem='s9_1_generated'):
+    """Per-cell 2D labels, computed once and reused."""
+    from diffusion.fidelity import label_fields
+
+    path = RESULTS_DIR / f'{out_stem}_labels.json'
+    if path.exists():
+        blob = json.loads(path.read_text(encoding='utf-8'))
+        if blob.get('n') == len(fields):
+            return blob['rows'], int(blob['dropped'])
+    rows, dropped = label_fields(fields)
+    path.write_text(json.dumps({'n': len(fields), 'dropped': int(dropped), 'rows': rows}), encoding='utf-8')
+    return rows, dropped
+
 def screen_phase(out_stem='s9_1_generated'):
     """No torch. Clean, validate, label, and record achieved vs asked per target."""
     from diffusion.fidelity import label_fields
 
     fields, which, meta = load_samples(out_stem)
     targets = meta['targets']
-    rows, dropped = label_fields(fields)
+    rows, dropped = cached_labels(fields, out_stem)
 
     per_target = []
     for j, t in enumerate(targets):
