@@ -138,3 +138,26 @@ def test_ema_tracks_but_lags_the_weights():
     moved = (ema.shadow[key] - before[key]).abs().max().item()
     assert moved > 0.0
     assert moved < 1.0
+
+def test_trajectory_capture_matches_the_plain_sample(net):
+    """Recording the chain shouldn't change it."""
+    ddpm = DDPM(net, timesteps=50, device='cpu')
+    y = torch.zeros(2, 4)
+    torch.manual_seed(7)
+    plain = ddpm.ddim_sample(2, y, guidance=1.0, steps=5)
+    torch.manual_seed(7)
+    traced, (t_seq, xt, x0) = ddpm.ddim_sample(2, y, guidance=1.0, steps=5, trajectory=True)
+    assert torch.allclose(plain, traced, atol=0)
+    assert len(t_seq) == 5 and xt.shape == (5, 2, 1, 64, 64) and x0.shape == xt.shape
+
+def test_trajectory_timesteps_descend_to_zero(net):
+    ddpm = DDPM(net, timesteps=50, device='cpu')
+    _, (t_seq, _, _) = ddpm.ddim_sample(1, torch.zeros(1, 4), guidance=0.0, steps=6, trajectory=True)
+    assert list(t_seq) == sorted(t_seq, reverse=True)
+    assert t_seq[0] == 49 and t_seq[-1] == 0
+
+def test_clamped_x0_estimates_stay_in_range(net):
+    """The data is binary in [-1, 1]; a recorded x0 outside it would mean clamp broke."""
+    ddpm = DDPM(net, timesteps=50, device='cpu')
+    _, (_, _, x0) = ddpm.ddim_sample(2, torch.zeros(2, 4), guidance=1.0, steps=5, trajectory=True)
+    assert x0.min() >= -1.0 and x0.max() <= 1.0

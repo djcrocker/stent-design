@@ -147,7 +147,7 @@ class DDPM:
         return x
 
     @torch.no_grad()
-    def ddim_sample(self, n, y, guidance=2.0, steps=50, eta=0.0, shape=(1, 64, 64), clamp=True):
+    def ddim_sample(self, n, y, guidance=2.0, steps=50, eta=0.0, shape=(1, 64, 64), clamp=True, trajectory=False):
         """
         DDIM sampling on a subsequence of the training timesteps.
 
@@ -156,8 +156,13 @@ class DDPM:
 
         `clamp` bounds the predicted x0 to [-1, 1]. The data is binary, so an x0 estimate
         outside that range is known to be wrong and letting it through only injects error.
+
+        `trajectory` additionally returns the per-step record as
+        `(timesteps, x_t, x0_hat)`, for visualizing how structure emerges. It is off by
+        default because it holds every step in memory.
         """
         seq = np.linspace(0, self.timesteps - 1, steps).round().astype(int)[::-1]
+        traj_t, traj_x, traj_x0 = [], [], []
         x = torch.randn(n, *shape, device=self.device)
         y = y.to(self.device)
         ones = torch.ones(n, device=self.device)
@@ -183,12 +188,18 @@ class DDPM:
             if clamp:
                 x0 = x0.clamp(-1.0, 1.0)
                 eps = (x - ab_t.sqrt() * x0) / (1 - ab_t).sqrt()
+            if trajectory:
+                traj_t.append(int(t_cur))
+                traj_x.append(x.detach().cpu().clone())
+                traj_x0.append(x0.detach().cpu().clone())
 
             sigma = eta * ((1 - ab_prev) / (1 - ab_t)).sqrt() * (1 - ab_t / ab_prev).sqrt()
             direction = (1 - ab_prev - sigma ** 2).clamp(min=0).sqrt() * eps
             x = ab_prev.sqrt() * x0 + direction
             if eta > 0 and t_prev >= 0:
                 x = x + sigma * torch.randn_like(x)
+        if trajectory:
+            return x, (np.array(traj_t), torch.stack(traj_x), torch.stack(traj_x0))
         return x
 
 class EMA:

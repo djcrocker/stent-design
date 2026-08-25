@@ -1,0 +1,900 @@
+<title>Strut Topology Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+/* ---- tokens ---- */
+:root {
+  --ground:        #eef1f1;
+  --panel:         #ffffff;
+  --panel-2:       #f5f7f7;
+  --ink:           #101618;
+  --ink-2:         #4d5a5c;
+  --ink-3:         #7d8a8c;
+  --rule:          #d5dcdc;
+  --rule-strong:   #b6c1c1;
+  --metal:         #1b2426;
+  --void:          #ffffff;
+  --accent:        #0e7c86;
+  --accent-soft:   rgba(14, 124, 134, 0.16);
+  --gen:           #d1541f;
+  --gen-soft:      rgba(209, 84, 31, 0.18);
+  --pick:          #2a6fd6;
+  --pick-soft:     rgba(42, 111, 214, 0.18);
+  --warn:          #a8670c;
+  --cloud:         rgba(16, 22, 24, 0.55);
+  --shadow:        0 1px 2px rgba(16, 22, 24, 0.06), 0 8px 24px rgba(16, 22, 24, 0.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0d1315;
+    --panel:       #151d1f;
+    --panel-2:     #1b2426;
+    --ink:         #e8eeee;
+    --ink-2:       #9fb0b1;
+    --ink-3:       #748586;
+    --rule:        #2a3638;
+    --rule-strong: #3c4b4d;
+    --metal:       #dfe8e8;
+    --void:        #101819;
+    --accent:      #3fb3bd;
+    --accent-soft: rgba(63, 179, 189, 0.20);
+    --gen:         #f0803f;
+    --gen-soft:    rgba(240, 128, 63, 0.22);
+    --pick:        #6ea3ee;
+    --pick-soft:   rgba(110, 163, 238, 0.22);
+    --warn:        #d9a441;
+    --cloud:       rgba(232, 238, 238, 0.50);
+    --shadow:      0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.3);
+  }
+}
+:root[data-theme="dark"] {
+  --ground:      #0d1315;
+  --panel:       #151d1f;
+  --panel-2:     #1b2426;
+  --ink:         #e8eeee;
+  --ink-2:       #9fb0b1;
+  --ink-3:       #748586;
+  --rule:        #2a3638;
+  --rule-strong: #3c4b4d;
+  --metal:       #dfe8e8;
+  --void:        #101819;
+  --accent:      #3fb3bd;
+  --accent-soft: rgba(63, 179, 189, 0.20);
+  --gen:         #f0803f;
+  --gen-soft:    rgba(240, 128, 63, 0.22);
+  --pick:        #6ea3ee;
+  --pick-soft:   rgba(110, 163, 238, 0.22);
+  --warn:        #d9a441;
+  --cloud:       rgba(232, 238, 238, 0.50);
+  --shadow:      0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1420px; margin: 0 auto; padding: 28px 22px 56px; }
+
+/* ---- masthead ---- */
+.masthead {
+  display: flex; flex-wrap: wrap; align-items: flex-end;
+  gap: 18px 28px; padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.eyebrow {
+  font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent);
+}
+h1 {
+  font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+  font-size: clamp(28px, 4.2vw, 44px); font-weight: 700; letter-spacing: -0.015em;
+  line-height: 1.05; margin: 4px 0 0; text-wrap: balance;
+}
+.standfirst {
+  margin: 8px 0 0; max-width: 60ch; color: var(--ink-2); font-size: 15px;
+}
+.theme-toggle {
+  margin-left: auto; align-self: flex-start;
+  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--panel); color: var(--ink-2);
+  border: 1px solid var(--rule); border-radius: 2px;
+  padding: 7px 12px; cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--rule-strong); color: var(--ink); }
+
+/* ---- readout strip ---- */
+.readout {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 1px; margin: 22px 0 24px;
+  background: var(--rule); border: 1px solid var(--rule);
+}
+.stat { background: var(--panel); padding: 12px 14px 13px; }
+.stat dt {
+  font-family: "IBM Plex Sans Condensed", sans-serif;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.11em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0;
+}
+.stat dd {
+  margin: 3px 0 0; font-family: "IBM Plex Mono", monospace;
+  font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.stat .sub { display: block; font-size: 11px; color: var(--ink-3); letter-spacing: 0; margin-top: 1px; }
+
+/* ---- main split ---- */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 20px; align-items: start; }
+@media (max-width: 960px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+.card {
+  background: var(--panel); border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+}
+.card-head {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  padding: 13px 16px; border-bottom: 1px solid var(--rule);
+}
+.card-head h2 {
+  font-family: "IBM Plex Sans Condensed", sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; margin: 0;
+}
+.card-head .note { font-size: 12.5px; color: var(--ink-3); }
+
+/* ---- controls ---- */
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: auto; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: "IBM Plex Mono", monospace; font-size: 11.5px;
+  padding: 5px 10px; border: 1px solid var(--rule); border-radius: 2px;
+  background: var(--panel-2); color: var(--ink-2); cursor: pointer;
+  user-select: none;
+}
+.chip:hover { border-color: var(--rule-strong); color: var(--ink); }
+.chip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3); }
+.chip[aria-pressed="true"] { color: var(--ink); border-color: var(--rule-strong); background: var(--panel); }
+.chip[aria-pressed="false"] { opacity: 0.5; }
+.chip[data-layer="data"][aria-pressed="true"] .dot { background: var(--cloud); }
+.chip[data-layer="gen"][aria-pressed="true"] .dot { background: var(--gen); }
+.chip[data-layer="pick"][aria-pressed="true"] .dot { background: var(--pick); }
+
+select {
+  font-family: "IBM Plex Mono", monospace; font-size: 11.5px;
+  padding: 5px 8px; background: var(--panel-2); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: 2px;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---- plot ---- */
+.plot-shell { position: relative; padding: 14px 16px 16px; }
+.plot-stack { position: relative; width: 100%; aspect-ratio: 16 / 10; min-height: 320px; }
+.plot-stack canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#overlay { cursor: crosshair; }
+.hint {
+  margin: 10px 2px 0; font-size: 12px; color: var(--ink-3);
+}
+
+/* ---- inspector ---- */
+.inspector { padding: 16px; }
+.cellbox {
+  position: relative; width: 100%; aspect-ratio: 1;
+  background: var(--void); border: 1px solid var(--rule);
+}
+.cellbox canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+.cellbox .seam {
+  position: absolute; inset: 0; pointer-events: none;
+}
+.cellbox .seam::before, .cellbox .seam::after {
+  content: ""; position: absolute; background: var(--accent); opacity: 0.55;
+}
+.cellbox .seam::before { left: 50%; top: 0; bottom: 0; width: 1px; }
+.cellbox .seam::after { top: 50%; left: 0; right: 0; height: 1px; }
+.cellcap { margin-top: 8px; font-size: 11.5px; color: var(--ink-3); }
+
+.kv { margin: 16px 0 0; border-top: 1px solid var(--rule); }
+.kv div {
+  display: flex; justify-content: space-between; gap: 12px; align-items: baseline;
+  padding: 7px 0; border-bottom: 1px solid var(--rule);
+}
+.kv dt {
+  font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 11px;
+  font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
+}
+.kv dd {
+  margin: 0; font-family: "IBM Plex Mono", monospace; font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+.tag {
+  display: inline-block; font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 2px; border: 1px solid transparent;
+}
+.tag.data   { background: var(--accent-soft); color: var(--accent); }
+.tag.gen    { background: var(--gen-soft);    color: var(--gen); }
+.tag.pick   { background: var(--pick-soft);   color: var(--pick); }
+.tag.bad    { background: transparent; color: var(--warn); border-color: var(--warn); }
+
+/* ---- exemplar strip ---- */
+.strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 12px; padding: 16px; }
+.ex {
+  border: 1px solid var(--rule); background: var(--void); padding: 0;
+  cursor: pointer; display: block; text-align: left;
+}
+.ex:hover { border-color: var(--gen); }
+.ex[aria-current="true"] { border-color: var(--gen); box-shadow: 0 0 0 1px var(--gen); }
+.ex canvas { display: block; width: 100%; aspect-ratio: 1; image-rendering: pixelated; }
+.ex figcaption {
+  font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--ink-2);
+  padding: 5px 6px 6px; border-top: 1px solid var(--rule); background: var(--panel);
+  font-variant-numeric: tabular-nums;
+}
+.strip-empty { padding: 16px; color: var(--ink-3); font-size: 13px; }
+
+/* ---- tube viewer ---- */
+.wrapbtn {
+  margin-top: 12px; width: 100%;
+  font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 12px;
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 9px 12px; cursor: pointer;
+  background: var(--accent); color: var(--panel);
+  border: 1px solid var(--accent); border-radius: 2px;
+}
+.wrapbtn:hover { filter: brightness(1.08); }
+.modal {
+  position: fixed; inset: 0; z-index: 40;
+  background: color-mix(in srgb, var(--ground) 88%, transparent);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal[data-open="true"] { display: flex; }
+.modal-card {
+  background: var(--panel); border: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow); width: min(880px, 100%); max-height: 100%;
+  display: flex; flex-direction: column;
+}
+.modal-body { padding: 14px 16px 16px; }
+#tubeCanvas {
+  display: block; width: 100%; aspect-ratio: 4 / 3; cursor: grab;
+  background: var(--panel-2); border: 1px solid var(--rule);
+}
+#tubeCanvas:active { cursor: grabbing; }
+.tube-meta {
+  display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 10px 0 0;
+  font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.tube-note { margin: 8px 0 0; font-size: 12px; color: var(--ink-3); max-width: 72ch; }
+
+.footnote {
+  margin: 26px 0 0; padding-top: 16px; border-top: 1px solid var(--rule);
+  color: var(--ink-3); font-size: 12.5px; max-width: 78ch;
+}
+.footnote code {
+  font-family: "IBM Plex Mono", monospace; font-size: 12px;
+  background: var(--panel-2); padding: 1px 4px; border: 1px solid var(--rule);
+}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Femoropopliteal stent &middot; periodic unit cell</div>
+      <h1>Strut Topology Explorer</h1>
+      <p class="standfirst">
+        Every point is one 64&times;64 strut topology, placed by what it does: radial
+        support across the bottom, fatigue exposure up the side. The cloud is what the
+        diffusion model was trained on. The orange is what it produced when asked for a
+        specific corner of that plane.
+      </p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button">Theme</button>
+  </header>
+
+  <dl class="readout" id="readout"></dl>
+
+  <div class="split">
+    <section class="card">
+      <div class="card-head">
+        <h2>Design space</h2>
+        <div class="controls">
+          <button class="chip" data-layer="data" aria-pressed="true" type="button"><span class="dot"></span>training</button>
+          <button class="chip" data-layer="gen" aria-pressed="true" type="button"><span class="dot"></span>generated</button>
+          <button class="chip" data-layer="pick" aria-pressed="true" type="button"><span class="dot"></span>shortlist</button>
+          <select id="targetSel" aria-label="Requested target"></select>
+        </div>
+      </div>
+      <div class="plot-shell">
+        <div class="plot-stack">
+          <canvas id="base"></canvas>
+          <canvas id="overlay" tabindex="0" aria-label="Design space scatter. Click a point to inspect it."></canvas>
+        </div>
+        <p class="hint" id="hint"></p>
+      </div>
+    </section>
+
+    <aside class="card inspector">
+      <div class="cellbox">
+        <canvas id="cellCanvas" width="128" height="128"></canvas>
+        <div class="seam"></div>
+      </div>
+      <p class="cellcap">Tiled 2&times;2. The teal seams are the unit-cell edges. Struts run
+        straight through them, which is what makes the cell a torus.</p>
+      <dl class="kv" id="kv"></dl>
+      <button class="wrapbtn" id="wrapBtn" type="button">Wrap to tube</button>
+    </aside>
+  </div>
+
+  <section class="card" style="margin-top: 20px;">
+    <div class="card-head">
+      <h2>One target, many designs</h2>
+      <span class="note" id="stripNote"></span>
+    </div>
+    <div id="strip" class="strip"></div>
+  </section>
+
+  <p class="footnote" id="footnote"></p>
+</div>
+
+<div class="modal" id="tubeModal" data-open="false" role="dialog" aria-modal="true"
+     aria-label="Tube view of the selected cell">
+  <div class="modal-card">
+    <div class="card-head">
+      <h2>Wrapped to the artery</h2>
+      <div class="controls">
+        <select id="tubeAxial" aria-label="Cells along the axis">
+          <option value="2">2 cells long</option>
+          <option value="3" selected>3 cells long</option>
+          <option value="5">5 cells long</option>
+        </select>
+        <button class="chip" id="tubeClose" type="button" aria-pressed="true">close</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <canvas id="tubeCanvas" tabindex="0"
+              aria-label="Rotatable tube. Drag to turn it."></canvas>
+      <div class="tube-meta" id="tubeMeta"></div>
+      <p class="tube-note">Drag to turn. The cell tiles
+        <strong id="tubeNcirc"></strong> times around the circumference, which is what closes
+        the ring exactly. Struts are drawn on the lumen surface, so this shows the pattern and
+        the silhouette, not wall thickness &mdash; for a true solid mesh use
+        <code>figures/scripts/s2_5_tube_gallery.py</code>.</p>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="payload">/*__PAYLOAD__*/</script>
+<script>
+(function () {
+  "use strict";
+  var P = JSON.parse(document.getElementById("payload").textContent);
+  var N = P.grid_n, NN = N * N, BYTES_PER_CELL = NN / 8;
+
+  /* ---------- decoding ---------- */
+  function raw(b64) {
+    var bin = atob(b64), v = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) { v[i] = bin.charCodeAt(i); }
+    return v;
+  }
+  function f32(b64) { var v = raw(b64); return new Float32Array(v.buffer, v.byteOffset, v.length / 4); }
+
+  var D = P.dataset, G = P.generated;
+  var dK = f32(D.K_radial), dA = f32(D.A_over_lim), dF = f32(D.f_metal), dE = f32(D.eps_a_max);
+  var dThumbIdx = f32(D.thumb_index), dThumbBits = raw(D.thumb_bits);
+  var gK = f32(G.K_radial), gA = f32(G.A_over_lim), gF = f32(G.f_metal), gE = f32(G.eps_a_max);
+  var gWhich = raw(G.which), gValid = raw(G.valid), gBits = raw(G.bits);
+  var targets = G.targets;
+  var shortRows = (P.shortlist && P.shortlist.rows) || [];
+  var otm = (P.onetomany && P.onetomany.per_target) || [];
+  var otmByName = {};
+  otm.forEach(function (t) { otmByName[t.name] = t; });
+  var pickIndex = {};
+  shortRows.forEach(function (r) { pickIndex[r.pool_index] = r; });
+
+  /* ---------- pickable points: what the reader can actually open ---------- */
+  var pts = [];
+  for (var i = 0; i < dThumbIdx.length; i++) {
+    var di = dThumbIdx[i];
+    pts.push({ kind: "data", row: i, src: di, k: dK[di], a: dA[di], f: dF[di], e: dE[di] });
+  }
+  for (var j = 0; j < G.n; j++) {
+    if (!gValid[j]) { continue; }
+    pts.push({ kind: pickIndex[j] ? "pick" : "gen", row: j, src: j,
+               k: gK[j], a: gA[j], f: gF[j], e: gE[j], which: gWhich[j] });
+  }
+
+  /* ---------- scales ---------- */
+  var PAD = { l: 62, r: 14, t: 14, b: 44 };
+  var kMin = Infinity, kMax = -Infinity, aMax = 0;
+  for (var q = 0; q < dK.length; q++) {
+    if (dK[q] > 0 && dK[q] < kMin) { kMin = dK[q]; }
+    if (dK[q] > kMax) { kMax = dK[q]; }
+    if (dA[q] > aMax) { aMax = dA[q]; }
+  }
+  var x0 = Math.floor(Math.log10(kMin) * 2) / 2, x1 = Math.ceil(Math.log10(kMax) * 2) / 2;
+  var y1 = Math.min(1, Math.ceil(aMax * 10) / 10);
+  var W = 0, H = 0;
+  function sx(k) { return PAD.l + (Math.log10(Math.max(k, 1e-6)) - x0) / (x1 - x0) * (W - PAD.l - PAD.r); }
+  function sy(a) { return H - PAD.b - (a / y1) * (H - PAD.t - PAD.b); }
+
+  /* ---------- canvases ---------- */
+  var base = document.getElementById("base"), bctx = base.getContext("2d");
+  var over = document.getElementById("overlay"), octx = over.getContext("2d");
+  var layers = { data: true, gen: true, pick: true };
+  var selTarget = "";
+  var selected = null;
+  var css = getComputedStyle(document.documentElement);
+  function tok(name) { return css.getPropertyValue(name).trim(); }
+
+  function resize() {
+    var r = over.parentNode.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    [base, over].forEach(function (c) {
+      c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+      c.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+    });
+    drawBase(); drawOverlay();
+  }
+
+  function axes() {
+    bctx.strokeStyle = tok("--rule"); bctx.lineWidth = 1;
+    bctx.fillStyle = tok("--ink-3");
+    bctx.font = '11px "IBM Plex Mono", monospace';
+    var d;
+    for (d = Math.ceil(x0); d <= x1; d += 1) {
+      var px = Math.round(sx(Math.pow(10, d))) + 0.5;
+      bctx.beginPath(); bctx.moveTo(px, PAD.t); bctx.lineTo(px, H - PAD.b); bctx.stroke();
+      bctx.textAlign = "center";
+      bctx.fillText(Math.pow(10, d).toLocaleString(), px, H - PAD.b + 16);
+    }
+    var steps = y1 <= 0.5 ? 0.1 : 0.2;
+    for (var a = 0; a <= y1 + 1e-9; a += steps) {
+      var py = Math.round(sy(a)) + 0.5;
+      bctx.beginPath(); bctx.moveTo(PAD.l, py); bctx.lineTo(W - PAD.r, py); bctx.stroke();
+      bctx.textAlign = "right";
+      bctx.fillText(a.toFixed(1), PAD.l - 8, py + 4);
+    }
+    bctx.fillStyle = tok("--ink-2");
+    bctx.font = '600 11px "IBM Plex Sans Condensed", sans-serif';
+    bctx.textAlign = "center";
+    bctx.fillText("K_radial   (N/mm³, log)", (PAD.l + W - PAD.r) / 2, H - 6);
+    bctx.save();
+    bctx.translate(13, (PAD.t + H - PAD.b) / 2); bctx.rotate(-Math.PI / 2);
+    bctx.fillText("A_over_lim   (area past the fatigue limit)", 0, 0);
+    bctx.restore();
+  }
+
+  function drawBase() {
+    bctx.clearRect(0, 0, W, H);
+    axes();
+    if (layers.data) {
+      bctx.fillStyle = tok("--cloud");
+      bctx.globalAlpha = 0.055;
+      for (var i = 0; i < dK.length; i++) {
+        bctx.fillRect(sx(dK[i]) - 0.9, sy(dA[i]) - 0.9, 1.8, 1.8);
+      }
+      bctx.globalAlpha = 1;
+    }
+    if (layers.gen) {
+      for (var j = 0; j < G.n; j++) {
+        if (!gValid[j]) { continue; }
+        var dim = selTarget && targets[gWhich[j]].name !== selTarget;
+        bctx.fillStyle = tok("--gen");
+        bctx.globalAlpha = dim ? 0.10 : 0.72;
+        bctx.beginPath(); bctx.arc(sx(gK[j]), sy(gA[j]), 2.6, 0, 6.2832); bctx.fill();
+      }
+      bctx.globalAlpha = 1;
+    }
+    if (layers.pick) {
+      bctx.strokeStyle = tok("--pick"); bctx.lineWidth = 1.6;
+      bctx.fillStyle = tok("--panel");
+      shortRows.forEach(function (r) {
+        bctx.beginPath(); bctx.arc(sx(r.K_radial), sy(r.A_over_lim), 4.4, 0, 6.2832);
+        bctx.fill(); bctx.stroke();
+      });
+    }
+    if (selTarget) {
+      var t = targets.filter(function (o) { return o.name === selTarget; })[0];
+      if (t) { crosshair(bctx, t); }
+    }
+  }
+
+  function crosshair(c, t) {
+    var px = sx(t.asked.K_radial), py = sy(t.asked.A_over_lim);
+    c.save();
+    c.strokeStyle = tok("--accent"); c.lineWidth = 1.2; c.setLineDash([4, 4]);
+    c.beginPath(); c.moveTo(PAD.l, py); c.lineTo(W - PAD.r, py);
+    c.moveTo(px, PAD.t); c.lineTo(px, H - PAD.b); c.stroke();
+    c.setLineDash([]);
+    c.beginPath(); c.arc(px, py, 5, 0, 6.2832); c.stroke();
+    c.fillStyle = tok("--accent");
+    c.font = '600 11px "IBM Plex Mono", monospace';
+    c.textAlign = px > W - 150 ? "right" : "left";
+    c.fillText("asked: " + t.asked.K_radial + " / " + t.asked.A_over_lim,
+               px + (px > W - 150 ? -9 : 9), py - 9);
+    c.restore();
+  }
+
+  function drawOverlay() {
+    octx.clearRect(0, 0, W, H);
+    if (!selected) { return; }
+    var px = sx(selected.k), py = sy(selected.a);
+    var color = selected.kind === "data" ? tok("--accent")
+              : selected.kind === "pick" ? tok("--pick") : tok("--gen");
+    octx.strokeStyle = color; octx.lineWidth = 1.8;
+    octx.beginPath(); octx.arc(px, py, 8.5, 0, 6.2832); octx.stroke();
+    octx.globalAlpha = 0.35;
+    octx.beginPath(); octx.arc(px, py, 13.5, 0, 6.2832); octx.stroke();
+    octx.globalAlpha = 1;
+  }
+
+  /* ---------- cell bitmaps ---------- */
+  function bitAt(bytes, cell, p) {
+    return (bytes[cell * BYTES_PER_CELL + (p >> 3)] >> (7 - (p & 7))) & 1;
+  }
+  var tile = document.createElement("canvas");
+  tile.width = N; tile.height = N;
+  var tctx = tile.getContext("2d");
+
+  function paintTile(bytes, cell) {
+    var img = tctx.createImageData(N, N);
+    var on = hexToRgb(tok("--metal")), off = hexToRgb(tok("--void"));
+    for (var p = 0; p < NN; p++) {
+      var c = bitAt(bytes, cell, p) ? on : off, o = p * 4;
+      img.data[o] = c[0]; img.data[o + 1] = c[1]; img.data[o + 2] = c[2]; img.data[o + 3] = 255;
+    }
+    tctx.putImageData(img, 0, 0);
+  }
+  function hexToRgb(h) {
+    h = h.replace("#", "");
+    if (h.length === 3) { h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2]; }
+    var n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function drawCell(canvas, bytes, cell, reps) {
+    paintTile(bytes, cell);
+    var c = canvas.getContext("2d");
+    canvas.width = N * reps; canvas.height = N * reps;
+    c.imageSmoothingEnabled = false;
+    for (var r = 0; r < reps; r++) {
+      for (var s = 0; s < reps; s++) { c.drawImage(tile, s * N, r * N); }
+    }
+  }
+
+  /* ---------- inspector ---------- */
+  var kvEl = document.getElementById("kv");
+  var cellCanvas = document.getElementById("cellCanvas");
+
+  function fmt(v, dp) { return (v === undefined || v === null || isNaN(v)) ? "—" : v.toFixed(dp); }
+
+  function select(pt) {
+    selected = pt;
+    var bytes = pt.kind === "data" ? dThumbBits : gBits;
+    var cell = pt.kind === "data" ? pt.row : pt.src;
+    drawCell(cellCanvas, bytes, cell, 2);
+
+    var rows = [];
+    if (pt.kind === "data") {
+      rows.push(["origin", '<span class="tag data">training cell</span>']);
+      rows.push(["index", "#" + pt.src]);
+    } else {
+      var t = targets[pt.which];
+      var pick = pickIndex[pt.src];
+      rows.push(["origin", '<span class="tag gen">generated</span>' +
+        (pick ? ' <span class="tag pick">shortlist #' + pick.slot + "</span>" : "")]);
+      rows.push(["asked for", "K " + t.asked.K_radial + " &nbsp; A " + t.asked.A_over_lim]);
+      if (!t.well_supported) { rows.push(["support", '<span class="tag bad">thin</span> ' + t.support + " cells"]); }
+      else { rows.push(["support", t.support + " cells"]); }
+    }
+    rows.push(["K_radial", fmt(pt.k, 1)]);
+    rows.push(["A_over_lim", fmt(pt.a, 4)]);
+    rows.push(["eps_a_max", fmt(pt.e, 5)]);
+    rows.push(["f_metal", fmt(pt.f, 4)]);
+    kvEl.innerHTML = rows.map(function (r) {
+      return "<div><dt>" + r[0] + "</dt><dd>" + r[1] + "</dd></div>";
+    }).join("");
+
+    document.querySelectorAll(".ex").forEach(function (el) {
+      el.setAttribute("aria-current", String(Number(el.dataset.cell) === pt.src && pt.kind !== "data"));
+    });
+    drawOverlay();
+  }
+
+  function nearest(mx, my) {
+    var best = null, bd = 1e9;
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      if (p.kind === "data" && !layers.data) { continue; }
+      if (p.kind === "gen" && !layers.gen) { continue; }
+      if (p.kind === "pick" && !layers.pick) { continue; }
+      if (selTarget && p.kind !== "data" && targets[p.which].name !== selTarget) { continue; }
+      var dx = sx(p.k) - mx, dy = sy(p.a) - my, d = dx * dx + dy * dy;
+      if (d < bd) { bd = d; best = p; }
+    }
+    return bd < 900 ? best : null;
+  }
+
+  over.addEventListener("click", function (ev) {
+    var r = over.getBoundingClientRect();
+    var p = nearest(ev.clientX - r.left, ev.clientY - r.top);
+    if (p) { select(p); }
+  });
+
+  /* ---------- exemplar strip ---------- */
+  var strip = document.getElementById("strip"), stripNote = document.getElementById("stripNote");
+
+  function buildStrip() {
+    strip.innerHTML = "";
+    var name = selTarget || targets[0].name;
+    var t = otmByName[name];
+    var spec = targets.filter(function (o) { return o.name === name; })[0];
+    if (!t) {
+      strip.innerHTML = '<p class="strip-empty">No distinctness record for this target.</p>';
+      stripNote.textContent = "";
+      return;
+    }
+    stripNote.innerHTML = "<strong>" + name + "</strong> &mdash; " + t.n_valid +
+      " valid designs, mean structural distance " + t.within_mean.toFixed(3) +
+      " (" + Math.round(100 * t.ratio_to_cross_target) + "% of the distance between different targets), " +
+      Math.round(100 * t.fraction_above_floor) + "% of pairs above the torus-shift floor.";
+    t.exemplar_pool_indices.forEach(function (idx) {
+      var fig = document.createElement("figure");
+      fig.className = "ex"; fig.tabIndex = 0; fig.dataset.cell = idx;
+      fig.setAttribute("role", "button");
+      var cv = document.createElement("canvas");
+      fig.appendChild(cv);
+      var cap = document.createElement("figcaption");
+      cap.innerHTML = "K " + gK[idx].toFixed(0) + "<br>A " + gA[idx].toFixed(3);
+      fig.appendChild(cap);
+      strip.appendChild(fig);
+      drawCell(cv, gBits, idx, 1);
+      function open() {
+        select({ kind: pickIndex[idx] ? "pick" : "gen", row: idx, src: idx,
+                 k: gK[idx], a: gA[idx], f: gF[idx], e: gE[idx], which: gWhich[idx] });
+      }
+      fig.addEventListener("click", open);
+      fig.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); open(); }
+      });
+    });
+    if (spec) {
+      document.getElementById("hint").innerHTML =
+        "Click any point to open it. Dashed crosshair marks what was asked for; the orange " +
+        "cloud around it is what came back.";
+    }
+  }
+
+  /* ---------- tube view ----------
+     The cell wrapped onto its cylinder, drawn as flat-shaded quads on the lumen
+     surface. Per angular column we find runs of metal along the axis, so a solid
+     strut is a few quads rather than a few hundred voxels - about 1,200 quads a
+     frame instead of ~90,000, which is what makes 2D canvas enough here. Back-
+     facing columns are drawn first and dimmed, so holes show the far wall through
+     them rather than the page background. */
+  var TUBE = P.tube || { n_circ: 12, radius_mm: 3, thickness_mm: 0.22, cell_axial_mm: 1.5708 };
+  var tubeCv = document.getElementById("tubeCanvas");
+  var tubeModal = document.getElementById("tubeModal");
+  var tubeAxial = document.getElementById("tubeAxial");
+  var yaw = 0.6, pitch = 0.38, dragging = false, lastX = 0, lastY = 0;
+
+  function runsFor(bytes, cell, col) {
+    /* Metal runs down one angular column: [startRow, endRow) pairs. */
+    var out = [], start = -1;
+    for (var row = 0; row < N; row++) {
+      var on = bitAt(bytes, cell, row * N + col);
+      if (on && start < 0) { start = row; }
+      if (!on && start >= 0) { out.push([start, row]); start = -1; }
+    }
+    if (start >= 0) { out.push([start, N]); }
+    return out;
+  }
+
+  function drawTube() {
+    if (!selected) { return; }
+    var bytes = selected.kind === "data" ? dThumbBits : gBits;
+    var cell = selected.kind === "data" ? selected.row : selected.src;
+    var nAx = parseInt(tubeAxial.value, 10);
+    var nCirc = TUBE.n_circ;
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var rect = tubeCv.getBoundingClientRect();
+    tubeCv.width = Math.round(rect.width * dpr);
+    tubeCv.height = Math.round(rect.height * dpr);
+    var c = tubeCv.getContext("2d");
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, rect.width, rect.height);
+
+    var R = TUBE.radius_mm + TUBE.thickness_mm;
+    var Lz = nAx * TUBE.cell_axial_mm;
+    var M = nCirc * N;                       /* angular steps around the ring */
+    var dTheta = 2 * Math.PI / M;
+    var dz = TUBE.cell_axial_mm / N;
+
+    /* Fit the tube to the box with the axis vertical. */
+    var scale = 0.86 * Math.min(rect.width / (2 * R), rect.height / Math.max(Lz, 2 * R));
+    var cx = rect.width / 2, cy = rect.height / 2;
+    var ca = Math.cos(yaw), sa = Math.sin(yaw);
+    var cb = Math.cos(pitch), sb = Math.sin(pitch);
+
+    function project(theta, z) {
+      var x = R * Math.cos(theta), y = R * Math.sin(theta), zz = z - Lz / 2;
+      var x1 = x * ca - y * sa, y1 = x * sa + y * ca;      /* yaw about the axis */
+      var y2 = y1 * cb - zz * sb, z2 = y1 * sb + zz * cb;  /* tip toward the viewer */
+      return [cx + x1 * scale, cy - z2 * scale, y2];
+    }
+    function depthOfNormal(theta) {
+      var x = Math.cos(theta), y = Math.sin(theta);
+      return (x * sa + y * ca) * cb;                        /* rotated normal, camera axis */
+    }
+
+    /* Opaque colors, blended toward the ground rather than drawn with alpha: adjacent
+       quads share edges, and alpha compositing would double-darken every seam. Blending
+       toward the background (not toward black) also keeps "dim = recedes" true in both
+       themes, where the metal token is dark on light and light on dark. */
+    var metal = hexToRgb(tok("--metal")), ground = hexToRgb(tok("--panel-2"));
+    function shaded(t) {
+      var r = Math.round(ground[0] + (metal[0] - ground[0]) * t);
+      var g = Math.round(ground[1] + (metal[1] - ground[1]) * t);
+      var b = Math.round(ground[2] + (metal[2] - ground[2]) * t);
+      return "rgb(" + r + "," + g + "," + b + ")";
+    }
+    /* A hair of angular overlap closes the antialiased hairlines between columns. */
+    var eps = dTheta * 0.06;
+    var quads = 0;
+
+    for (var pass = 0; pass < 2; pass++) {
+      for (var j = 0; j < M; j++) {
+        var theta = j * dTheta;
+        var facing = depthOfNormal(theta + dTheta / 2) > 0;
+        if (facing !== (pass === 1)) { continue; }
+
+        var col = j % N;
+        var runs = runsFor(bytes, cell, col);
+        if (!runs.length) { continue; }
+
+        /* Lambert term on the rotated normal, plus ambient. Back faces are the
+           inside of the far wall, so they get a flat dim value instead. */
+        var shade = pass === 1
+          ? 0.45 + 0.55 * Math.max(0, depthOfNormal(theta + dTheta / 2))
+          : 0.20;
+        c.fillStyle = shaded(shade);
+
+        for (var m = 0; m < nAx; m++) {
+          for (var r = 0; r < runs.length; r++) {
+            var z0 = (m * N + runs[r][0]) * dz, z1 = (m * N + runs[r][1]) * dz;
+            var a1 = project(theta - eps, z0), a2 = project(theta + dTheta + eps, z0);
+            var a3 = project(theta + dTheta + eps, z1), a4 = project(theta - eps, z1);
+            c.beginPath();
+            c.moveTo(a1[0], a1[1]); c.lineTo(a2[0], a2[1]);
+            c.lineTo(a3[0], a3[1]); c.lineTo(a4[0], a4[1]);
+            c.closePath(); c.fill();
+            quads++;
+          }
+        }
+      }
+    }
+
+    var lab = selected;
+    document.getElementById("tubeMeta").innerHTML =
+      "<span>D " + (2 * TUBE.radius_mm).toFixed(1) + " mm</span>" +
+      "<span>length " + Lz.toFixed(2) + " mm</span>" +
+      "<span>K " + (isNaN(lab.k) ? "—" : lab.k.toFixed(0)) + "</span>" +
+      "<span>A " + (isNaN(lab.a) ? "—" : lab.a.toFixed(3)) + "</span>" +
+      "<span>f_metal " + lab.f.toFixed(3) + "</span>" +
+      "<span>" + quads.toLocaleString() + " quads</span>";
+  }
+
+  function openTube() {
+    tubeModal.setAttribute("data-open", "true");
+    document.getElementById("tubeNcirc").textContent = TUBE.n_circ;
+    requestAnimationFrame(drawTube);
+  }
+  function closeTube() { tubeModal.setAttribute("data-open", "false"); }
+
+  document.getElementById("wrapBtn").addEventListener("click", openTube);
+  document.getElementById("tubeClose").addEventListener("click", closeTube);
+  tubeAxial.addEventListener("change", drawTube);
+  tubeModal.addEventListener("click", function (ev) {
+    if (ev.target === tubeModal) { closeTube(); }
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") { closeTube(); }
+  });
+
+  tubeCv.addEventListener("pointerdown", function (ev) {
+    dragging = true; lastX = ev.clientX; lastY = ev.clientY;
+    tubeCv.setPointerCapture(ev.pointerId);
+  });
+  tubeCv.addEventListener("pointermove", function (ev) {
+    if (!dragging) { return; }
+    yaw += (ev.clientX - lastX) * 0.01;
+    pitch = Math.max(-1.35, Math.min(1.35, pitch + (ev.clientY - lastY) * 0.008));
+    lastX = ev.clientX; lastY = ev.clientY;
+    drawTube();
+  });
+  tubeCv.addEventListener("pointerup", function (ev) {
+    dragging = false;
+    if (tubeCv.hasPointerCapture(ev.pointerId)) { tubeCv.releasePointerCapture(ev.pointerId); }
+  });
+  window.addEventListener("resize", function () {
+    if (tubeModal.getAttribute("data-open") === "true") { drawTube(); }
+  });
+
+  /* ---------- readout ---------- */
+  function readout() {
+    var nValid = 0;
+    for (var i = 0; i < G.n; i++) { nValid += gValid[i]; }
+    var floor = P.onetomany ? P.onetomany.shift_floor_max : null;
+    var items = [
+      ["training cells", D.n.toLocaleString(), dThumbIdx.length + " inspectable"],
+      ["generated", G.n.toLocaleString(), targets.length + " targets × " + G.n_per_target],
+      ["valid", Math.round(100 * nValid / G.n) + "%", nValid.toLocaleString() + " labeled"],
+      ["shortlist", shortRows.length, (P.shortlist ? P.shortlist.layers_used : "?") + " Pareto layers"],
+      ["guidance", G.guidance.toFixed(1), G.steps + " DDIM steps"],
+      ["shift floor", floor === null ? "—" : floor.toFixed(4), "a cell vs its own shifts"]
+    ];
+    document.getElementById("readout").innerHTML = items.map(function (it) {
+      return '<div class="stat"><dt>' + it[0] + "</dt><dd>" + it[1] +
+             '<span class="sub">' + it[2] + "</span></dd></div>";
+    }).join("");
+  }
+
+  /* ---------- wiring ---------- */
+  var sel = document.getElementById("targetSel");
+  sel.innerHTML = '<option value="">all targets</option>' + targets.map(function (t) {
+    return '<option value="' + t.name + '">' + t.name + (t.well_supported ? "" : "  (thin)") + "</option>";
+  }).join("");
+  sel.addEventListener("change", function () {
+    selTarget = sel.value;
+    drawBase(); drawOverlay(); buildStrip();
+  });
+
+  document.querySelectorAll(".chip[data-layer]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var on = btn.getAttribute("aria-pressed") !== "true";
+      btn.setAttribute("aria-pressed", String(on));
+      layers[btn.dataset.layer] = on;
+      drawBase();
+    });
+  });
+
+  var themeBtn = document.getElementById("themeBtn");
+  themeBtn.addEventListener("click", function () {
+    var root = document.documentElement;
+    var now = root.getAttribute("data-theme");
+    var dark = now ? now === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", dark ? "light" : "dark");
+    css = getComputedStyle(root);
+    drawBase(); drawOverlay();
+    if (selected) { select(selected); }
+    document.querySelectorAll(".ex").forEach(function (el) {
+      drawCell(el.querySelector("canvas"), gBits, Number(el.dataset.cell), 1);
+    });
+  });
+
+  document.getElementById("footnote").innerHTML =
+    "Axes are the two labels every cell carries: <code>K_radial</code>, the homogenized " +
+    "radial support stiffness, and <code>A_over_lim</code>, the fraction of metal area whose " +
+    "strain amplitude exceeds the nitinol fatigue limit of " + P.limits.eps_a_lim +
+    ". Both come from the 2D screening simulator, not from 3D FEA. Training cells ship as " +
+    "scalars in full and as bitmaps for a coverage-spread subsample, which is why only some " +
+    "of the cloud opens. Generated designs ship complete.";
+
+  readout();
+  window.addEventListener("resize", resize);
+  resize();
+  buildStrip();
+  select(pts.filter(function (p) { return p.kind === "pick"; })[0] || pts[0]);
+}());
+</script>
