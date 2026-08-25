@@ -8,11 +8,11 @@
       },
       "target": {
         "K_radial": 100.0,
-        "eps_a_max": 0.03666400736114996,
+        "eps_a_max": 0.036555539309630146,
         "A_over_lim": 0.25,
-        "f_metal": 0.3096923828125
+        "f_metal": 0.3204345703125
       },
-      "support": 1062,
+      "support": 1050,
       "well_supported": true
     },
     {
@@ -23,11 +23,11 @@
       },
       "target": {
         "K_radial": 200.0,
-        "eps_a_max": 0.055285391320039165,
+        "eps_a_max": 0.055456992863101726,
         "A_over_lim": 0.25,
-        "f_metal": 0.381103515625
+        "f_metal": 0.38427734375
       },
-      "support": 578,
+      "support": 570,
       "well_supported": true
     },
     {
@@ -38,11 +38,11 @@
       },
       "target": {
         "K_radial": 300.0,
-        "eps_a_max": 0.06014345327038075,
+        "eps_a_max": 0.060009394695839845,
         "A_over_lim": 0.25,
-        "f_metal": 0.436767578125
+        "f_metal": 0.434326171875
       },
-      "support": 411,
+      "support": 406,
       "well_supported": true
     },
     {
@@ -53,11 +53,11 @@
       },
       "target": {
         "K_radial": 400.0,
-        "eps_a_max": 0.06502016612197589,
+        "eps_a_max": 0.06442226551910457,
         "A_over_lim": 0.25,
-        "f_metal": 0.4580078125
+        "f_metal": 0.46240234375
       },
-      "support": 175,
+      "support": 183,
       "well_supported": true
     },
     {
@@ -68,11 +68,11 @@
       },
       "target": {
         "K_radial": 100.0,
-        "eps_a_max": 0.02925073671343068,
+        "eps_a_max": 0.030583105700368207,
         "A_over_lim": 0.1,
-        "f_metal": 0.322021484375
+        "f_metal": 0.32470703125
       },
-      "support": 189,
+      "support": 173,
       "well_supported": true
     },
     {
@@ -83,11 +83,11 @@
       },
       "target": {
         "K_radial": 200.0,
-        "eps_a_max": 0.03975820849862498,
+        "eps_a_max": 0.0433005980302243,
         "A_over_lim": 0.1,
-        "f_metal": 0.351806640625
+        "f_metal": 0.362548828125
       },
-      "support": 131,
+      "support": 145,
       "well_supported": true
     },
     {
@@ -98,11 +98,11 @@
       },
       "target": {
         "K_radial": 300.0,
-        "eps_a_max": 0.043697693711151064,
+        "eps_a_max": 0.04891139902336902,
         "A_over_lim": 0.1,
-        "f_metal": 0.4188232421875
+        "f_metal": 0.411865234375
       },
-      "support": 70,
+      "support": 82,
       "well_supported": true
     },
     {
@@ -113,11 +113,11 @@
       },
       "target": {
         "K_radial": 400.0,
-        "eps_a_max": 0.05027615867563415,
+        "eps_a_max": 0.05126770348627549,
         "A_over_lim": 0.1,
-        "f_metal": 0.447998046875
+        "f_metal": 0.4510498046875
       },
-      "support": 25,
+      "support": 42,
       "well_supported": true
     },
     {
@@ -128,11 +128,11 @@
       },
       "target": {
         "K_radial": 100.0,
-        "eps_a_max": 0.023149056011380828,
+        "eps_a_max": 0.023524380084173006,
         "A_over_lim": 0.05,
-        "f_metal": 0.301025390625
+        "f_metal": 0.3033447265625
       },
-      "support": 35,
+      "support": 30,
       "well_supported": true
     },
     {
@@ -143,11 +143,11 @@
       },
       "target": {
         "K_radial": 200.0,
-        "eps_a_max": 0.03242270926743188,
+        "eps_a_max": 0.03431699963527314,
         "A_over_lim": 0.05,
-        "f_metal": 0.351318359375
+        "f_metal": 0.3594970703125
       },
-      "support": 23,
+      "support": 22,
       "well_supported": true
     },
     {
@@ -158,9 +158,9 @@
       },
       "target": {
         "K_radial": 300.0,
-        "eps_a_max": 0.02941319083574679,
+        "eps_a_max": 0.029269847555726716,
         "A_over_lim": 0.05,
-        "f_metal": 0.40478515625
+        "f_metal": 0.404541015625
       },
       "support": 9,
       "well_supported": true
@@ -173,11 +173,11 @@
       },
       "target": {
         "K_radial": 58.0,
-        "eps_a_max": 0.06274528055718873,
+        "eps_a_max": 0.0628199111441315,
         "A_over_lim": 0.54,
-        "f_metal": 0.38623046875
+        "f_metal": 0.38330078125
       },
-      "support": 4264,
+      "support": 3811,
       "well_supported": true
     },
     {
@@ -188,11 +188,11 @@
       },
       "target": {
         "K_radial": 20.0,
-        "eps_a_max": 0.07238049218080052,
+        "eps_a_max": 0.07005639087409932,
         "A_over_lim": 0.7,
-        "f_metal": 0.3515625
+        "f_metal": 0.346923828125
       },
-      "support": 2995,
+      "support": 2323,
       "well_supported": true
     }
   ],
@@ -200,9 +200,9 @@
   "n_per_target": 96,
   "steps": 50,
   "normalizer_std": [
-    0.49618334446391893,
-    0.024513128063337362,
-    0.22104532333741356,
-    0.07829217475137869
+    0.4923151838044488,
+    0.024496231615125437,
+    0.22250618825376606,
+    0.07834506009987036
   ]
 }

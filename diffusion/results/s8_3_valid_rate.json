@@ -2,43 +2,43 @@
   {
     "epoch": 10,
     "n": 256,
-    "raw_rate": 0.86328125,
-    "cleaned_rate": 0.94140625,
-    "f_metal_mean": 0.35715770721435547
+    "raw_rate": 0.80859375,
+    "cleaned_rate": 0.921875,
+    "f_metal_mean": 0.3565225601196289
   },
   {
     "epoch": 20,
     "n": 256,
-    "raw_rate": 0.7734375,
-    "cleaned_rate": 0.90625,
-    "f_metal_mean": 0.3660411834716797
+    "raw_rate": 0.75,
+    "cleaned_rate": 0.93359375,
+    "f_metal_mean": 0.3668689727783203
   },
   {
     "epoch": 30,
     "n": 256,
-    "raw_rate": 0.8203125,
+    "raw_rate": 0.75,
     "cleaned_rate": 0.9375,
-    "f_metal_mean": 0.36531829833984375
+    "f_metal_mean": 0.370880126953125
   },
   {
     "epoch": 40,
     "n": 256,
-    "raw_rate": 0.83984375,
-    "cleaned_rate": 0.953125,
-    "f_metal_mean": 0.36519527435302734
+    "raw_rate": 0.8125,
+    "cleaned_rate": 0.94921875,
+    "f_metal_mean": 0.3587656021118164
   },
   {
     "epoch": 50,
     "n": 256,
-    "raw_rate": 0.87890625,
-    "cleaned_rate": 0.94140625,
-    "f_metal_mean": 0.3707904815673828
+    "raw_rate": 0.8125,
+    "cleaned_rate": 0.90234375,
+    "f_metal_mean": 0.3377971649169922
   },
   {
     "epoch": 60,
     "n": 256,
-    "raw_rate": 0.85546875,
-    "cleaned_rate": 0.9375,
-    "f_metal_mean": 0.36466026306152344
+    "raw_rate": 0.8046875,
+    "cleaned_rate": 0.88671875,
+    "f_metal_mean": 0.34696197509765625
   }
 ]

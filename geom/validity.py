@@ -3,15 +3,11 @@ Validity checker.
 
 Defines what counts as an acceptable stent unit cell.
 
-Three criteria, all evaluated on the torus (see geom/periodic.py):
+Three criteria, all evaluated on the torus:
 
-
-  Connectivity:  One connected component - no islands floating free of the structure
-  Wrapping:      A load path must run all the way around the circumference and all the way
-                 along the axis. On a torus "spans both axes" can't mean "touches all four
-                 edges", because every column is interior; it means the component contains a
-                 non-contractible loop in each direction. Circumferentially that is radial
-                 support; axially it is what stops the stent falling apart into loose rings.
+  Connectivity:  One connected component, no islands floating free of the structure
+  Wrapping:      A load path has to run all the way around the circumference and all the way
+                 along the axis.
   Min feature:   Nothing thinner than MIN_FEATURE_MM, checked by morphological opening with
                  a disk of radius w/2, the standard length-scale test in topology
                  optimization, since a solid admits a min feature size 2r when
@@ -35,19 +31,45 @@ DISCONNECTED = 'disconnected'
 NO_WRAP_CIRC = 'no_wrap_circ'
 NO_WRAP_AXIAL = 'no_wrap_axial'
 THIN_FEATURE = 'thin_feature'
+VOID_THIN_FEATURE = 'void_thin_feature'
 TOO_SPARSE = 'too_sparse'
 TOO_DENSE = 'too_dense'
 EMPTY = 'empty'
 
+# Every reason `check` can return, so downstream caches can fingerprint the envelope.
+CRITERIA = (DISCONNECTED, NO_WRAP_CIRC, NO_WRAP_AXIAL, THIN_FEATURE, VOID_THIN_FEATURE, TOO_SPARSE, TOO_DENSE, EMPTY)
+
 # Fraction of material that opening may remove before a cell is called too thin. Non-zero
 # because discretising a curved or diagonal edge always removes a few pixels at corners.
 THIN_TOLERANCE = 0.02
+
+# Same allowance on the void side.
+VOID_THIN_TOLERANCE = 0.02
 
 def disk(radius_px):
     """Disk structuring element of the given radius, in pixels."""
     r = int(np.ceil(radius_px))
     y, x = np.ogrid[-r:r + 1, -r:r + 1]
     return (x * x + y * y) <= radius_px ** 2
+
+def min_feature_radius_px():
+    """Radius of the structuring element that defines MIN_FEATURE_MM, in pixels."""
+    return (config.MIN_FEATURE_MM / 2.0) / config.mm_per_px()[0]
+
+def void_thin_fraction(arr, radius_px=None, structure=None):
+    """How much of the void is narrower than the minimum feature."""
+    arr = np.asarray(arr, dtype=bool)
+    radius_px = min_feature_radius_px() if radius_px is None else radius_px
+    closed = periodic.closing(arr, structure=disk(radius_px))
+    void = int((~arr).sum())
+    if not void:
+        return 0.0
+    return float((closed & ~arr).sum()) / float(void)
+
+def has_thin_void(arr, tol=None, radius_px=None, structure=None):
+    """True when the cell contains voids below the minimum feature size."""
+    tol = VOID_THIN_TOLERANCE if tol is None else tol
+    return void_thin_fraction(arr, radius_px, structure) > tol
 
 def wraps(arr, structure=None):
     """
@@ -113,6 +135,11 @@ def check(cell, structure=None):
     metrics['thin_fraction'] = removed
     if removed > THIN_TOLERANCE:
         reasons.append(THIN_FEATURE)
+
+    void_removed = void_thin_fraction(arr, radius_px, structure)
+    metrics['void_thin_fraction'] = void_removed
+    if void_removed > VOID_THIN_TOLERANCE:
+        reasons.append(VOID_THIN_FEATURE)
 
     # Coverage guards.
     if f_metal < config.F_METAL_MIN:

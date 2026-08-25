@@ -128,17 +128,56 @@ def load_samples(out_stem='s9_1_generated'):
     meta = json.loads((RESULTS_DIR / f'{out_stem}_targets.json').read_text(encoding='utf-8'))
     return fields, blob['which'], meta
 
+def label_fingerprint():
+    """Everything a cached label depends on besides the field itself."""
+    from geom import validity
+
+    return {
+        'grid_n': config.GRID_N,
+        'min_feature_mm': config.MIN_FEATURE_MM,
+        'f_metal_min': config.F_METAL_MIN,
+        'f_metal_max': config.F_METAL_MAX,
+        'thin_tolerance': validity.THIN_TOLERANCE,
+        'void_thin_tolerance': validity.VOID_THIN_TOLERANCE,
+        'criteria': sorted(validity.CRITERIA),
+    }
+
+def fields_digest(fields):
+    """
+    Content hash of the sampled cells.
+
+    The count is not an identity. A retrained model regenerates the same 13 x 96 = 1248
+    samples with the same criteria, so a cache keyed on count and criteria alone HITS and
+    serves labels for the previous pool. That happened once (2026-08-25) and put 763 wrong
+    rows into the shortlist, so the cells themselves are hashed.
+    """
+    import hashlib
+
+    arr = np.ascontiguousarray(np.asarray(fields, dtype=bool))
+    return hashlib.sha256(np.packbits(arr, axis=None).tobytes()).hexdigest()
+
+
 def cached_labels(fields, out_stem='s9_1_generated'):
-    """Per-cell 2D labels, computed once and reused."""
+    """Per-cell 2D labels, reused only for the same cells under the same criteria."""
     from diffusion.fidelity import label_fields
 
     path = RESULTS_DIR / f'{out_stem}_labels.json'
+    fingerprint = label_fingerprint()
+    digest = fields_digest(fields)
     if path.exists():
         blob = json.loads(path.read_text(encoding='utf-8'))
-        if blob.get('n') == len(fields):
+        if (blob.get('n') == len(fields) and blob.get('fingerprint') == fingerprint
+                and blob.get('digest') == digest):
             return blob['rows'], int(blob['dropped'])
+        why = ('the samples changed' if blob.get('digest') not in (None, digest)
+               else 'the validity criteria changed' if blob.get('fingerprint') != fingerprint
+               else 'it predates content hashing')
+        print(f'  label cache is stale ({why}); relabeling', flush=True)
     rows, dropped = label_fields(fields)
-    path.write_text(json.dumps({'n': len(fields), 'dropped': int(dropped), 'rows': rows}), encoding='utf-8')
+    path.write_text(json.dumps({'n': len(fields), 'dropped': int(dropped),
+                                'fingerprint': fingerprint, 'digest': digest,
+                                'rows': rows}),
+                    encoding='utf-8')
     return rows, dropped
 
 def screen_phase(out_stem='s9_1_generated'):

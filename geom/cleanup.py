@@ -58,6 +58,14 @@ def keep_largest_component(arr, structure=None):
     sizes[0] = 0
     return lab == sizes.argmax(), count - 1
 
+def fill_thin_voids(field_like, structure=None, radius_px=None):
+    """Close voids narrower than the minimum feature. Returns (array, pixels_added)."""
+    arr = (field_like.to_array() if hasattr(field_like, 'to_array')
+           else np.asarray(field_like, dtype=bool))
+    radius_px = _disk_radius_px() if radius_px is None else radius_px
+    closed = periodic.closing(arr, structure=validity.disk(radius_px))
+    return closed, int(closed.sum() - arr.sum())
+
 def clean(field_like, structure=None, radius_px=None):
     """
     Repair a raw field. Returns a Cleanup.

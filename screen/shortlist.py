@@ -93,6 +93,54 @@ def select(objectives, k=DEFAULT_K):
             break
     return np.array(chosen), np.array(ranks)
 
+def manufacturable(fields, indices, progress=True):
+    """
+    Close sub-minimum voids, relabel, and re-check validity.
+
+    Returns (kept_indices, repaired_fields_by_index, labels_by_index, report). A design is
+    dropped when repair pushes it outside the validity envelope.
+    """
+    from diffusion.dataset import label_one
+    from geom import cleanup, validity
+    from geom.cell import UnitCell
+
+    kept, repaired, labels = [], {}, {}
+    n_changed, n_dropped, n_specks, reasons = 0, 0, 0, {}
+    for count, i in enumerate(indices):
+        result = cleanup.clean(fields[i])
+        if not result.fixed or result.cell is None:
+            n_dropped += 1
+            reasons['cleanup_failed'] = reasons.get('cleanup_failed', 0) + 1
+            continue
+        arr, added = cleanup.fill_thin_voids(result.cell)
+        if added:
+            n_changed += 1
+        arr, islands = cleanup.keep_largest_component(arr)
+        if islands:
+            n_specks += islands
+        verdict = validity.check(UnitCell(arr))
+        if not verdict.ok:
+            n_dropped += 1
+            for r in verdict.reasons:
+                reasons[r] = reasons.get(r, 0) + 1
+            continue
+        kept.append(i)
+        repaired[i] = arr
+        labels[i] = label_one(arr)
+        if progress and count and count % 100 == 0:
+            print(f'    screened {count}/{len(indices)}', flush=True)
+
+    report = {
+        'considered': int(len(indices)),
+        'repaired': int(n_changed),
+        'diagonal_specks_dropped': int(n_specks),
+        'dropped': int(n_dropped),
+        'kept': int(len(kept)),
+        'drop_reasons': reasons,
+    }
+    return np.array(kept, dtype=int), repaired, labels, report
+
+
 def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
     """Load the generated pool, label it, filter to valid, rank, and save the shortlist."""
     from diffusion import generate, splits
@@ -104,6 +152,18 @@ def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
     valid = np.array([i for i, r in enumerate(rows) if r is not None])
     if not len(valid):
         raise RuntimeError('no valid designs in the pool')
+
+    print(f'  manufacturability screen on {len(valid)} valid designs', flush=True)
+    valid, repaired, relabeled, screen_report = manufacturable(fields, valid)
+    if not len(valid):
+        raise RuntimeError('nothing survived the manufacturability screen')
+    print(f"  repaired {screen_report['repaired']}, dropped {screen_report['dropped']}, "
+          f"kept {screen_report['kept']}", flush=True)
+    for i, arr in repaired.items():
+        fields[i] = arr
+    rows = list(rows)
+    for i, lab in relabeled.items():
+        rows[i] = lab
 
     groups = splits.group_ids(fields[valid])
     _, first = np.unique(groups, return_index=True)
@@ -137,9 +197,11 @@ def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
         'objectives': {'maximize': OBJECTIVES[0], 'minimize': OBJECTIVES[1]},
         'rule': 'non-dominated sorting, crowding-distance tie-break',
         'pool_sampled': int(len(fields)),
-        'pool_valid': int(len(valid)),
+        'pool_valid': int(screen_report['considered']),
+        'pool_manufacturable': int(screen_report['kept']),
         'pool_distinct': int(len(unique)),
         'duplicates_removed': int(len(valid) - len(unique)),
+        'manufacturability_screen': screen_report,
         'layers_used': int(max(e['layer'] for e in entries)),
         # We measured top-K retention at 83-90% in this K range, so roughly 10-17% of the
         # actual best designs are missed because the 2D screen ranks them wrong. That's

@@ -101,6 +101,7 @@ def analyze(source_stem='s9_1_generated', min_valid=8, n_exemplars=6,
             out_stem='s9_3_onetomany'):
     """Per-target distinctness, calibrated against the shift floor and cross-target spread."""
     from diffusion import generate
+    from screen.shortlist import manufacturable
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     fields, which, meta = generate.load_samples(source_stem)
@@ -108,6 +109,15 @@ def analyze(source_stem='s9_1_generated', min_valid=8, n_exemplars=6,
     targets = meta['targets']
 
     valid = np.array([i for i, r in enumerate(rows) if r is not None])
+    valid, repaired, relabeled, screen_report = manufacturable(fields, valid, progress=False)
+    for i, arr in repaired.items():
+        fields[i] = arr
+    rows = list(rows)
+    for i, lab in relabeled.items():
+        rows[i] = lab
+    print(f"  manufacturability screen: repaired {screen_report['repaired']}, "
+          f"dropped {screen_report['dropped']}, kept {screen_report['kept']}", flush=True)
+
     floor_mean, floor_max = shift_floor(fields[valid[:40]])
 
     # Cross-target reference: one design from each target, pairwise.
@@ -150,6 +160,7 @@ def analyze(source_stem='s9_1_generated', min_valid=8, n_exemplars=6,
 
     result = {
         'source': source_stem,
+        'manufacturability_screen': screen_report,
         'shift_floor_mean': floor_mean,
         'shift_floor_max': floor_max,
         'cross_target_mean': cross_mean,

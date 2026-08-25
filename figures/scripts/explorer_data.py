@@ -57,11 +57,22 @@ def dataset_block():
 
 def generated_block():
     from diffusion import generate
+    from screen.shortlist import manufacturable
 
     fields, which, meta = generate.load_samples()
     rows, _ = generate.cached_labels(fields, 's9_1_generated')
     targets = meta['targets']
     print(f'generated: {len(fields)} samples over {len(targets)} targets')
+
+    idx = np.array([i for i, r in enumerate(rows) if r is not None])
+    idx, repaired, relabeled, screen = manufacturable(fields, idx, progress=False)
+    for i, arr in repaired.items():
+        fields[i] = arr
+    rows = list(rows)
+    for i in range(len(rows)):
+        rows[i] = relabeled.get(i)
+    print(f"  screen: repaired {screen['repaired']}, dropped {screen['dropped']}, "
+          f"kept {screen['kept']}")
 
     valid = np.array([r is not None for r in rows], dtype=bool)
     block = {
@@ -69,6 +80,7 @@ def generated_block():
         'guidance': meta['guidance'],
         'n_per_target': meta['n_per_target'],
         'steps': meta['steps'],
+        'screen': screen,
         'which': b64u8(np.asarray(which, dtype=np.uint8)),
         'valid': b64u8(valid),
         'bits': b64bits(fields),

@@ -6,9 +6,18 @@
   },
   "rule": "non-dominated sorting, crowding-distance tie-break",
   "pool_sampled": 1248,
-  "pool_valid": 650,
-  "pool_distinct": 650,
+  "pool_valid": 671,
+  "pool_manufacturable": 671,
+  "pool_distinct": 671,
   "duplicates_removed": 0,
+  "manufacturability_screen": {
+    "considered": 671,
+    "repaired": 496,
+    "diagonal_specks_dropped": 1,
+    "dropped": 0,
+    "kept": 671,
+    "drop_reasons": {}
+  },
   "layers_used": 4,
   "expected_top_k_retention": [
     0.83,
@@ -24,89 +33,164 @@
         "K_radial": 400.0,
         "A_over_lim": 0.25
       },
-      "K_radial": 537.8316290854136,
-      "eps_a_max": 0.055472841880995355,
-      "A_over_lim": 0.13380362922096323,
-      "f_metal": 0.457275390625,
-      "eps_a_p99": 0.019852121716318748
+      "K_radial": 548.1968740965845,
+      "eps_a_max": 0.05104078508292175,
+      "A_over_lim": 0.06831893329172592,
+      "f_metal": 0.463623046875,
+      "eps_a_p99": 0.014863995073779397
     },
     {
       "slot": 2,
-      "pool_index": 754,
+      "pool_index": 327,
       "layer": 1,
-      "target_name": "K400_A10",
+      "target_name": "K400_A25",
       "target_asked": {
         "K_radial": 400.0,
-        "A_over_lim": 0.1
+        "A_over_lim": 0.25
       },
-      "K_radial": 525.7406634230088,
-      "eps_a_max": 0.04347970663293563,
-      "A_over_lim": 0.06124253923079963,
-      "f_metal": 0.45751953125,
-      "eps_a_p99": 0.013231038207724267
+      "K_radial": 530.5784722482068,
+      "eps_a_max": 0.02865389015445762,
+      "A_over_lim": 0.04015246752409505,
+      "f_metal": 0.467529296875,
+      "eps_a_p99": 0.010669149477169218
     },
     {
       "slot": 3,
-      "pool_index": 311,
+      "pool_index": 362,
       "layer": 1,
       "target_name": "K400_A25",
       "target_asked": {
         "K_radial": 400.0,
         "A_over_lim": 0.25
       },
-      "K_radial": 484.3161155585665,
-      "eps_a_max": 0.0452135394948523,
-      "A_over_lim": 0.05984270160161918,
-      "f_metal": 0.463134765625,
-      "eps_a_p99": 0.013165122312255991
+      "K_radial": 429.49278775672883,
+      "eps_a_max": 0.02709693723419806,
+      "A_over_lim": 0.03923841590508255,
+      "f_metal": 0.469970703125,
+      "eps_a_p99": 0.010071627089209305
     },
     {
       "slot": 4,
-      "pool_index": 308,
+      "pool_index": 665,
       "layer": 1,
-      "target_name": "K400_A25",
+      "target_name": "K300_A10",
       "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.25
+        "K_radial": 300.0,
+        "A_over_lim": 0.1
       },
-      "K_radial": 483.75509891493624,
-      "eps_a_max": 0.02786435822975508,
-      "A_over_lim": 0.05801643889879185,
-      "f_metal": 0.45654296875,
-      "eps_a_p99": 0.014374026480474094
+      "K_radial": 303.56310004198497,
+      "eps_a_max": 0.01917983663494253,
+      "A_over_lim": 0.0355738730286378,
+      "f_metal": 0.40478515625,
+      "eps_a_p99": 0.007833379724777653
     },
     {
       "slot": 5,
-      "pool_index": 694,
-      "layer": 1,
-      "target_name": "K400_A10",
-      "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.1
-      },
-      "K_radial": 460.41368925431146,
-      "eps_a_max": 0.020865959895423315,
-      "A_over_lim": 0.032518001279485995,
-      "f_metal": 0.44287109375,
-      "eps_a_p99": 0.0074842293043806156
-    },
-    {
-      "slot": 6,
-      "pool_index": 288,
+      "pool_index": 319,
       "layer": 2,
       "target_name": "K400_A25",
       "target_asked": {
         "K_radial": 400.0,
         "A_over_lim": 0.25
       },
-      "K_radial": 511.14221443784686,
-      "eps_a_max": 0.03289213470025032,
-      "A_over_lim": 0.34677393345975727,
-      "f_metal": 0.46728515625,
-      "eps_a_p99": 0.025593943636442094
+      "K_radial": 540.2599536844799,
+      "eps_a_max": 0.03486197863253656,
+      "A_over_lim": 0.07225224016912238,
+      "f_metal": 0.471923828125,
+      "eps_a_p99": 0.016900784821702958
+    },
+    {
+      "slot": 6,
+      "pool_index": 754,
+      "layer": 2,
+      "target_name": "K400_A10",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.1
+      },
+      "K_radial": 507.3411757828343,
+      "eps_a_max": 0.04989308719782307,
+      "A_over_lim": 0.06644724667565495,
+      "f_metal": 0.4560546875,
+      "eps_a_p99": 0.01398113763926874
     },
     {
       "slot": 7,
+      "pool_index": 272,
+      "layer": 2,
+      "target_name": "K300_A25",
+      "target_asked": {
+        "K_radial": 300.0,
+        "A_over_lim": 0.25
+      },
+      "K_radial": 480.6211514931899,
+      "eps_a_max": 0.04190644753383215,
+      "A_over_lim": 0.05751584918251589,
+      "f_metal": 0.43359375,
+      "eps_a_p99": 0.013575575649192796
+    },
+    {
+      "slot": 8,
+      "pool_index": 321,
+      "layer": 2,
+      "target_name": "K400_A25",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.25
+      },
+      "K_radial": 478.0042017602222,
+      "eps_a_max": 0.02805391970363638,
+      "A_over_lim": 0.057393198825423916,
+      "f_metal": 0.477294921875,
+      "eps_a_p99": 0.01388409658696721
+    },
+    {
+      "slot": 9,
+      "pool_index": 343,
+      "layer": 2,
+      "target_name": "K400_A25",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.25
+      },
+      "K_radial": 468.7482447127459,
+      "eps_a_max": 0.04106692554014713,
+      "A_over_lim": 0.055376375329304235,
+      "f_metal": 0.466796875,
+      "eps_a_p99": 0.012561574702824235
+    },
+    {
+      "slot": 10,
+      "pool_index": 371,
+      "layer": 2,
+      "target_name": "K400_A25",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.25
+      },
+      "K_radial": 446.27923085708295,
+      "eps_a_max": 0.03502208472989336,
+      "A_over_lim": 0.051696335812666916,
+      "f_metal": 0.472900390625,
+      "eps_a_p99": 0.01250569263300438
+    },
+    {
+      "slot": 11,
+      "pool_index": 702,
+      "layer": 2,
+      "target_name": "K400_A10",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.1
+      },
+      "K_radial": 446.0372986486409,
+      "eps_a_max": 0.03615561216906482,
+      "A_over_lim": 0.049365616770972294,
+      "f_metal": 0.440673828125,
+      "eps_a_p99": 0.011419409772665848
+    },
+    {
+      "slot": 12,
       "pool_index": 292,
       "layer": 2,
       "target_name": "K400_A25",
@@ -114,89 +198,44 @@
         "K_radial": 400.0,
         "A_over_lim": 0.25
       },
-      "K_radial": 500.8482545685599,
-      "eps_a_max": 0.039511486213998526,
-      "A_over_lim": 0.06314293667903176,
-      "f_metal": 0.465576171875,
-      "eps_a_p99": 0.014015954814123245
+      "K_radial": 438.7988636281526,
+      "eps_a_max": 0.031645345962063684,
+      "A_over_lim": 0.04469308603575063,
+      "f_metal": 0.470947265625,
+      "eps_a_p99": 0.010985166895672738
     },
     {
-      "slot": 8,
-      "pool_index": 323,
-      "layer": 2,
-      "target_name": "K400_A25",
-      "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.25
-      },
-      "K_radial": 483.01342709912865,
-      "eps_a_max": 0.04100980899092199,
-      "A_over_lim": 0.058060890108215225,
-      "f_metal": 0.474609375,
-      "eps_a_p99": 0.013030693735411523
-    },
-    {
-      "slot": 9,
-      "pool_index": 378,
-      "layer": 2,
-      "target_name": "K400_A25",
-      "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.25
-      },
-      "K_radial": 449.56139571742517,
-      "eps_a_max": 0.027329770366830552,
-      "A_over_lim": 0.05507361193635704,
-      "f_metal": 0.45654296875,
-      "eps_a_p99": 0.012986584922665318
-    },
-    {
-      "slot": 10,
-      "pool_index": 238,
-      "layer": 2,
-      "target_name": "K300_A25",
-      "target_asked": {
-        "K_radial": 300.0,
-        "A_over_lim": 0.25
-      },
-      "K_radial": 425.6231088128708,
-      "eps_a_max": 0.04057890920052665,
-      "A_over_lim": 0.05358710562414265,
-      "f_metal": 0.439453125,
-      "eps_a_p99": 0.013010922416052926
-    },
-    {
-      "slot": 11,
-      "pool_index": 749,
+      "slot": 13,
+      "pool_index": 694,
       "layer": 2,
       "target_name": "K400_A10",
       "target_asked": {
         "K_radial": 400.0,
         "A_over_lim": 0.1
       },
-      "K_radial": 413.2479135118472,
-      "eps_a_max": 0.023030642690761886,
-      "A_over_lim": 0.039022355689022376,
-      "f_metal": 0.45166015625,
-      "eps_a_p99": 0.010616456086515794
+      "K_radial": 431.27716190830256,
+      "eps_a_max": 0.024272426417649526,
+      "A_over_lim": 0.04126695562265905,
+      "f_metal": 0.440185546875,
+      "eps_a_p99": 0.009209245953290078
     },
     {
-      "slot": 12,
-      "pool_index": 319,
-      "layer": 3,
-      "target_name": "K400_A25",
+      "slot": 14,
+      "pool_index": 602,
+      "layer": 2,
+      "target_name": "K300_A10",
       "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.25
+        "K_radial": 300.0,
+        "A_over_lim": 0.1
       },
-      "K_radial": 484.76330904937396,
-      "eps_a_max": 0.05744185260436501,
-      "A_over_lim": 0.1176962277451189,
-      "f_metal": 0.466064453125,
-      "eps_a_p99": 0.01790337121139269
+      "K_radial": 392.2222992496297,
+      "eps_a_max": 0.020946698114046973,
+      "A_over_lim": 0.03998064962977243,
+      "f_metal": 0.422119140625,
+      "eps_a_p99": 0.010331099170462647
     },
     {
-      "slot": 13,
+      "slot": 15,
       "pool_index": 368,
       "layer": 3,
       "target_name": "K400_A25",
@@ -204,176 +243,146 @@
         "K_radial": 400.0,
         "A_over_lim": 0.25
       },
-      "K_radial": 458.9119309564611,
-      "eps_a_max": 0.06002121744730853,
-      "A_over_lim": 0.11080530991196935,
-      "f_metal": 0.450927734375,
-      "eps_a_p99": 0.02000772049296161
-    },
-    {
-      "slot": 14,
-      "pool_index": 359,
-      "layer": 3,
-      "target_name": "K400_A25",
-      "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.25
-      },
-      "K_radial": 438.13837312489227,
-      "eps_a_max": 0.03741637836736887,
-      "A_over_lim": 0.06714670413300547,
-      "f_metal": 0.46337890625,
-      "eps_a_p99": 0.013857541740541171
-    },
-    {
-      "slot": 15,
-      "pool_index": 690,
-      "layer": 3,
-      "target_name": "K400_A10",
-      "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.1
-      },
-      "K_radial": 399.0668265597157,
-      "eps_a_max": 0.041642726948608294,
-      "A_over_lim": 0.057065859371308605,
-      "f_metal": 0.446533203125,
-      "eps_a_p99": 0.013431108210057125
+      "K_radial": 524.1929423887128,
+      "eps_a_max": 0.0398389526224609,
+      "A_over_lim": 0.07330246913580252,
+      "f_metal": 0.455078125,
+      "eps_a_p99": 0.015446505869037518
     },
     {
       "slot": 16,
-      "pool_index": 755,
+      "pool_index": 291,
       "layer": 3,
-      "target_name": "K400_A10",
-      "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.1
-      },
-      "K_radial": 393.2774882524023,
-      "eps_a_max": 0.02448309622208141,
-      "A_over_lim": 0.04407304240173324,
-      "f_metal": 0.438232421875,
-      "eps_a_p99": 0.009698119660163379
-    },
-    {
-      "slot": 17,
-      "pool_index": 249,
-      "layer": 3,
-      "target_name": "K300_A25",
-      "target_asked": {
-        "K_radial": 300.0,
-        "A_over_lim": 0.25
-      },
-      "K_radial": 393.12195327829386,
-      "eps_a_max": 0.025064063595828925,
-      "A_over_lim": 0.042596426654397675,
-      "f_metal": 0.432373046875,
-      "eps_a_p99": 0.00904544853385935
-    },
-    {
-      "slot": 18,
-      "pool_index": 687,
-      "layer": 3,
-      "target_name": "K400_A10",
-      "target_asked": {
-        "K_radial": 400.0,
-        "A_over_lim": 0.1
-      },
-      "K_radial": 334.8181329890219,
-      "eps_a_max": 0.03300769477829974,
-      "A_over_lim": 0.04139047881303146,
-      "f_metal": 0.459716796875,
-      "eps_a_p99": 0.009651019072588172
-    },
-    {
-      "slot": 19,
-      "pool_index": 536,
-      "layer": 3,
-      "target_name": "K200_A10",
-      "target_asked": {
-        "K_radial": 200.0,
-        "A_over_lim": 0.1
-      },
-      "K_radial": 271.73118626590497,
-      "eps_a_max": 0.024942067920037947,
-      "A_over_lim": 0.04099794238683129,
-      "f_metal": 0.3515625,
-      "eps_a_p99": 0.008377420725836535
-    },
-    {
-      "slot": 20,
-      "pool_index": 546,
-      "layer": 3,
-      "target_name": "K200_A10",
-      "target_asked": {
-        "K_radial": 200.0,
-        "A_over_lim": 0.1
-      },
-      "K_radial": 244.4622296814015,
-      "eps_a_max": 0.022880434606537603,
-      "A_over_lim": 0.03979192868081757,
-      "f_metal": 0.352294921875,
-      "eps_a_p99": 0.008063138524861159
-    },
-    {
-      "slot": 21,
-      "pool_index": 306,
-      "layer": 4,
       "target_name": "K400_A25",
       "target_asked": {
         "K_radial": 400.0,
         "A_over_lim": 0.25
       },
-      "K_radial": 480.7751161217209,
-      "eps_a_max": 0.09562320250457068,
-      "A_over_lim": 0.19619267396473028,
-      "f_metal": 0.47412109375,
-      "eps_a_p99": 0.024165825357681088
+      "K_radial": 481.56339133982965,
+      "eps_a_max": 0.05444497601015273,
+      "A_over_lim": 0.07109090562513105,
+      "f_metal": 0.474365234375,
+      "eps_a_p99": 0.015517392428539742
     },
     {
-      "slot": 22,
-      "pool_index": 200,
-      "layer": 4,
-      "target_name": "K300_A25",
+      "slot": 17,
+      "pool_index": 333,
+      "layer": 3,
+      "target_name": "K400_A25",
       "target_asked": {
-        "K_radial": 300.0,
+        "K_radial": 400.0,
         "A_over_lim": 0.25
       },
-      "K_radial": 452.3245070705178,
-      "eps_a_max": 0.05446993048812129,
-      "A_over_lim": 0.1125650877635005,
-      "f_metal": 0.4306640625,
-      "eps_a_p99": 0.019479434277039947
+      "K_radial": 460.85104339227837,
+      "eps_a_max": 0.04566805914082324,
+      "A_over_lim": 0.06592138614610525,
+      "f_metal": 0.47802734375,
+      "eps_a_p99": 0.014444715389093183
     },
     {
-      "slot": 23,
-      "pool_index": 508,
-      "layer": 4,
-      "target_name": "K200_A10",
+      "slot": 18,
+      "pool_index": 732,
+      "layer": 3,
+      "target_name": "K400_A10",
       "target_asked": {
-        "K_radial": 200.0,
+        "K_radial": 400.0,
         "A_over_lim": 0.1
       },
-      "K_radial": 200.82108133261318,
-      "eps_a_max": 0.0235200912682184,
-      "A_over_lim": 0.04377865347962709,
-      "f_metal": 0.35107421875,
-      "eps_a_p99": 0.007581631087671951
+      "K_radial": 428.0762740660645,
+      "eps_a_max": 0.042082468111351023,
+      "A_over_lim": 0.05164491230776152,
+      "f_metal": 0.468994140625,
+      "eps_a_p99": 0.012907400024345081
     },
     {
-      "slot": 24,
-      "pool_index": 822,
-      "layer": 4,
+      "slot": 19,
+      "pool_index": 667,
+      "layer": 3,
+      "target_name": "K300_A10",
+      "target_asked": {
+        "K_radial": 300.0,
+        "A_over_lim": 0.1
+      },
+      "K_radial": 401.1407829957201,
+      "eps_a_max": 0.029235860094818433,
+      "A_over_lim": 0.04987198372615038,
+      "f_metal": 0.4296875,
+      "eps_a_p99": 0.012016402499098845
+    },
+    {
+      "slot": 20,
+      "pool_index": 698,
+      "layer": 3,
+      "target_name": "K400_A10",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.1
+      },
+      "K_radial": 396.3414181085655,
+      "eps_a_max": 0.02977214035899417,
+      "A_over_lim": 0.04325000334390008,
+      "f_metal": 0.45068359375,
+      "eps_a_p99": 0.010580600705329589
+    },
+    {
+      "slot": 21,
+      "pool_index": 823,
+      "layer": 3,
       "target_name": "K100_A05",
       "target_asked": {
         "K_radial": 100.0,
         "A_over_lim": 0.05
       },
-      "K_radial": 74.27517640977125,
-      "eps_a_max": 0.012372537544260497,
-      "A_over_lim": 0.04089013134540291,
-      "f_metal": 0.3056640625,
-      "eps_a_p99": 0.005338248787646837
+      "K_radial": 110.83875945136285,
+      "eps_a_max": 0.01324760589164534,
+      "A_over_lim": 0.04180116661003509,
+      "f_metal": 0.3193359375,
+      "eps_a_p99": 0.006213384734331127
+    },
+    {
+      "slot": 22,
+      "pool_index": 373,
+      "layer": 4,
+      "target_name": "K400_A25",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.25
+      },
+      "K_radial": 510.3187024980788,
+      "eps_a_max": 0.06279931501803432,
+      "A_over_lim": 0.08295682244198822,
+      "f_metal": 0.46630859375,
+      "eps_a_p99": 0.01697513793322064
+    },
+    {
+      "slot": 23,
+      "pool_index": 378,
+      "layer": 4,
+      "target_name": "K400_A25",
+      "target_asked": {
+        "K_radial": 400.0,
+        "A_over_lim": 0.25
+      },
+      "K_radial": 464.1595067822814,
+      "eps_a_max": 0.03921554979551377,
+      "A_over_lim": 0.07347052935288227,
+      "f_metal": 0.460693359375,
+      "eps_a_p99": 0.014293576927554058
+    },
+    {
+      "slot": 24,
+      "pool_index": 578,
+      "layer": 4,
+      "target_name": "K300_A10",
+      "target_asked": {
+        "K_radial": 300.0,
+        "A_over_lim": 0.1
+      },
+      "K_radial": 324.6764435418097,
+      "eps_a_max": 0.03071245082301947,
+      "A_over_lim": 0.044769050659855245,
+      "f_metal": 0.4248046875,
+      "eps_a_p99": 0.011203610814734189
     }
   ]
 }
