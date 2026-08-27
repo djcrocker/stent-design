@@ -1,8 +1,5 @@
 """
 Filter the generated pool to valid designs, rank them, and cut a shortlist.
-
-Ranking is by NON-DOMINATED SORTING with crowding-distance tie-breaking, on two objectives:
-`K_radial` maximized and `A_over_lim` minimized.
 """
 
 import argparse
@@ -15,12 +12,16 @@ from diffusion import dataset
 
 RESULTS_DIR = config.PROJECT_ROOT / 'screen' / 'results'
 DEFAULT_K = 24
-OBJECTIVES = ('K_radial', 'A_over_lim')
+OBJECTIVES = ('K_radial', 'A_over_lim', 'f_metal')
 
 def _as_minimization(objectives):
-    """Both columns as things to minimize, with `K_radial` on a log scale."""
+    """
+    Every column as something to minimize. The first column is log10(K_radial) because
+    the range is huge and we want to treat it as a multiplicative factor. The other columns are already minimization objectives.
+    """
+    objectives = np.asarray(objectives, float)
     k = np.log10(np.maximum(objectives[:, 0], 1e-12))
-    return np.column_stack([-k, objectives[:, 1]])
+    return np.column_stack([-k] + [objectives[:, c] for c in range(1, objectives.shape[1])])
 
 def nondominated_layers(objectives):
     """Peel successive non-dominated fronts. Returns a list of index arrays, best first."""
@@ -191,10 +192,12 @@ def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
     entries.sort(key=lambda e: (e['layer'], -e['K_radial']))
     for slot, e in enumerate(entries, 1):
         e['slot'] = slot
+    # Reorder the saved cells to match.
+    chosen = np.array([e['pool_index'] for e in entries], dtype=int)
 
     summary = {
         'k': int(len(entries)),
-        'objectives': {'maximize': OBJECTIVES[0], 'minimize': OBJECTIVES[1]},
+        'objectives': {'maximize': [OBJECTIVES[0]], 'minimize': list(OBJECTIVES[1:])},
         'rule': 'non-dominated sorting, crowding-distance tie-break',
         'pool_sampled': int(len(fields)),
         'pool_valid': int(screen_report['considered']),
