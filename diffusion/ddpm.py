@@ -147,7 +147,9 @@ class DDPM:
         return x
 
     @torch.no_grad()
-    def ddim_sample(self, n, y, guidance=2.0, steps=50, eta=0.0, shape=(1, 64, 64), clamp=True, trajectory=False):
+    def ddim_sample(self, n, y, guidance=2.0, steps=50, eta=0.0, shape=(1, 64, 64),
+                    clamp=True, trajectory=False, known=None, known_mask=None,
+                    resample=1):
         """
         DDIM sampling on a subsequence of the training timesteps.
 
@@ -163,12 +165,17 @@ class DDPM:
         """
         seq = np.linspace(0, self.timesteps - 1, steps).round().astype(int)[::-1]
         traj_t, traj_x, traj_x0 = [], [], []
+        if known is not None:
+            known = known.to(self.device)
+            known_mask = known_mask.to(self.device)
         x = torch.randn(n, *shape, device=self.device)
         y = y.to(self.device)
         ones = torch.ones(n, device=self.device)
         zeros = torch.zeros(n, device=self.device)
 
         for i, t_cur in enumerate(seq):
+          ab_t_outer = self.alphas_bar[int(t_cur)]
+          for _pass in range(resample if known is not None else 1):
             t = torch.full((n,), int(t_cur), device=self.device, dtype=torch.long)
             if guidance == 0.0:
                 eps = self.model(x, t, y, zeros)
@@ -198,6 +205,16 @@ class DDPM:
             x = ab_prev.sqrt() * x0 + direction
             if eta > 0 and t_prev >= 0:
                 x = x + sigma * torch.randn_like(x)
+            if known is not None:
+                # Re-impose the known region at the noise level the chain has reached
+                noised = (ab_prev.sqrt() * known
+                          + (1 - ab_prev).sqrt() * torch.randn_like(known))
+                x = known_mask * noised + (1 - known_mask) * x
+                # U-turn: re-noise back to this step's level and denoise again, except on
+                # the final pass, which must leave x at t_prev for the chain to advance.
+                if _pass < resample - 1:
+                    beta = (1 - ab_t_outer / ab_prev).clamp(min=0.0, max=1.0)
+                    x = (1 - beta).sqrt() * x + beta.sqrt() * torch.randn_like(x)
         if trajectory:
             return x, (np.array(traj_t), torch.stack(traj_x), torch.stack(traj_x0))
         return x

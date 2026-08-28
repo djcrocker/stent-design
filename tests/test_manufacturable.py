@@ -206,8 +206,23 @@ def test_the_label_cache_is_keyed_on_the_cells_not_just_their_count():
     rng = np.random.default_rng(0)
     a = rng.random((8, config.GRID_N, config.GRID_N)) > 0.5
     b = a.copy()
-    b[3, 10, 10] = not b[3, 10, 10]                 # one pixel, one cell
+    b[3, 10, 10] = not b[3, 10, 10]                 # One pixel, one cell
 
     assert fields_digest(a) == fields_digest(a.copy())
     assert fields_digest(a) != fields_digest(b)
-    assert len(a) == len(b)                         # the count cannot tell them apart
+    assert len(a) == len(b)                         # The count can't tell them apart
+
+def test_wraps_handles_a_non_square_stack():
+    """An axial stack of cells is taller than it is wide."""
+    from geom import validity as v
+
+    n = config.GRID_N
+    bar = np.zeros((2 * n, n), bool)
+    bar[:, 10:14] = True                        # A full-height axial strut
+    circ, axial = v.wraps(bar)
+    assert axial and not circ
+
+    band = np.zeros((2 * n, n), bool)
+    band[10:14, :] = True                       # A full-width circumferential band
+    circ, axial = v.wraps(band)
+    assert circ and not axial

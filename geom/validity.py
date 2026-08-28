@@ -79,11 +79,11 @@ def wraps(arr, structure=None):
     share a label. If they do, a path connects them: a non-contractible loop around that direction of the torus.
     """
     structure = periodic.CONN4 if structure is None else structure
-    n = arr.shape[0]
+    rows, cols = arr.shape
     lab, _ = ndimage.label(np.tile(arr, (3, 3)), structure=structure)
-    center = lab[n:2 * n, n:2 * n]
-    right = lab[n:2 * n, 2 * n:3 * n]
-    down = lab[2 * n:3 * n, n:2 * n]
+    center = lab[rows:2 * rows, cols:2 * cols]
+    right = lab[rows:2 * rows, 2 * cols:3 * cols]
+    down = lab[2 * rows:3 * rows, cols:2 * cols]
     solid = center > 0
     return (bool(np.any(solid & (center == right))),
             bool(np.any(solid & (center == down))))

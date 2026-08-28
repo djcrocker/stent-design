@@ -1,0 +1,71 @@
+{
+  "targets": [
+    {
+      "name": "K100_A25",
+      "asked": {
+        "K_radial": 100.0,
+        "A_over_lim": 0.25
+      },
+      "target": {
+        "K_radial": 100.0,
+        "eps_a_max": 0.036555539309630146,
+        "A_over_lim": 0.25,
+        "f_metal": 0.3204345703125
+      },
+      "support": 1050
+    },
+    {
+      "name": "K200_A10",
+      "asked": {
+        "K_radial": 200.0,
+        "A_over_lim": 0.1
+      },
+      "target": {
+        "K_radial": 200.0,
+        "eps_a_max": 0.0433005980302243,
+        "A_over_lim": 0.1,
+        "f_metal": 0.362548828125
+      },
+      "support": 145
+    },
+    {
+      "name": "K300_A05",
+      "asked": {
+        "K_radial": 300.0,
+        "A_over_lim": 0.05
+      },
+      "target": {
+        "K_radial": 300.0,
+        "eps_a_max": 0.029269847555726716,
+        "A_over_lim": 0.05,
+        "f_metal": 0.404541015625
+      },
+      "support": 9
+    },
+    {
+      "name": "control_mid",
+      "asked": {
+        "K_radial": 58.0,
+        "A_over_lim": 0.54
+      },
+      "target": {
+        "K_radial": 58.0,
+        "eps_a_max": 0.0628199111441315,
+        "A_over_lim": 0.54,
+        "f_metal": 0.38330078125
+      },
+      "support": 3811
+    }
+  ],
+  "guidance": 5.0,
+  "steps": 50,
+  "band_rows": 4,
+  "n_per_target": 24,
+  "resample": 4,
+  "sigma": {
+    "band_density": 0.3984375,
+    "median_density": 0.404296875,
+    "column_coverage": 0.453125,
+    "n_candidates": 63
+  }
+}
