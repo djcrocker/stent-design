@@ -1,0 +1,106 @@
+{
+  "targets": [
+    {
+      "index": 0,
+      "asked": {
+        "K_radial": 120.0
+      },
+      "target": {
+        "K_radial": 120.0,
+        "eps_a_max": 0.06393664689916544,
+        "A_over_lim": 0.5833947537753355,
+        "f_metal": 0.391845703125
+      },
+      "support": 6730
+    },
+    {
+      "index": 1,
+      "asked": {
+        "K_radial": 172.0
+      },
+      "target": {
+        "K_radial": 172.0,
+        "eps_a_max": 0.06187334422981077,
+        "A_over_lim": 0.5754305182061771,
+        "f_metal": 0.411376953125
+      },
+      "support": 5442
+    },
+    {
+      "index": 2,
+      "asked": {
+        "K_radial": 224.0
+      },
+      "target": {
+        "K_radial": 224.0,
+        "eps_a_max": 0.060730582418091344,
+        "A_over_lim": 0.5756378600823044,
+        "f_metal": 0.43505859375
+      },
+      "support": 5321
+    },
+    {
+      "index": 3,
+      "asked": {
+        "K_radial": 276.0
+      },
+      "target": {
+        "K_radial": 276.0,
+        "eps_a_max": 0.06020753048628068,
+        "A_over_lim": 0.5762187614388871,
+        "f_metal": 0.447509765625
+      },
+      "support": 4709
+    },
+    {
+      "index": 4,
+      "asked": {
+        "K_radial": 328.0
+      },
+      "target": {
+        "K_radial": 328.0,
+        "eps_a_max": 0.058864935717881914,
+        "A_over_lim": 0.5595575894635033,
+        "f_metal": 0.455322265625
+      },
+      "support": 3053
+    },
+    {
+      "index": 5,
+      "asked": {
+        "K_radial": 380.0
+      },
+      "target": {
+        "K_radial": 380.0,
+        "eps_a_max": 0.05834796684473283,
+        "A_over_lim": 0.5201551606975247,
+        "f_metal": 0.467041015625
+      },
+      "support": 1580
+    }
+  ],
+  "key": "K_radial",
+  "lo": 120.0,
+  "hi": 380.0,
+  "n_cells": 6,
+  "pool": 24,
+  "guidance": 5.0,
+  "steps": 50,
+  "resample": 4,
+  "band_rows": 4,
+  "sigma": {
+    "band_density": 0.2890625,
+    "median_density": 0.26171875,
+    "column_coverage": 0.34375,
+    "n_candidates": 23
+  },
+  "chosen_from": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "positions_with_no_join": 0
+}

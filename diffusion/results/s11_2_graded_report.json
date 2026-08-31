@@ -1,0 +1,45 @@
+{
+  "key": "K_radial",
+  "n_cells": 6,
+  "asked": [
+    120.0,
+    172.0,
+    224.0,
+    276.0,
+    328.0,
+    380.0
+  ],
+  "achieved": [
+    170.03338266469044,
+    209.89142380251803,
+    163.3604564186334,
+    332.2018821051973,
+    312.3660501811236,
+    403.5890485280886
+  ],
+  "f_metal": [
+    0.400634765625,
+    0.385009765625,
+    0.431884765625,
+    0.45849609375,
+    0.448974609375,
+    0.4609375
+  ],
+  "all_cells_valid": true,
+  "n_valid_cells": 6,
+  "stack_connected": true,
+  "stack_wrap_circ": true,
+  "stack_wrap_axial": true,
+  "interfaces_joined": 6,
+  "min_crossings": [
+    13,
+    13,
+    13,
+    14,
+    14,
+    13
+  ],
+  "gradient_rho": 0.7714285714285715,
+  "achieved_span": 240.2285921094552,
+  "positions_with_no_join": 0
+}
