@@ -1,0 +1,141 @@
+{
+  "mesh": {
+    "n_circ": null,
+    "n_axial": 4,
+    "layers": 2,
+    "limit": 0.2
+  },
+  "arms": [
+    "bend",
+    "comb"
+  ],
+  "bend_radius_mm": 54.0,
+  "bend_radius_full_excursion_mm": 27.0,
+  "axial_compression": 0.045,
+  "axial_compression_full_excursion": 0.09,
+  "sample_fraction": 0.5,
+  "release": false,
+  "length_mm": 6.283185307179586,
+  "cells": [
+    {
+      "pool_index": 2,
+      "stem": "s9_4_cell02",
+      "f_metal": 0.469970703125,
+      "n_nodes": 307980,
+      "n_hexes": 184800,
+      "entities": 492780,
+      "scaled_jacobian_min": 0.7221589187640381,
+      "max_face_angle_deg": 133.76642089894239,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell02_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell02_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell02_comb.inp"
+      }
+    },
+    {
+      "pool_index": 6,
+      "stem": "s9_4_cell06",
+      "f_metal": 0.389404296875,
+      "n_nodes": 254232,
+      "n_hexes": 153120,
+      "entities": 407352,
+      "scaled_jacobian_min": 0.7221774791277096,
+      "max_face_angle_deg": 133.76488354506378,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell06_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell06_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell06_comb.inp"
+      }
+    },
+    {
+      "pool_index": 8,
+      "stem": "s9_4_cell08",
+      "f_metal": 0.40478515625,
+      "n_nodes": 271080,
+      "n_hexes": 159168,
+      "entities": 430248,
+      "scaled_jacobian_min": 0.7221649852494415,
+      "max_face_angle_deg": 133.76591835785257,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell08_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell08_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell08_comb.inp"
+      }
+    },
+    {
+      "pool_index": 9,
+      "stem": "s9_4_cell09",
+      "f_metal": 0.349365234375,
+      "n_nodes": 236268,
+      "n_hexes": 137376,
+      "entities": 373644,
+      "scaled_jacobian_min": 0.7203852842761052,
+      "max_face_angle_deg": 133.91314425934374,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell09_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell09_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell09_comb.inp"
+      }
+    },
+    {
+      "pool_index": 12,
+      "stem": "s9_4_cell12",
+      "f_metal": 0.311767578125,
+      "n_nodes": 208368,
+      "n_hexes": 122592,
+      "entities": 330960,
+      "scaled_jacobian_min": 0.7187731601347079,
+      "max_face_angle_deg": 134.04615712510255,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell12_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell12_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell12_comb.inp"
+      }
+    },
+    {
+      "pool_index": 13,
+      "stem": "s9_4_cell13",
+      "f_metal": 0.318115234375,
+      "n_nodes": 221220,
+      "n_hexes": 125088,
+      "entities": 346308,
+      "scaled_jacobian_min": 0.7221468389341165,
+      "max_face_angle_deg": 133.76742138746138,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell13_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell13_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell13_comb.inp"
+      }
+    },
+    {
+      "pool_index": 14,
+      "stem": "s9_4_cell14",
+      "f_metal": 0.297607421875,
+      "n_nodes": 209160,
+      "n_hexes": 117024,
+      "entities": 326184,
+      "scaled_jacobian_min": 0.7195906234661067,
+      "max_face_angle_deg": 133.97869835061175,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell14_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell14_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell14_comb.inp"
+      }
+    },
+    {
+      "pool_index": 20,
+      "stem": "s9_4_cell20",
+      "f_metal": 0.292236328125,
+      "n_nodes": 198684,
+      "n_hexes": 114912,
+      "entities": 313596,
+      "scaled_jacobian_min": 0.7160188555402416,
+      "max_face_angle_deg": 134.27267155323005,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell20_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell20_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s9_4_cell20_comb.inp"
+      }
+    }
+  ]
+}

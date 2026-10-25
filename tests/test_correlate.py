@@ -136,3 +136,23 @@ def test_difficulty_coupling_is_measured_not_assumed():
     assert 'rho' in out and 'p' in out
     flat = [dict(r, retries=0) for r in rows]
     assert 'note' in correlate.difficulty_coupling(flat, 'K_radial')
+
+def test_the_fatigue_gate_is_the_percentile_not_the_peak():
+    """
+    S9.4: eps_a_max cleared the 2D-vs-3D axis (rho 0.860) but not a change of load mode
+    (+0.31, +0.33). A single-node peak sits on whichever strut is critical, and bending
+    picks a different one.
+    """
+    assert 'eps_a_p99' in correlate.GATE_METRICS
+    assert 'eps_a_max' not in correlate.GATE_METRICS
+
+def test_a_gated_metric_with_no_3d_column_is_pending_not_passing():
+    """
+    eps_a_p99_3D was never computed for the S6 cells. The danger is a gate that names a
+    metric it cannot evaluate and reports a pass anyway.
+    """
+    rows = [{'K_radial_2D': i, 'K_radial_3D': i, 'eps_a_p99_2D': i} for i in range(1, 21)]
+    r = correlate.analyze_metric(rows, 'eps_a_p99', n_boot=200)
+    assert r['gates'] and not r['passes']
+    assert 'eps_a_p99_3D' in r['pending']
+    assert r['rho'] is None

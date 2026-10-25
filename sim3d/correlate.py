@@ -23,10 +23,11 @@ import config
 
 # Both metrics have to clear this
 GATE_RHO = 0.7
-GATE_METRICS = ('K_radial', 'eps_a_max')
+GATE_METRICS = ('K_radial', 'eps_a_p99')
 
 # Radial support wants a stiff stent; fatigue wants low strain amplitude.
-HIGHER_IS_BETTER = {'K_radial': True, 'eps_a_max': False, 'A_over_lim': False}
+HIGHER_IS_BETTER = {'K_radial': True, 'eps_a_max': False, 'A_over_lim': False,
+                    'eps_a_p99': False}
 
 def load_labels(path=None):
     """Converged rows only, as a cell with no 3D result can't enter a correlation."""
@@ -81,11 +82,17 @@ def retention_curve(pred, truth, higher_is_better=True):
 
 def analyze_metric(rows, metric, n_boot=10000, seed=0):
     """rho, CI, p, n and retention for one metric across the given rows."""
+    hib = HIGHER_IS_BETTER[metric]
+    if rows and f'{metric}_3D' not in rows[0]:
+        return {'metric': metric, 'n': 0, 'rho': None, 'p': None, 'ci95': [None, None],
+                'higher_is_better': hib, 'retention': {},
+                'gates': metric in GATE_METRICS, 'passes': False,
+                'pending': f'{metric}_3D is not in the labels; recompute the S6 3D tier '
+                           f'with per-node dumps (sim3d.loadsteps.flex_scalars) to evaluate'}
     x = [r[f'{metric}_2D'] for r in rows]
     y = [r[f'{metric}_3D'] for r in rows]
     rho, p = spearman(x, y)
     lo, hi = bootstrap_ci(x, y, n_boot=n_boot, seed=seed)
-    hib = HIGHER_IS_BETTER[metric]
     return {'metric': metric, 'n': len(rows), 'rho': rho, 'p': p,
             'ci95': [lo, hi], 'higher_is_better': hib,
             'retention': {str(k): topk_retention(x, y, k, hib)
@@ -93,7 +100,8 @@ def analyze_metric(rows, metric, n_boot=10000, seed=0):
             'gates': metric in GATE_METRICS,
             'passes': (metric in GATE_METRICS) and rho >= GATE_RHO}
 
-def analyze(path=None, metrics=('K_radial', 'eps_a_max', 'A_over_lim'), n_boot=10000, seed=0):
+def analyze(path=None, metrics=('K_radial', 'eps_a_max', 'eps_a_p99', 'A_over_lim'),
+            n_boot=10000, seed=0):
     """Overall, per family, and gate verdict."""
     rows, all_rows = load_labels(path)
     out = {'n_converged': len(rows), 'n_total': len(all_rows),
@@ -113,7 +121,9 @@ def analyze(path=None, metrics=('K_radial', 'eps_a_max', 'A_over_lim'), n_boot=1
     gated = [out['overall'][m] for m in GATE_METRICS if m in out['overall']]
     out['gate_passed'] = bool(gated) and all(g['passes'] for g in gated)
     # A pass whose CI reaches below the threshold is not a settled pass.
-    out['gate_ci_clears'] = bool(gated) and all(g['ci95'][0] >= GATE_RHO for g in gated)
+    out['gate_ci_clears'] = bool(gated) and all(
+        g['ci95'][0] is not None and g['ci95'][0] >= GATE_RHO for g in gated)
+    out['gate_pending'] = [g['metric'] for g in gated if g.get('pending')]
     return out
 
 def write(result, path=None):
@@ -144,7 +154,9 @@ def gate_record(path=None, n_boot=10000, seed=0):
         families[fam] = n
 
     excluded = [r['name'] for r in all_rows if not r.get('converged')]
-    coupling = {m: difficulty_coupling(rows, m) for m in result['overall']}
+    # Skip metrics with no 3D column; see analyze_metric's pending branch.
+    coupling = {m: difficulty_coupling(rows, m) for m in result['overall']
+                if rows and f'{m}_3D' in rows[0]}
 
     caveats = []
     # 'reference' is a crown geometry carried separately for continuity with S5, so it's
@@ -169,7 +181,14 @@ def gate_record(path=None, n_boot=10000, seed=0):
             'evidence': coupled,
         })
     marginal = {m: d['ci95'][0] for m, d in result['overall'].items()
-                if d['gates'] and d['ci95'][0] < GATE_RHO + 0.05}
+                if d['gates'] and d['ci95'][0] is not None
+                and d['ci95'][0] < GATE_RHO + 0.05}
+    for m, d in result['overall'].items():
+        if d['gates'] and d.get('pending'):
+            caveats.append({'id': 'gate_metric_unmeasured',
+                            'detail': f'{m} gates the verdict but has no 3D label on this '
+                                      f'axis, so the gate cannot be evaluated.',
+                            'evidence': {'metric': m, 'pending': d['pending']}})
     if marginal:
         caveats.append({
             'id': 'ci_close_to_threshold',

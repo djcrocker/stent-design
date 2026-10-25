@@ -66,9 +66,34 @@ FLEX_AXIAL_COMPRESSION = FLEX_AXIAL_COMPRESSION_BY_SEGMENT[FLEX_SEGMENT][0]
 FLEX_AXIAL_AMPLITUDE = FLEX_AXIAL_COMPRESSION / 2.0
 FLEX_AXIAL_MEAN = -FLEX_AXIAL_COMPRESSION / 2.0
 
+# Flexion bends the FPA as well as compressing it:
+# Nikanorov's 10^7-cycle tests had Protege EverFlex and SMART Control at 0/5 fractures under
+# 5% axial but 5/5 under bending, with LifeStent showing the reverse. Load mode reorders
+# devices, which is what S9.4 measures. Same Poulson 2018 cohort as the axial numbers, so
+# the two load modes are drawn from one source and one set of postures.
+FLEX_BEND_RADIUS_MM_BY_SEGMENT = {      # (walking, most-flexed) bending sphere radius, mm
+    'SFA': (27.0, 21.0),
+    'AH': (18.0, 10.0),                 # adductor hiatus
+    'PA': (19.0, 8.0),                  # popliteal
+}
+# Walking for the same reason as the axial value: Pelton's limit is a 10^7-cycle limit.
+# Larger radius is the gentler state, so walking takes the upper end of each range.
+FLEX_BEND_RADIUS_MM = FLEX_BEND_RADIUS_MM_BY_SEGMENT[FLEX_SEGMENT][0]
+FLEX_BEND_CURVATURE = 1.0 / FLEX_BEND_RADIUS_MM     # 1/mm
+
+# The cycle runs between the standing baseline and the flexed state, as for axial.
+# Poulson reports no standing bending radius, so standing is taken as straight; that makes
+# the full curvature the peak-to-peak range and half of it the amplitude. Treating standing
+# as straight overstates the bending amplitude, so the fatigue screen leans conservative.
+FLEX_BEND_AMPLITUDE = FLEX_BEND_CURVATURE / 2.0     # provisional
+# The radius the 3D deck imposes. Imposed fiber strain is eps = -kappa*y, pure kinematics
+# and material-independent, so bending to half the curvature gives exactly half the nominal
+# strain, which is the amplitude, and shouldn't be halved a second time downstream.
+FLEX_BEND_AMPLITUDE_RADIUS_MM = 1.0 / FLEX_BEND_AMPLITUDE
+
 # VALIDITY THRESHOLDS #
 MIN_FEATURE_MM = 0.10
-# Degeneracy guards, not design targets. Conventional self-expanding nitinol stents cover
+# Degeneracy guards. Conventional self-expanding nitinol stents cover
 # ~19-26% of the vessel wall (see sources); these span roughly half to twice that band so
 # generative designs may leave conventional practice, while near-empty and near-solid
 # fields are still rejected.
@@ -123,6 +148,16 @@ SOURCES = {
         "compression: SFA 9-15%, adductor hiatus 11-19%, popliteal 13-25%. Bending sphere "
         "radii 21-27 / 10-18 / 8-19 mm. Same group as the Kamenskiy 2026 baseline."
     ),
+    'FLEX_BEND_RADIUS_MM': (
+        "Poulson 2018 (same study and cohort as FLEX_AXIAL_COMPRESSION): bending sphere "
+        "radii by segment, SFA 21-27 mm / adductor hiatus 10-18 mm / popliteal 8-19 mm, "
+        "across standing 180deg / walking 110deg / sitting 90deg / gardening 60deg. The "
+        "need for a bending load case at all is Nikanorov S, et al. Fracture of self-"
+        "expanding nitinol stents stressed in vitro under simulated intravascular "
+        "conditions. J Vasc Surg. 2008;48(2):435-440. doi:10.1016/j.jvs.2008.02.029 "
+        "(10^7 cycles: 0/5 fractures at 5 % axial vs 5/5 under bending for two devices, "
+        "reversed for a third - load mode reorders devices)."
+    ),
     'EPS_A_LIM': (
         "Pelton AR, Schroeder V, Mitchell MR, Gong X-Y, Barney M, Robertson SW. Fatigue "
         "and durability of Nitinol stents. J Mech Behav Biomed Mater. 2008;1(2):153-164. "
@@ -139,6 +174,11 @@ PROVISIONAL = {
     'D_CRIMPED_MM': "confirm against delivery-system sizing",
     'STRUT_THICKNESS_MM': "confirm at G2; sits inside Kamenskiy 2026 DOE1 (100-250 um)",
     'STRUT_WIDTH_MM': "confirm at G2; inside Kamenskiy DOE1 (100-250 um); sets MIN_FEATURE_MM",
+    'FLEX_BEND_AMPLITUDE': (
+        "the radius is sourced (Poulson 2018); the amplitude assumes standing is straight, "
+        "which Poulson does not report. Conservative - a non-zero standing curvature would "
+        "shrink the range - but confirm before quoting a bending amplitude as measured."
+    ),
 }
 
 def cell_extent_mm():
@@ -187,6 +227,14 @@ def summary():
     print(f"OBJECTIVE_KEYS      {OBJECTIVE_KEYS}")
     print(f"EPS_A_LIM           {EPS_A_LIM}{mark('EPS_A_LIM')}")
     print(f"MIN_FEATURE_MM      {MIN_FEATURE_MM}")
+    print(f"FLEX_SEGMENT        {FLEX_SEGMENT}  (of {', '.join(FLEX_AXIAL_COMPRESSION_BY_SEGMENT)})")
+    print(f"  axial compression {FLEX_AXIAL_COMPRESSION:.3f} "
+          f"-> amplitude {FLEX_AXIAL_AMPLITUDE:.4f}{mark('FLEX_AXIAL_COMPRESSION')}")
+    print(f"  bend radius       {FLEX_BEND_RADIUS_MM:.1f} mm -> curvature "
+          f"{FLEX_BEND_CURVATURE:.5f} 1/mm{mark('FLEX_BEND_RADIUS_MM')}")
+    print(f"  bend amplitude    {FLEX_BEND_AMPLITUDE:.5f} 1/mm{mark('FLEX_BEND_AMPLITUDE')}")
+    print(f"  3D deck imposes   {FLEX_BEND_AMPLITUDE_RADIUS_MM:.1f} mm "
+          f"(the amplitude, not the full excursion)")
     print(f"F_METAL range       [{F_METAL_MIN}, {F_METAL_MAX}]{mark('F_METAL_MIN')}")
     print()
     print(f"NITINOL{mark('NITINOL')}")

@@ -102,19 +102,80 @@ def lumped_node_volumes(points, hexes):
     np.add.at(lumped, hexes.ravel(), np.repeat(vol / 8.0, hexes.shape[1]))
     return lumped
 
-def a_over_lim_3d(amplitudes, points, hexes, limit=None):
+def a_over_lim_3d(amplitudes, points, hexes, limit=None, keep=None):
     """
     Volume fraction of the structure whose strain amplitude exceeds the nitinol limit.
 
     Same definition as sim2d.fatigue.A_over_lim, with volume in place of area.
+
+    `keep` restricts the measure to a subset of nodes, which the bending arm needs so the
+    driven end faces don't contribute. Both numerator and denominator are restricted, so
+    the result stays a fraction of the material actually being measured.
     """
     limit = config.EPS_A_LIM if limit is None else limit
     lumped = lumped_node_volumes(points, hexes)
     amp = amplitudes[:points.shape[0]]
     if amp.shape[0] != points.shape[0]:
         raise ValueError(f'{amp.shape[0]} amplitudes for {points.shape[0]} nodes')
+    if keep is not None:
+        lumped = lumped * np.asarray(keep, dtype=float)
     over = amp > limit
     return float(lumped[over].sum() / lumped.sum())
+
+def vol_weighted_percentile(amplitudes, volumes, q):
+    """Volume-weighted quantile of a nodal field."""
+    amp = np.asarray(amplitudes, float)
+    w = np.asarray(volumes, float)
+    if amp.shape != w.shape:
+        raise ValueError(f'{amp.shape} amplitudes for {w.shape} volumes')
+    o = np.argsort(amp)
+    a, cw = amp[o], np.cumsum(w[o])
+    if cw[-1] <= 0:
+        raise ValueError('zero total volume')
+    return float(a[np.searchsorted(cw, q * cw[-1])])
+
+def central_window(points, fraction=None):
+    """Boolean node mask for the central `fraction` of the axial extent."""
+    from sim3d import apdl
+
+    fraction = apdl.BEND_SAMPLE_FRACTION if fraction is None else fraction
+    z = np.asarray(points)[:, 2]
+    zmid = 0.5 * (z.min() + z.max())
+    half = 0.5 * fraction * (z.max() - z.min())
+    return (z >= zmid - half) & (z <= zmid + half)
+
+def flex_scalars(status_path, amp_path, points, hexes, zloc_path=None, fraction=None, limit=None, halve=False):
+    """The bending arm's two scalars."""
+    keep = central_window(points, fraction)
+    amp = read_node_amplitudes(amp_path, halve=halve)[:points.shape[0]]
+    if amp.shape[0] != points.shape[0]:
+        raise ValueError(f'{amp.shape[0]} amplitudes for {points.shape[0]} nodes')
+
+    z_check = None
+    if zloc_path is not None:
+        z_deck = read_node_amplitudes(zloc_path, halve=False)[:points.shape[0]]
+        z_check = float(np.abs(z_deck - points[:, 2]).max())
+        if z_check > 1e-4:
+            raise ValueError(f'node ordering disagrees with the deck: max |dz| {z_check:.3e} mm')
+
+    out = dict(read_status(status_path))
+    # p99 with the max: a single-node peak moves with the mesh and with where the 
+    # critical strut happens to be. eps_a_max doesn't survive the change of load mode
+    # while eps_a_p99 does.
+    lumped_window = lumped_node_volumes(points, hexes) * keep
+    sel = lumped_window > 0
+    out['eps_a_p99_bend'] = vol_weighted_percentile(amp[sel], lumped_window[sel], 0.99)
+    out['eps_a_p95_bend'] = vol_weighted_percentile(amp[sel], lumped_window[sel], 0.95)
+    # Fraction of window volume past the Auricchio model's transformation strain.
+    out['over_eps_L_bend'] = a_over_lim_3d(amp, points, hexes, 0.046, keep=keep)
+    out['eps_a_max_bend'] = float(amp[keep].max())
+    out['A_over_lim_bend'] = a_over_lim_3d(amp, points, hexes, limit, keep=keep)
+    out['n_nodes_in_window'] = int(keep.sum())
+    out['window_fraction'] = float(keep.mean())
+    out['eps_a_max_whole_ring'] = float(amp.max())
+    out['grip_inflation'] = float(amp.max() / amp[keep].max()) if amp[keep].max() else None
+    out['node_order_max_dz_mm'] = z_check
+    return out
 
 def extract_scalars(status_path=None, amp_path=None, n_axial=2, n_circ=1, layers=4, radial_mm=0.01, out_path=None):
     """The three 3D scalars for the reference cell."""
