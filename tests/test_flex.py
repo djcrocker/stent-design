@@ -38,7 +38,7 @@ def test_curvature_matches_one_over_radius():
     L = 4 * config.cell_extent_mm()[1]
     uy, uz = apdl.bend_displacement(0.0, np.array([-L / 2, L / 2]), R)
     z_new = np.array([-L / 2, L / 2]) + uz
-    # Angle subtended at the arc centre (y = R, z = 0).
+    # Angle subtended at the arc center (y = R, z = 0).
     ang = np.arctan2(z_new, R - uy)
     assert float(ang[1] - ang[0]) == pytest.approx(L / R, rel=1e-9)
 

@@ -1,7 +1,7 @@
 """
 Effective in-plane stiffness of a periodic unit cell.
 
-Computational homogenisation: the total strain splits as
+Computational homogenization: the total strain splits as
 
     eps = E + sym(grad u~)
 

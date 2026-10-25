@@ -29,7 +29,9 @@ GRID = '#dcdcd8'
 LIMIT = '#e34948'
 
 COLOR = {'crown': CROWN, 'handmade': HAND, 'reference': REF}
-METRICS = ('K_radial', 'eps_a_max', 'A_over_lim')
+# eps_a_p99 joined in S9.4; eps_a_max is kept on the figure because it is the
+# metric it replaced.
+METRICS = ('K_radial', 'eps_a_p99', 'eps_a_max', 'A_over_lim')
 
 def style(ax):
     ax.grid(True, color=GRID, lw=0.7, zorder=0)
@@ -44,7 +46,7 @@ def main():
     rows, all_rows = correlate.load_labels()
     result = correlate.analyze(n_boot=4000)
 
-    fig, axes = plt.subplots(2, 3, figsize=(14, 8.5))
+    fig, axes = plt.subplots(2, len(METRICS), figsize=(4.7 * len(METRICS), 8.5))
 
     for col, metric in enumerate(METRICS):
         d = result['overall'][metric]
@@ -106,7 +108,8 @@ def main():
 
     fig.suptitle(
         f"2D screen vs 3D FEA - {result['n_converged']} of {result['n_total']} cells"
-        f"   |   gate: rho >= {correlate.GATE_RHO} on K_radial and eps_a_max",
+        f"   |   gate: rho >= {correlate.GATE_RHO} on "
+        + " and ".join(correlate.GATE_METRICS),
         color=TEXT_PRIMARY, fontsize=13, x=0.01, ha='left')
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     OUT.parent.mkdir(parents=True, exist_ok=True)

@@ -4,6 +4,7 @@ Filter the generated pool to valid designs, rank them, and cut a shortlist.
 
 import argparse
 import json
+from dataclasses import dataclass, field
 
 import numpy as np
 
@@ -13,6 +14,20 @@ from diffusion import dataset
 RESULTS_DIR = config.PROJECT_ROOT / 'screen' / 'results'
 DEFAULT_K = 24
 OBJECTIVES = ('K_radial', 'A_over_lim', 'f_metal')
+
+@dataclass
+class Pool:
+    """The screened, deduplicated candidate pool a shortlist is cut from."""
+    fields: object                  # (n_sampled, N, N) bool - all samples, repairs applied
+    rows: list                      # per-sample 2D labels, None where invalid
+    unique: object                  # indices into `fields`: valid, manufacturable, distinct
+    which: object                   # per-sample index into meta['targets']
+    meta: dict                      # the generation targets
+    report: dict = field(default_factory=dict)      # manufacturability screen counts
+
+    def objectives(self, keys=OBJECTIVES):
+        """The objective matrix over `unique`, in `keys` order."""
+        return np.array([[self.rows[i][k] for k in keys] for i in self.unique], float)
 
 def _as_minimization(objectives):
     """
@@ -142,11 +157,10 @@ def manufacturable(fields, indices, progress=True):
     return np.array(kept, dtype=int), repaired, labels, report
 
 
-def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
-    """Load the generated pool, label it, filter to valid, rank, and save the shortlist."""
+def load_pool(source_stem='s9_1_generated', progress=True):
+    """The pool a shortlist is cut from: label, screen for manufacturability, deduplicate."""
     from diffusion import generate, splits
 
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     fields, which, meta = generate.load_samples(source_stem)
     rows, dropped = generate.cached_labels(fields, source_stem)
 
@@ -154,12 +168,14 @@ def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
     if not len(valid):
         raise RuntimeError('no valid designs in the pool')
 
-    print(f'  manufacturability screen on {len(valid)} valid designs', flush=True)
+    if progress:
+        print(f'  manufacturability screen on {len(valid)} valid designs', flush=True)
     valid, repaired, relabeled, screen_report = manufacturable(fields, valid)
     if not len(valid):
         raise RuntimeError('nothing survived the manufacturability screen')
-    print(f"  repaired {screen_report['repaired']}, dropped {screen_report['dropped']}, "
-          f"kept {screen_report['kept']}", flush=True)
+    if progress:
+        print(f"  repaired {screen_report['repaired']}, dropped {screen_report['dropped']}, "
+              f"kept {screen_report['kept']}", flush=True)
     for i, arr in repaired.items():
         fields[i] = arr
     rows = list(rows)
@@ -169,8 +185,17 @@ def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
     groups = splits.group_ids(fields[valid])
     _, first = np.unique(groups, return_index=True)
     unique = valid[np.sort(first)]
+    return Pool(fields=fields, rows=rows, unique=unique, which=which, meta=meta,
+                report=screen_report)
 
-    objectives = np.array([[rows[i][key] for key in OBJECTIVES] for i in unique], float)
+def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
+    """Load the generated pool, label it, filter to valid, rank, and save the shortlist."""
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    pool = load_pool(source_stem)
+    fields, rows, unique = pool.fields, pool.rows, pool.unique
+    which, meta, screen_report = pool.which, pool.meta, pool.report
+
+    objectives = pool.objectives()
     chosen_local, layer_of = select(objectives, k=k)
     chosen = unique[chosen_local]
 
@@ -203,12 +228,10 @@ def build(k=DEFAULT_K, source_stem='s9_1_generated', out_stem='s9_2_shortlist'):
         'pool_valid': int(screen_report['considered']),
         'pool_manufacturable': int(screen_report['kept']),
         'pool_distinct': int(len(unique)),
-        'duplicates_removed': int(len(valid) - len(unique)),
+        # The screen's `kept` count is the post-screen valid set `unique` was cut from.
+        'duplicates_removed': int(screen_report['kept'] - len(unique)),
         'manufacturability_screen': screen_report,
         'layers_used': int(max(e['layer'] for e in entries)),
-        # We measured top-K retention at 83-90% in this K range, so roughly 10-17% of the
-        # actual best designs are missed because the 2D screen ranks them wrong. That's
-        # the price of the two-tier architecture, and it belongs in the record.
         'expected_top_k_retention': [0.83, 0.90],
         'shortlist': entries,
     }

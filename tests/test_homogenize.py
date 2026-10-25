@@ -43,7 +43,7 @@ def test_corner_folding_does_not_break_a_solid_cell():
 
 # EXACT SOLUTIONS #
 def test_solid_cell_returns_the_base_material():
-    """The sharpest available check: no holes means no homogenisation."""
+    """The sharpest available check: no holes means no homogenization."""
     C = homogenize(UnitCell(np.ones((N, N), dtype=bool))).C_eff
     assert np.allclose(C, exact_plane_stress(), rtol=1e-9, atol=1e-6)
 

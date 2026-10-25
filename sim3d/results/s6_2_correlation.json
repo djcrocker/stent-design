@@ -4,7 +4,7 @@
   "gate_rho": 0.7,
   "gate_metrics": [
     "K_radial",
-    "eps_a_max"
+    "eps_a_p99"
   ],
   "overall": {
     "K_radial": {
@@ -41,6 +41,25 @@
         "10": 0.9,
         "20": 0.85,
         "30": 0.9
+      },
+      "gates": false,
+      "passes": false
+    },
+    "eps_a_p99": {
+      "metric": "eps_a_p99",
+      "n": 56,
+      "rho": 0.8181756040876311,
+      "p": 1.3737557295282324e-14,
+      "ci95": [
+        0.6547527068394755,
+        0.9179530960636105
+      ],
+      "higher_is_better": false,
+      "retention": {
+        "5": 0.8,
+        "10": 0.7,
+        "20": 0.9,
+        "30": 0.9333333333333333
       },
       "gates": true,
       "passes": true
@@ -102,6 +121,25 @@
           "20": 0.95,
           "30": 0.8333333333333334
         },
+        "gates": false,
+        "passes": false
+      },
+      "eps_a_p99": {
+        "metric": "eps_a_p99",
+        "n": 52,
+        "rho": 0.7851105609152224,
+        "p": 5.588576761596025e-12,
+        "ci95": [
+          0.5917832288002436,
+          0.9069658065268625
+        ],
+        "higher_is_better": false,
+        "retention": {
+          "5": 0.8,
+          "10": 0.9,
+          "20": 0.9,
+          "30": 0.8
+        },
         "gates": true,
         "passes": true
       },
@@ -135,5 +173,6 @@
     }
   },
   "gate_passed": true,
-  "gate_ci_clears": true
+  "gate_ci_clears": false,
+  "gate_pending": []
 }

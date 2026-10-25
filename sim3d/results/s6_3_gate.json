@@ -5,10 +5,10 @@
   "threshold": 0.7,
   "gate_metrics": [
     "K_radial",
-    "eps_a_max"
+    "eps_a_p99"
   ],
   "gate_passed": true,
-  "gate_ci_clears": true,
+  "gate_ci_clears": false,
   "n_converged": 56,
   "n_total": 60,
   "metrics": {
@@ -33,13 +33,28 @@
         0.716545165819849,
         0.936632772819052
       ],
-      "gates": true,
-      "passes": true,
+      "gates": false,
+      "passes": false,
       "retention": {
         "5": 1.0,
         "10": 0.9,
         "20": 0.85,
         "30": 0.9
+      }
+    },
+    "eps_a_p99": {
+      "rho": 0.8181756040876311,
+      "ci95": [
+        0.6547527068394755,
+        0.9179530960636105
+      ],
+      "gates": true,
+      "passes": true,
+      "retention": {
+        "5": 0.8,
+        "10": 0.7,
+        "20": 0.9,
+        "30": 0.9333333333333333
       }
     },
     "A_over_lim": {
@@ -71,6 +86,10 @@
     "eps_a_max": {
       "rho": 0.3663026175859418,
       "p": 0.0054938898541206415
+    },
+    "eps_a_p99": {
+      "rho": 0.4044163157978169,
+      "p": 0.0019925399098054057
     },
     "A_over_lim": {
       "rho": 0.5646406770029393,
@@ -108,6 +127,10 @@
           "rho": 0.3663026175859418,
           "p": 0.0054938898541206415
         },
+        "eps_a_p99": {
+          "rho": 0.4044163157978169,
+          "p": 0.0019925399098054057
+        },
         "A_over_lim": {
           "rho": 0.5646406770029393,
           "p": 5.8180611578979784e-06
@@ -118,7 +141,7 @@
       "id": "ci_close_to_threshold",
       "detail": "A gate metric clears only narrowly once sampling error is accounted for.",
       "evidence": {
-        "eps_a_max": 0.716545165819849
+        "eps_a_p99": 0.6547527068394755
       }
     },
     {

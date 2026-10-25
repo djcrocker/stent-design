@@ -73,6 +73,36 @@ def select_cells(n_parametric=N_PARAMETRIC, include_handmade=True, include_refer
         specs.append({'name': 's6_ref', 'family': 'reference', 'params': dict(reference.PARAMS), 'cell': reference.build()})
     return specs
 
+def cells_from_manifest(path=None):
+    """Rebuild the exact cell set a manifest recorded."""
+    from geom import handmade, parametric, reference
+
+    path = (RESULTS_DIR / 's6_1_manifest.json') if path is None else pathlib.Path(path)
+    payload = json.loads(path.read_text(encoding='utf-8'))
+    specs = []
+    for c in payload['cells']:
+        p = c['params']
+        if c['family'] == 'crown':
+            cell = parametric.crown(strut_width_mm=p['strut_width_mm'],
+                                    crown_amplitude=p['crown_amplitude'],
+                                    n_periods=p['n_periods'])
+        elif c['family'] == 'handmade':
+            cell = handmade.VALID_CELLS[p['label']]()
+        else:
+            cell = reference.build()
+        recorded = (c.get('labels_2d') or {}).get('f_metal')
+        if recorded is not None and abs(float(cell.f_metal) - recorded) > 1e-9:
+            raise ValueError(f"{c['name']} did not rebuild: f_metal "
+                             f"{float(cell.f_metal):.6f} vs manifest {recorded:.6f}")
+        specs.append({'name': c['name'], 'family': c['family'], 'params': p, 'cell': cell,
+                      'labels_2d': c.get('labels_2d'), 'quality': c.get('quality')})
+    return specs
+
+def recorded_cells(path=None):
+    """The cells S6 actually ran, falling back to a fresh sample if no manifest exists."""
+    path = (RESULTS_DIR / 's6_1_manifest.json') if path is None else pathlib.Path(path)
+    return cells_from_manifest(path) if path.exists() else select_cells()
+
 def label_2d(cell):
     """The 2D screen's labels for one cell."""
     h = homogenize(cell)
@@ -173,14 +203,14 @@ RETRY_NSUBST = '100,2000,50'
 def failed_cells(results_dir=None, specs=None):
     """Names of cells whose monitor file shows they never reached the final load step."""
     results_dir = (config.PROJECT_ROOT / 'ansys_output') if results_dir is None         else pathlib.Path(results_dir)
-    specs = select_cells() if specs is None else specs
+    specs = recorded_cells() if specs is None else specs
     return [s['name'] for s in specs
             if not read_convergence(results_dir / f"{s['name']}.mntr")['converged']]
 
 def write_retry(names=None, results_dir=None, nsubst=RETRY_NSUBST, path=None):
     """Regenerate just the failed cells' decks with finer substepping, plus a batch script."""
     names = failed_cells(results_dir) if names is None else names
-    specs = [s for s in select_cells() if s['name'] in set(names)]
+    specs = [s for s in recorded_cells() if s['name'] in set(names)]
     build(specs, nsubst=nsubst)
     path = (DECK_DIR / 'run_spikeb_retry.ps1') if path is None else path
     return write_batch_script(specs, path=path), [s['name'] for s in specs]
@@ -227,7 +257,7 @@ def collect(specs=None, results_dir=None, mesh=None, out_stem='s6_1_labels', out
     """
     from sim3d import loadsteps, mesh3d
 
-    specs = select_cells() if specs is None else specs
+    specs = recorded_cells() if specs is None else specs
     results_dir = (config.PROJECT_ROOT / 'ansys_output') if results_dir is None \
         else pathlib.Path(results_dir)
     mesh = MESH if mesh is None else mesh
@@ -242,7 +272,8 @@ def collect(specs=None, results_dir=None, mesh=None, out_stem='s6_1_labels', out
         conv = read_convergence(results_dir / f'{stem}.mntr')
         row.update(conv)
         if not (status.exists() and amps.exists() and conv['converged']):
-            row.update({'converged': False, 'K_radial_3D': None, 'eps_a_max_3D': None, 'A_over_lim_3D': None})
+            row.update({'converged': False, 'K_radial_3D': None, 'eps_a_max_3D': None,
+                        'A_over_lim_3D': None, 'eps_a_p99_3D': None})
             rows.append(row)
             continue
         summary = loadsteps.summarize(status, n_axial=mesh['n_axial'], n_circ=mesh['n_circ'])
@@ -250,11 +281,14 @@ def collect(specs=None, results_dir=None, mesh=None, out_stem='s6_1_labels', out
             spec['cell'], n_circ=mesh['n_circ'], n_axial=mesh['n_axial'],
             layers=mesh['layers'], limit=mesh['limit'])
         amp = loadsteps.read_node_amplitudes(amps)
+        lumped = loadsteps.lumped_node_volumes(points, hexes)
         row.update({
             'converged': True,
             'K_radial_3D': summary['K_radial_3D'],
             'eps_a_max_3D': summary['eps_a_max_3D'],
             'A_over_lim_3D': loadsteps.a_over_lim_3d(amp, points, hexes),
+            'eps_a_p99_3D': loadsteps.vol_weighted_percentile(
+                amp[:points.shape[0]], lumped, 0.99),
             'eps_etable_over_nodal': summary.get('eps_etable_over_nodal'),
         })
         rows.append(row)
@@ -264,7 +298,8 @@ def collect(specs=None, results_dir=None, mesh=None, out_stem='s6_1_labels', out
     (out_dir / f'{out_stem}.json').write_text(json.dumps(rows, indent=2), encoding='utf-8')
     cols = ['name', 'family', 'converged', 'reached_time', 'retries', 'max_attempts',
             'f_metal', 'K_radial_2D', 'K_radial_3D', 'eps_a_max_2D', 'eps_a_max_3D',
-            'eps_a_p99_2D', 'A_over_lim_2D', 'A_over_lim_3D', 'eps_etable_over_nodal']
+            'eps_a_p99_2D', 'eps_a_p99_3D', 'A_over_lim_2D', 'A_over_lim_3D',
+            'eps_etable_over_nodal']
     lines = [','.join(cols)]
     for row in rows:
         lines.append(','.join('' if row.get(c) is None else str(row.get(c, ''))  for c in cols))

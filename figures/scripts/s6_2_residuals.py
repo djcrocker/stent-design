@@ -20,7 +20,7 @@ from sim3d import correlate, spikeb
 
 OUT = config.FIG_DEV_DIR / 's6_2_residuals.png'
 
-SERIES = {'K_radial': '#2a78d6', 'eps_a_max': '#eb6834', 'A_over_lim': '#7a3fbf'}
+SERIES = {'K_radial': '#2a78d6', 'eps_a_p99': '#2f9e64', 'eps_a_max': '#eb6834', 'A_over_lim': '#7a3fbf'}
 TEXT_PRIMARY = '#0b0b0b'
 TEXT_SECONDARY = '#52514e'
 GRID = '#dcdcd8'

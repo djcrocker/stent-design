@@ -11,7 +11,7 @@ Notes:
   - label() doesn't repair.
   - Both eps_a_max and eps_a_p99 are recorded. y carries eps_a_max per S0.5, but the p99 is
     kept alongside because the voxel mesh inflates the raw max by a 1.75-2x.
-  - One homogenisation is computed and reused for stiffness and fatigue; about half the
+  - One homogenization is computed and reused for stiffness and fatigue; about half the
     work of computing each separately.
 """
 

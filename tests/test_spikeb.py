@@ -1,5 +1,7 @@
 """Spike B cell set and its batch machinery."""
 
+import json
+
 import numpy as np
 import pytest
 
@@ -140,3 +142,78 @@ def test_failed_cells_reads_from_monitor_files(tmp_path):
     specs = spikeb.select_cells()[:2]
     # No monitor files at all -> every cell counts as failed, not as silently fine.
     assert spikeb.failed_cells(results_dir=tmp_path, specs=specs) == [s['name'] for s in specs]
+
+def test_collect_reads_the_percentile_off_the_same_dump_as_a_over_lim(specs, tmp_path):
+    """
+    `eps_a_p99_3D` is the metric the S9.4 gate swap needs on this axis, and it comes from
+    the per-node dump `A_over_lim_3D` was always computed from - so it must appear whenever
+    that one does, with no new solve. Also pins the volume weighting: an unweighted
+    np.percentile over nodes would let a densely meshed patch outvote the same metal.
+    """
+    from sim3d import loadsteps
+
+    spec = specs[0]
+    spec['labels_2d'] = spikeb.label_2d(spec['cell'])
+    stem = spec['name']
+    m = spikeb.MESH
+    points, hexes, _ = mesh3d.tube_hex_mesh(spec['cell'], n_circ=m['n_circ'],
+                                            n_axial=m['n_axial'], layers=m['layers'],
+                                            limit=m['limit'])
+    # A converged run: a status file, a monitor file reaching FINAL_TIME, and one range per
+    # node. read_node_amplitudes halves it, so the amplitudes are 0, 1/n, 2/n, ...
+    n = points.shape[0]
+    ramp = np.linspace(0.0, 2.0, n)
+    (tmp_path / f'{stem}_amp.txt').write_text(
+        chr(10).join(f'  {v:.8E}' for v in ramp) + chr(10))
+    (tmp_path / f'{stem}.mntr').write_text(
+        '  LOAD   SUB-  NO.  NO.    TOTL  INCREMENT    TOTAL\n'
+        '     4     42    1     2    584   0.65288E-02   4.0000       939.8  1.3  0.0\n')
+    (tmp_path / f'{stem}.txt').write_text(
+        ' FRADIAL                          0.878442110                  SCALAR\n'
+        ' EPS3                             0.115704158                  SCALAR\n'
+        ' EPS4                             8.415406183E-004             SCALAR\n'
+        ' EPS3ETAB                         8.649727831E-002             SCALAR\n'
+        ' RATIO3                           0.747572771                  SCALAR\n'
+        ' EPSRANGE                         0.115509702                  SCALAR\n'
+        ' EPSAMP                           5.775485082E-002             SCALAR\n')
+
+    row = spikeb.collect([spec], results_dir=tmp_path, out_dir=tmp_path)[0]
+    assert row['converged'] is True
+    assert row['eps_a_p99_3D'] is not None
+    # Same volume weighting as the metric it sits beside, on the same halved dump.
+    amp = loadsteps.read_node_amplitudes(tmp_path / f'{stem}_amp.txt')
+    lumped = loadsteps.lumped_node_volumes(points, hexes)
+    assert row['eps_a_p99_3D'] == pytest.approx(
+        loadsteps.vol_weighted_percentile(amp[:n], lumped, 0.99))
+    # On a ramp it lands near the top but strictly below the peak, which is the whole point
+    # of preferring it to eps_a_max.
+    assert row['eps_a_p99_3D'] < amp[:n].max()
+    assert row['eps_a_p99_3D'] > loadsteps.vol_weighted_percentile(amp[:n], lumped, 0.95)
+    # And it reaches the CSV, or correlate.analyze() cannot see it.
+    assert 'eps_a_p99_3D' in (tmp_path / 's6_1_labels.csv').read_text().splitlines()[0]
+
+def test_the_recorded_cell_set_is_rebuilt_from_params_not_resampled(specs):
+    """
+    `stratify` samples whatever `parametric.sweep()` currently returns, and the
+    manufacturability screen shrank that sweep after S6 ran. Names are positional, so a
+    by-name join of old 3D dumps to a fresh sample pairs cells with other cells' labels.
+    The manifest is the authority on what was actually solved.
+    """
+    rec = spikeb.cells_from_manifest()
+    man = json.loads(spikeb.RESULTS_DIR.joinpath('s6_1_manifest.json').read_text())['cells']
+    assert [s['name'] for s in rec] == [c['name'] for c in man]
+    # Every cell rebuilds to the f_metal that was recorded for it (the guard inside).
+    for s, c in zip(rec, man):
+        assert s['cell'].f_metal == pytest.approx(c['labels_2d']['f_metal'], abs=1e-9)
+    # And this is NOT the same set a fresh sample gives, which is the whole point.
+    fresh = {s['name']: float(s['cell'].f_metal) for s in specs}
+    assert any(abs(fresh[s['name']] - float(s['cell'].f_metal)) > 1e-9 for s in rec)
+
+def test_a_manifest_naming_a_cell_that_cannot_rebuild_is_an_error(tmp_path):
+    bad = tmp_path / 'm.json'
+    bad.write_text(json.dumps({'mesh': spikeb.MESH, 'cells': [
+        {'name': 's6_cell00', 'family': 'crown', 'quality': {},
+         'params': {'strut_width_mm': 0.12, 'crown_amplitude': 0.30, 'n_periods': 2},
+         'labels_2d': {'f_metal': 0.999}}]}))
+    with pytest.raises(ValueError, match='did not rebuild'):
+        spikeb.cells_from_manifest(bad)

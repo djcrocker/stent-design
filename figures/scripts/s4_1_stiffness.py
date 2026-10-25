@@ -2,8 +2,8 @@
 Left  - K_radial across the family's six pixel-exact strut widths, log-log, with the fitted
         power-law exponent labeled. Bending-dominated cellular solids scale near w^3, 
         stretch-dominated near w^1; where this lands says which regime the cell is in.
-Right - Relative error against closed-form answers the homogenisation: a solid cell 
-        (no holes means no homogenisation) and aligned bars (rule of mixtures). 
+Right - Relative error against closed-form answers the homogenization: a solid cell 
+        (no holes means no homogenization) and aligned bars (rule of mixtures). 
         Log axis, because the claim is "machine precision".
 
 Usage: python figures/scripts/s4_1_stiffness.py
