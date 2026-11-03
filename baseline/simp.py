@@ -40,24 +40,35 @@ PENAL = 3.0                 # SIMP exponent
 E_MIN_FRAC = 1e-9           # void modulus as a fraction of solid, to keep K non-singular
 PINNED = np.array([0, 1])   # periodic BCs leave rigid translation free, as in sim2d
 
-@functools.lru_cache(maxsize=1)
-def design_basis():
+@functools.lru_cache(maxsize=4)
+def design_basis(n=None):
     """
     The full grid as one periodic design domain.
     Element e corresponds to `rho.ravel()[e]` with rho indexed [axial, circumferential].
+
+    `n` below GRID_N is the same physical cell at a coarser discretization, which is how
+    the optimizer loop is tested at a cost a test suite can pay.
     """
-    n = config.GRID_N
+    n = config.GRID_N if n is None else n
     return Basis(cell_to_mesh(UnitCell(np.ones((n, n), dtype=bool))), ElementVector(ElementQuad1()))
 
-def moduli(rho, penal=PENAL, e_min_frac=E_MIN_FRAC):
+def density_stiffness(lam, mu):
+    """Plane-stress stiffness form weighted by a per-element modulus `w['emod']`."""
+    @BilinearForm
+    def form(u, v, w):
+        return w['emod'] * (2.0 * mu * ddot(sym_grad(u), sym_grad(v))
+                            + lam * trace(sym_grad(u)) * trace(sym_grad(v)))
+    return form
+
+def moduli(rho, penal=PENAL, e_min_frac=E_MIN_FRAC, e0=None):
     """SIMP interpolation E(rho) = E_min + rho^p (E_0 - E_min), and dE/drho, per element."""
-    e0 = config.NITINOL['E_austenite_MPa']
+    e0 = config.NITINOL['E_austenite_MPa'] if e0 is None else e0
     e_min = e_min_frac * e0
     rho = np.asarray(rho, float).ravel()
     return (e_min + rho ** penal * (e0 - e_min),
             penal * rho ** (penal - 1.0) * (e0 - e_min))
 
-def _at_quadrature(values, basis):
+def at_quadrature(values, basis):
     """Element-wise values broadcast to the quadrature points a form sees."""
     return np.broadcast_to(np.asarray(values, float)[:, None], (basis.mesh.t.shape[1], basis.X.shape[1]))
 
@@ -69,15 +80,24 @@ class DensityHomogenized(Homogenized):
     rest of the project already uses, instead of a second copy that can drift from it.
     """
 
-    def __init__(self, C_eff, fluctuations, basis, area_mm2, seconds, energies, dE_drho):
+    def __init__(self, C_eff, fluctuations, basis, area_mm2, seconds, energies, dE_drho, shape):
         super().__init__(C_eff, fluctuations, basis, area_mm2, seconds)
         self.energies = energies        # (3, 3, n_elements) unit-modulus mutual energies
         self.dE_drho = dE_drho          # (n_elements,) dE/drho from the SIMP interpolation
+        self.shape = shape              # the density field's grid shape
 
     def dC(self, i, j):
         """dC_eff[i, j] / drho, as an (N, N) field in the same layout as the cell."""
-        n = config.GRID_N
-        return (self.dE_drho * self.energies[i, j] / self.area_mm2).reshape(n, n)
+        return (self.dE_drho * self.energies[i, j] / self.area_mm2).reshape(self.shape)
+
+    def dbulk(self):
+        """
+        d of the 2D bulk modulus (C[:2, :2].sum() / 4) / drho, as an (N, N) field.
+
+        The objective validation (c) maximizes, since the Hashin-Shtrikman bound it is
+        checked against is a bound on exactly this quantity.
+        """
+        return sum(self.dC(i, j) for i in range(2) for j in range(2)) / 4.0
 
     def dK_radial(self):
         """
@@ -94,20 +114,43 @@ class DensityHomogenized(Homogenized):
         R = config.D_DEPLOYED_MM / 2.0
         return dE_circ * config.STRUT_THICKNESS_MM / R ** 2
 
+def bulk(C_eff):
+    """
+    2D (area) bulk modulus of a plane-stress C_eff, MPa.
+
+    Under hydrostatic macro strain, p = (sigma_xx + sigma_yy) / 2 and the area strain is
+    e_xx + e_yy, so K = C[:2, :2].sum() / 4. For solid isotropic material this is
+    E / (2 (1 - nu)), which `tests/test_optimize.py` checks.
+    """
+    return np.asarray(C_eff)[:2, :2].sum() / 4.0
+
+def hs_bulk_bound(volfrac, e0=None, nu=None):
+    """
+    Hashin-Shtrikman upper bound on the 2D bulk modulus of a porous material, MPa.
+
+    For a solid/void two-phase composite the general 2D bound collapses to
+
+        K_HS = f K_s G_s / ((1 - f) K_s + G_s)
+
+    with K_s = E / (2 (1 - nu)) and G_s = E / (2 (1 + nu)) the solid's 2D moduli. This is
+    the bound optimal microstructures are known to attain in 2D, so the optimizer
+    approaching it is a real test of the loop.
+    """
+    e0 = config.NITINOL['E_austenite_MPa'] if e0 is None else e0
+    nu = config.NITINOL['poisson_austenite'] if nu is None else nu
+    k_s, g_s = e0 / (2.0 * (1.0 - nu)), e0 / (2.0 * (1.0 + nu))
+    return volfrac * k_s * g_s / ((1.0 - volfrac) * k_s + g_s)
+
 def homogenize_density(rho, penal=PENAL, e_min_frac=E_MIN_FRAC):
     """C_eff of a density field, with the per-element mutual energies kept for the gradient."""
     started = time.perf_counter()
-    basis = design_basis()
+    rho = np.asarray(rho, float)
+    basis = design_basis(rho.shape[0])
     lam1, mu1 = plane_stress_moduli(E=1.0)
     e_mod, de_mod = moduli(rho, penal, e_min_frac)
-    emod = _at_quadrature(e_mod, basis)
+    emod = at_quadrature(e_mod, basis)
 
-    @BilinearForm
-    def stiffness(u, v, w):
-        return w['emod'] * (2.0 * mu1 * ddot(sym_grad(u), sym_grad(v))
-                             + lam1 * trace(sym_grad(u)) * trace(sym_grad(v)))
-
-    K = asm(stiffness, basis, emod=emod)
+    K = asm(density_stiffness(lam1, mu1), basis, emod=emod)
 
     fluctuations = []
     for E_mac in UNIT_STRAINS:
@@ -144,7 +187,8 @@ def homogenize_density(rho, penal=PENAL, e_min_frac=E_MIN_FRAC):
     circ_mm, axial_mm = config.cell_extent_mm()
     area = circ_mm * axial_mm
     C_eff = np.einsum('ije,e->ij', energies, e_mod) / area
-    return DensityHomogenized(C_eff, fluctuations, basis, area, time.perf_counter() - started, energies, de_mod)
+    return DensityHomogenized(C_eff, fluctuations, basis, area, time.perf_counter() - started,
+                              energies, de_mod, rho.shape)
 
 # LENGTH SCALE #
 def filter_kernel(radius):
@@ -154,7 +198,11 @@ def filter_kernel(radius):
     k = np.maximum(0.0, radius - np.hypot(dx, dy))
     return k / k.sum()
 
-def density_filter(x, radius):
+def _boundary_weight(shape, radius, mode):
+    """top88's Hs: how much of the kernel stays inside a non-periodic domain."""
+    return convolve(np.ones(shape), filter_kernel(radius), mode=mode, cval=0.0)
+
+def density_filter(x, radius, mode='wrap'):
     """
     Cone-weighted average over a `radius` pixel neighborhood, wrapping at both seams.
 
@@ -162,16 +210,22 @@ def density_filter(x, radius):
     constraint stays meaningful after filtering and top88's boundary correction is not
     needed. `mode='wrap'` is the whole of the periodicity.
     """
-    return convolve(np.asarray(x, float), filter_kernel(radius), mode='wrap')
+    x = np.asarray(x, float)
+    out = convolve(x, filter_kernel(radius), mode=mode, cval=0.0)
+    return out if mode == 'wrap' else out / _boundary_weight(x.shape, radius, mode)
 
-def filter_chain_rule(sensitivity, radius):
+def filter_chain_rule(sensitivity, radius, mode='wrap'):
     """
     Push a sensitivity in the FILTERED field back onto the design variables.
 
     The cone kernel is symmetric, so its transpose is itself and the same convolution
-    serves both directions.
+    serves both directions. With the boundary correction the operator is diag(1/Hs) K, whose
+    transpose is K diag(1/Hs), so the division comes first on the way back.
     """
-    return density_filter(sensitivity, radius)
+    g = np.asarray(sensitivity, float)
+    if mode != 'wrap':
+        g = g / _boundary_weight(g.shape, radius, mode)
+    return convolve(g, filter_kernel(radius), mode=mode, cval=0.0)
 
 def project(x, beta, eta=0.5):
     """Smoothed Heaviside projection, which is what turns a gray filtered field crisp."""
