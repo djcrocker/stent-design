@@ -1,0 +1,54 @@
+{
+  "grid_n": 64,
+  "penal": 3.0,
+  "a_solid": {
+    "max_rel_error": 2.054804309199636e-14,
+    "bulk": 48507.462686566185,
+    "bulk_closed_form": 48507.46268656717
+  },
+  "b_mbb": {
+    "compliance": 233.6429270770265,
+    "published": 233.71,
+    "rel_error": -0.00028699209692995,
+    "volume": 0.5,
+    "nelx": 60,
+    "nely": 20,
+    "radius": 2.4,
+    "iterations": 200,
+    "seconds": 6.010408100000859
+  },
+  "c_hashin_shtrikman": {
+    "volfrac": 0.5,
+    "bulk": 11669.328591535084,
+    "bound": 12172.284644194757,
+    "ratio": 0.9586802258276516,
+    "gray": 0.034280551423727885,
+    "seconds": 61.76347760000135
+  },
+  "k_radial": [
+    {
+      "volfrac": 0.25,
+      "K_radial": 388.19886963420805,
+      "f_metal": 0.25,
+      "valid": false,
+      "reasons": [
+        "no_wrap_axial",
+        "void_thin_feature"
+      ],
+      "gray": 0.0012286994025102914,
+      "seconds": 65.42153399999916
+    },
+    {
+      "volfrac": 0.4,
+      "K_radial": 631.3746987527569,
+      "f_metal": 0.400390625,
+      "valid": false,
+      "reasons": [
+        "no_wrap_axial"
+      ],
+      "gray": 0.00121371783781095,
+      "seconds": 62.54999300000054
+    }
+  ],
+  "seconds": 197.06626309999956
+}
