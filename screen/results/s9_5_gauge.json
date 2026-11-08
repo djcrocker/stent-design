@@ -1,0 +1,203 @@
+{
+  "pool": 671,
+  "grid_n": 64,
+  "mm_per_px": 0.02454369260617026,
+  "reference": {
+    "gauge_mm": [
+      0.2,
+      0.22
+    ],
+    "label_drift": 0.0,
+    "width_mm_median": 0.21082340282540096,
+    "alive": 671,
+    "valid": 671,
+    "banded": 212,
+    "band_depth_px": {
+      "min": 1,
+      "median": 4.0,
+      "max": 14
+    },
+    "band_depth_mm_median": 0.09817477042468103
+  },
+  "arms": [
+    {
+      "offset_px": 1,
+      "offset_mm_per_side": 0.02454369260617026,
+      "gauge_mm": [
+        0.1509126147876595,
+        0.16600387626642543
+      ],
+      "width_mm_median": 0.17142989079714083,
+      "survival": {
+        "alive": 662,
+        "alive_both": 662,
+        "valid": 235,
+        "winners": 64,
+        "winners_alive": 62,
+        "reasons": {
+          "disconnected": 7,
+          "no_wrap_circ": 1,
+          "no_wrap_axial": 2,
+          "thin_feature": 433,
+          "void_thin_feature": 0,
+          "too_sparse": 0,
+          "too_dense": 0,
+          "empty": 0
+        }
+      },
+      "circumferential_band": {
+        "reference": 212,
+        "kept": 135,
+        "depth_px_median": 2.0
+      },
+      "spearman": {
+        "K_radial": {
+          "spearman": 0.993223972025122,
+          "p_value": 0.0,
+          "n": 662
+        },
+        "eps_a_max": {
+          "spearman": 0.9459599980650556,
+          "p_value": 0.0,
+          "n": 662
+        },
+        "eps_a_p99": {
+          "spearman": 0.9597060861673586,
+          "p_value": 0.0,
+          "n": 662
+        },
+        "A_over_lim": {
+          "spearman": 0.9858406163811243,
+          "p_value": 0.0,
+          "n": 662
+        },
+        "f_metal": {
+          "spearman": 0.9435687115458997,
+          "p_value": 0.0,
+          "n": 662
+        }
+      },
+      "front_overlap": {
+        "reference": 62,
+        "light": 57,
+        "shared": 39,
+        "jaccard": 0.4875,
+        "kept": 0.6290322580645161
+      },
+      "top_k_overlap": {
+        "5": {
+          "k": 5,
+          "shared": 2,
+          "overlap": 0.4
+        },
+        "10": {
+          "k": 10,
+          "shared": 4,
+          "overlap": 0.4
+        },
+        "24": {
+          "k": 24,
+          "shared": 10,
+          "overlap": 0.4166666666666667
+        }
+      },
+      "median_change": {
+        "K_radial": -0.6078559983620817,
+        "eps_a_max": -0.2335108244103895,
+        "eps_a_p99": -0.23708559171326093,
+        "A_over_lim": -0.4682487271812926,
+        "f_metal": -0.19771863117870725
+      }
+    },
+    {
+      "offset_px": 2,
+      "offset_mm_per_side": 0.04908738521234052,
+      "gauge_mm": [
+        0.10182522957531898,
+        0.11200775253285086
+      ],
+      "width_mm_median": 0.13505087830760346,
+      "survival": {
+        "alive": 338,
+        "alive_both": 338,
+        "valid": 42,
+        "winners": 64,
+        "winners_alive": 16,
+        "reasons": {
+          "disconnected": 312,
+          "no_wrap_circ": 52,
+          "no_wrap_axial": 251,
+          "thin_feature": 623,
+          "void_thin_feature": 0,
+          "too_sparse": 0,
+          "too_dense": 0,
+          "empty": 0
+        }
+      },
+      "circumferential_band": {
+        "reference": 212,
+        "kept": 70,
+        "depth_px_median": 0.0
+      },
+      "spearman": {
+        "K_radial": {
+          "spearman": 0.9413159958475311,
+          "p_value": 1.4997888708996365e-160,
+          "n": 338
+        },
+        "eps_a_max": {
+          "spearman": 0.7930617840607277,
+          "p_value": 2.5329460208483862e-74,
+          "n": 338
+        },
+        "eps_a_p99": {
+          "spearman": 0.8702749620126146,
+          "p_value": 2.3253959356231137e-105,
+          "n": 338
+        },
+        "A_over_lim": {
+          "spearman": 0.9164779404349715,
+          "p_value": 9.984447994691872e-136,
+          "n": 338
+        },
+        "f_metal": {
+          "spearman": 0.7123856632823301,
+          "p_value": 1.2874460029396146e-53,
+          "n": 338
+        }
+      },
+      "front_overlap": {
+        "reference": 47,
+        "light": 45,
+        "shared": 34,
+        "jaccard": 0.5862068965517241,
+        "kept": 0.723404255319149
+      },
+      "top_k_overlap": {
+        "5": {
+          "k": 5,
+          "shared": 1,
+          "overlap": 0.2
+        },
+        "10": {
+          "k": 10,
+          "shared": 2,
+          "overlap": 0.2
+        },
+        "24": {
+          "k": 24,
+          "shared": 10,
+          "overlap": 0.4166666666666667
+        }
+      },
+      "median_change": {
+        "K_radial": -0.9079775195105299,
+        "eps_a_max": -0.43091294214528264,
+        "eps_a_p99": -0.4364861206526358,
+        "A_over_lim": -0.7304646489324318,
+        "f_metal": -0.41441761363636365
+      }
+    }
+  ],
+  "seconds": 147.71806169999763
+}
