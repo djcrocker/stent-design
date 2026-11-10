@@ -1,0 +1,143 @@
+{
+  "k_targets": [
+    200.0
+  ],
+  "grid_n": 64,
+  "axial_floor": 1.0,
+  "aggregate_p": 20.0,
+  "match_rtol": 0.05,
+  "penal": 3.0,
+  "volfrac_bounds": [
+    0.1,
+    0.8
+  ],
+  "targets": [
+    {
+      "k_target": 200.0,
+      "volfrac": 0.23398437500000002,
+      "radius_px": 2.0371832715762603,
+      "g": 0.9773881421818063,
+      "iterations": 60,
+      "bracket": [
+        {
+          "volfrac": 0.45,
+          "g": 2.1230717097873493,
+          "matched": true,
+          "reached": true,
+          "K_radial": 431.5458137654613,
+          "k_rel_error": 1.1577290688273063,
+          "floor_met": true,
+          "ratio": 0.9999999999889145,
+          "f_metal": 0.4501953125,
+          "valid": true
+        },
+        {
+          "volfrac": 0.275,
+          "g": 1.1431000106280376,
+          "matched": true,
+          "reached": true,
+          "K_radial": 232.78551196520064,
+          "k_rel_error": 0.16392755982600327,
+          "floor_met": true,
+          "ratio": 1.0283630867745404,
+          "f_metal": 0.275390625,
+          "valid": false
+        },
+        {
+          "volfrac": 0.1875,
+          "g": 0.5100001606539085,
+          "matched": false,
+          "reached": false,
+          "K_radial": 165.99171303126653,
+          "k_rel_error": -0.1700414348436674,
+          "floor_met": false,
+          "ratio": 0.614588966588386,
+          "f_metal": 0.1826171875,
+          "valid": false
+        },
+        {
+          "volfrac": 0.23125,
+          "g": 0.8584982816307735,
+          "matched": false,
+          "reached": false,
+          "K_radial": 172.53182965478078,
+          "k_rel_error": -0.1373408517260961,
+          "floor_met": false,
+          "ratio": 1.1416783461598148,
+          "f_metal": 0.228515625,
+          "valid": false
+        },
+        {
+          "volfrac": 0.25312500000000004,
+          "g": 1.0664885844266967,
+          "matched": true,
+          "reached": true,
+          "K_radial": 220.43698180756058,
+          "k_rel_error": 0.10218490903780286,
+          "floor_met": true,
+          "ratio": 0.9981339057523216,
+          "f_metal": 0.25390625,
+          "valid": false
+        },
+        {
+          "volfrac": 0.24218750000000003,
+          "g": 1.0171718294624041,
+          "matched": true,
+          "reached": true,
+          "K_radial": 210.32653183210866,
+          "k_rel_error": 0.05163265916054338,
+          "floor_met": true,
+          "ratio": 1.0003744978639697,
+          "f_metal": 0.2431640625,
+          "valid": false
+        },
+        {
+          "volfrac": 0.23671875000000003,
+          "g": 0.991577985520025,
+          "matched": true,
+          "reached": true,
+          "K_radial": 205.2470690659553,
+          "k_rel_error": 0.02623534532977634,
+          "floor_met": true,
+          "ratio": 0.9999999984764624,
+          "f_metal": 0.23828125,
+          "valid": false
+        },
+        {
+          "volfrac": 0.23398437500000002,
+          "g": 0.9773881421818063,
+          "matched": true,
+          "reached": true,
+          "K_radial": 202.40616131286544,
+          "k_rel_error": 0.01203080656432709,
+          "floor_met": true,
+          "ratio": 1.0000290441858923,
+          "f_metal": 0.234375,
+          "valid": false
+        }
+      ],
+      "seconds": 1018.8371225999435,
+      "K_radial": 202.40616131286544,
+      "E_circ": 8280.252053708131,
+      "E_axial": 8280.492546888014,
+      "ratio": 1.0000290441858923,
+      "k_rel_error": 0.01203080656432709,
+      "floor_met": true,
+      "floor_rel": 1.0120602001752017,
+      "f_metal": 0.234375,
+      "gray": 0.001949956239515193,
+      "valid": false,
+      "reasons": [
+        "thin_feature"
+      ],
+      "binary": {
+        "K_radial": 203.54065348291806,
+        "E_circ": 8326.663097028466,
+        "E_axial": 8326.663097028464,
+        "ratio": 0.9999999999999998,
+        "k_rel_error": 0.017703267414590274
+      }
+    }
+  ],
+  "seconds": 1018.8489382000407
+}

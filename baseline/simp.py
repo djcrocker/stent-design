@@ -33,7 +33,7 @@ from skfem.helpers import ddot, sym_grad, trace
 
 import config
 from geom.cell import UnitCell
-from sim2d.homogenize import UNIT_STRAINS, Homogenized, plane_stress_moduli
+from sim2d.homogenize import UNIT_STRAINS, Homogenized, plane_stress_moduli, spd_solve
 from sim2d.mesh import cell_to_mesh
 
 PENAL = 3.0                 # SIMP exponent
@@ -99,20 +99,26 @@ class DensityHomogenized(Homogenized):
         """
         return sum(self.dC(i, j) for i in range(2) for j in range(2)) / 4.0
 
-    def dK_radial(self):
+    def dE(self, axis):
         """
-        dK_radial / drho, as an (N, N) field.
+        d of the uniaxial modulus along `axis` (0 circumferential, 1 axial) / drho, as an
+        (N, N) field.
 
-        K_radial goes through the compliance (E_circ = 1 / inv(C)[0,0]), so the chain 
-        rule runs over the whole matrix: d inv(C) = -inv(C) dC inv(C).
+        The modulus goes through the compliance (E = 1 / inv(C)[axis, axis]), so the chain
+        rule runs over the whole matrix: d inv(C) = -inv(C) dC inv(C). Taking C[axis, axis]
+        instead would be stiffness under lateral constraint, which isn't what the 3D tier
+        reproduces.
         """
         S = np.linalg.inv(self.C_eff)
-        # d(1/S00)/dC_ij = -(1/S00^2) * dS00/dC_ij, and dS00/dC_ij = -S[0,i] S[j,0].
-        dE_circ = np.einsum('i,j,ij...->...', S[0], S[:, 0],
-                            np.array([[self.dC(i, j) for j in range(3)]
-                                      for i in range(3)])) / S[0, 0] ** 2
+        # d(1/Saa)/dC_ij = -(1/Saa^2) * dSaa/dC_ij, and dSaa/dC_ij = -S[a,i] S[j,a].
+        return np.einsum('i,j,ij...->...', S[axis], S[:, axis],
+                         np.array([[self.dC(i, j) for j in range(3)]
+                                   for i in range(3)])) / S[axis, axis] ** 2
+
+    def dK_radial(self):
+        """dK_radial / drho, as an (N, N) field."""
         R = config.D_DEPLOYED_MM / 2.0
-        return dE_circ * config.STRUT_THICKNESS_MM / R ** 2
+        return self.dE(0) * config.STRUT_THICKNESS_MM / R ** 2
 
 def bulk(C_eff):
     """
@@ -164,7 +170,7 @@ def homogenize_density(rho, penal=PENAL, e_min_frac=E_MIN_FRAC):
                                + lam1 * trE * trace(e))
 
         f = asm(rhs, basis, emod=emod)
-        fluctuations.append(solve(*condense(K, f, D=PINNED)))
+        fluctuations.append(solve(*condense(K, f, D=PINNED), solver=spd_solve))
 
     interp = [basis.interpolate(u) for u in fluctuations]
     energies = np.zeros((3, 3, basis.mesh.t.shape[1]))

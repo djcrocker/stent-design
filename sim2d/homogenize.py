@@ -21,12 +21,28 @@ effective stiffness of the perforated sheet, not of the metal in it.
 import time
 
 import numpy as np
+import scipy.sparse as sparse
+import scipy.sparse.linalg as spla
 from skfem import (Basis, BilinearForm, ElementQuad1, ElementVector, Functional,
                    LinearForm, asm, condense, solve)
 from skfem.helpers import ddot, sym_grad, trace
 
 import config
 from sim2d.mesh import cell_to_mesh
+
+CG_RTOL = 1e-12
+
+def spd_solve(A, b, rtol=CG_RTOL, **_):
+    """Jacobi-preconditioned conjugate gradients."""
+    A = sparse.csr_matrix(A)
+    diag = A.diagonal().copy()
+    diag[diag == 0.0] = 1.0
+    jacobi = spla.LinearOperator(A.shape, matvec=lambda v: v / diag)
+    x, info = spla.cg(A, np.asarray(b).ravel(), rtol=rtol, atol=0.0,
+                      maxiter=100 * A.shape[0], M=jacobi)
+    if info != 0:
+        raise RuntimeError(f'CG did not converge on a {A.shape[0]}-DOF system (info {info})')
+    return x
 
 # Voigt order used throughout: (xx, yy, xy) = (circumferential, axial, shear).
 VOIGT = ('circ', 'axial', 'shear')
@@ -113,7 +129,7 @@ def homogenize(cell, E=None, nu=None):
 
         f = asm(rhs, basis)
         # solve() on a condensed system returns the full vector, constrained DOFs included.
-        u = solve(*condense(K, f, D=pinned))
+        u = solve(*condense(K, f, D=pinned), solver=spd_solve)
         fluctuations.append(u)
 
         # Volume-averaged stress over the whole cell (metal contributes, void does not).

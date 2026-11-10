@@ -1,9 +1,4 @@
-"""
-The top88 MBB beam: validation (b) for the SIMP baseline.
-
-The domain is a beam, not a torus, so the filter runs in its boundary-corrected mode. Using
-the periodic filter here would be the mistake in the other direction.
-"""
+"""The top88 MBB beam: validation (b) for the SIMP baseline."""
 
 import functools
 
@@ -12,7 +7,7 @@ from skfem import (Basis, ElementQuad1, ElementVector, Functional, MeshQuad1, as
 from skfem.helpers import ddot, sym_grad, trace
 
 from baseline import optimize, simp
-from sim2d.homogenize import plane_stress_moduli
+from sim2d.homogenize import plane_stress_moduli, spd_solve
 
 E0 = 1.0                # benchmark modulus
 NU = 0.3                # benchmark Poisson ratio
@@ -51,7 +46,7 @@ def compliance(rho, penal=simp.PENAL, nelx=NELX, nely=NELY):
     e_mod, de_mod = simp.moduli(np.asarray(rho, float)[index], penal=penal, e0=E0)
 
     K = asm(simp.density_stiffness(lam1, mu1), basis, emod=simp.at_quadrature(e_mod, basis))
-    u = solve(*condense(K, f, D=constrained))
+    u = solve(*condense(K, f, D=constrained), solver=spd_solve)
 
     @Functional
     def unit_energy(w):

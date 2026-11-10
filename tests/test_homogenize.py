@@ -8,7 +8,7 @@ import config
 from geom.cell import UnitCell
 from geom import reference
 from geom.parametric import achievable_widths, crown
-from sim2d.homogenize import homogenize
+from sim2d.homogenize import homogenize, spd_solve
 from sim2d.mesh import cell_to_mesh
 
 N = config.GRID_N
@@ -93,3 +93,25 @@ def test_k_radial_follows_its_definition():
 def test_labeling_is_fast_enough():
     """~5 s per cell for the whole vector; stiffness is three solves of it."""
     assert homogenize(reference.build()).seconds < 2.0
+
+#  LINEAR SOLVER #
+def test_the_solver_reproduces_a_known_answer():
+    """`spd_solve` replaced SciPy's sparse LU because SuperLU aborts the process."""
+    import scipy.sparse as sparse
+
+    rng = np.random.default_rng(0)
+    a = rng.standard_normal((40, 40))
+    A = a @ a.T + 40.0 * np.eye(40)     # Symmetric positive definite
+    b = rng.standard_normal(40)
+    assert spd_solve(sparse.csr_matrix(A), b) == pytest.approx(np.linalg.solve(A, b), rel=1e-9)
+
+
+@pytest.mark.filterwarnings('ignore:divide by zero encountered')
+@pytest.mark.filterwarnings('ignore:invalid value encountered')
+def test_the_solver_raises_instead_of_vanishing():
+    """A solve that can't converge has to become a Python exception."""
+    import scipy.sparse as sparse
+
+    singular = sparse.csr_matrix(np.zeros((8, 8)))
+    with pytest.raises(RuntimeError, match='did not converge'):
+        spd_solve(singular, np.ones(8))
