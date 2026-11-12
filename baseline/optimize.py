@@ -76,13 +76,18 @@ def oc_step(x, benefit, dv, volume_fn, volfrac, move=0.2, damping=0.5):
     return x_new
 
 def optimize(grad_fn, shape, volfrac, radius=None, iters=60, move=0.2, damping=0.5,
-             beta_max=16.0, mode='wrap', x0=None, tol=1e-3, callback=None):
+             beta_max=16.0, mode='wrap', x0=None, tol=1e-3, callback=None, eta=0.5):
     """
     Maximize `grad_fn` at a fixed volume fraction.
 
     `grad_fn(rho) -> (value, dvalue_drho)` on the physical (filtered, projected) field.
     Returns the design variables, the physical field, and a per-iteration history, so a
     broken loop is diagnosable from the history instead of only from its answer.
+
+    `eta` is the projection threshold, and raising it above 0.5 is the robust formulation:
+    the field this loop optimizes and constrains is then the eroded design, so a member has
+    to stay load-bearing after erosion, and the caller delivers the intermediate (eta = 0.5)
+    design, which is thicker by the erosion margin.
     """
     started = time.perf_counter()
     radius = default_radius(shape[0]) if radius is None else radius
@@ -93,15 +98,15 @@ def optimize(grad_fn, shape, volfrac, radius=None, iters=60, move=0.2, damping=0
     for iteration in range(iters):
         beta = beta_at(iteration, iters, beta_max)
         x_tilde = simp.density_filter(x, radius, mode)
-        rho = simp.project(x_tilde, beta)
+        rho = simp.project(x_tilde, beta, eta)
         value, dvalue = grad_fn(rho)
 
-        dproject = simp.project_grad(x_tilde, beta)
+        dproject = simp.project_grad(x_tilde, beta, eta)
         benefit = simp.filter_chain_rule(dvalue * dproject, radius, mode)
         dv = simp.filter_chain_rule(dproject, radius, mode)
 
         def volume_fn(candidate):
-            return simp.project(simp.density_filter(candidate, radius, mode), beta).sum()
+            return simp.project(simp.density_filter(candidate, radius, mode), beta, eta).sum()
 
         x_next = oc_step(x, benefit, dv, volume_fn, volfrac, move, damping)
         change = float(np.max(np.abs(x_next - x)))
@@ -114,7 +119,8 @@ def optimize(grad_fn, shape, volfrac, radius=None, iters=60, move=0.2, damping=0
         if change < tol and beta >= beta_max:
             break
 
-    rho = simp.project(simp.density_filter(x, radius, mode), beta_at(iters, iters, beta_max))
+    rho = simp.project(simp.density_filter(x, radius, mode),
+                       beta_at(iters, iters, beta_max), eta)
     value = grad_fn(rho)[0]
     return Result(x, rho, float(value), float(rho.mean()), history, time.perf_counter() - started)
 

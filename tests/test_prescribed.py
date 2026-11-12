@@ -197,3 +197,50 @@ def test_no_repair_rows_when_repair_is_off():
     got = prescribed.min_volume_cell(50.0, steps=2, n=N, iters=4, binary=False, repair=())
     assert not any(row.get('repair') for row in got.bracket)
     assert got.radius == pytest.approx(optimize.default_radius(N))
+
+# THE ROBUST (ERODED) FORMULATION #
+def test_the_delivered_design_is_thicker_than_the_one_optimized():
+    """
+    The erosion margin is the length scale.
+
+    The loop is scored on the eroded field and the cell handed over is the intermediate
+    one, so the delivered design has to carry more material than what was optimized.
+    """
+    run = prescribed.optimize_prescribed(50.0, 0.3, n=N, iters=6)
+    rho = prescribed.delivered(run, n=N, iters=6)
+    assert rho.mean() > run.rho.mean()
+
+def test_a_half_eta_run_delivers_exactly_what_it_optimized():
+    """eta = 0.5 has to be the plain formulation."""
+    run = prescribed.optimize_prescribed(50.0, 0.3, n=N, iters=6, eta=0.5)
+    assert prescribed.delivered(run, n=N, iters=6) == pytest.approx(run.rho, rel=1e-12)
+
+def test_the_delivered_field_is_rebuilt_at_the_beta_the_run_ended_at():
+    """A mismatched beta would compare two different fields."""
+    run = prescribed.optimize_prescribed(50.0, 0.3, n=N, iters=6, eta=0.5)
+    assert optimize.beta_at(6, 6, 16.0) < 16.0          # the case worth guarding
+    wrong = prescribed.delivered(run, n=N, iters=60)
+    assert not np.allclose(wrong, run.rho)
+
+# THE SCREENED ARM #
+def test_validity_stays_out_of_the_search_direction():
+    """An invalid cell says nothing about which way to go, so it can't steer the bisection."""
+    got = prescribed.min_volume_cell(50.0, steps=3, n=N, iters=4, binary=False, repair=(), require_valid=True)
+    for row in got.bracket:
+        assert row['reached'] == (row['K_radial'] >= 50.0 * (1.0 - prescribed.MATCH_RTOL))
+
+def test_an_explicit_ladder_visits_exactly_what_it_was_given():
+    """Sweep mode, which is how the screened arm samples the valid band."""
+    ladder = (0.2, 0.3, 0.4)
+    got = prescribed.min_volume_cell(50.0, n=N, iters=4, binary=False, repair=(), require_valid=True, volfracs=ladder)
+    assert [row['volfrac'] for row in got.bracket] == pytest.approx(list(ladder))
+    valid_hits = [row['volfrac'] for row in got.bracket if row['matched'] and row['valid']]
+    if valid_hits:
+        assert got.volfrac == pytest.approx(min(valid_hits))
+
+def test_without_require_valid_validity_is_recorded_but_not_enforced():
+    """The unscreened arm still reports `valid`."""
+    got = prescribed.min_volume_cell(50.0, steps=2, n=N, iters=4, binary=False, repair=())
+    assert all('valid' in row for row in got.bracket)
+    for row in got.bracket:
+        assert row['reached'] == (row['K_radial'] >= 50.0 * (1.0 - prescribed.MATCH_RTOL))

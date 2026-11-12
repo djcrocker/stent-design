@@ -5,7 +5,7 @@ What is prescribed & why the two prescriptions have different forms:
 
   * `E_circ` is matched as an equality, because it's the quantity the comparison is matched
     on. `K_radial = E_circ t / R^2`, so prescribing one prescribes the other.
-  * `E_axial` is held to a floor.A floor leaves the baseline more freedom than an equality 
+  * `E_axial` is held to a floor. A floor leaves the baseline more freedom than an equality 
     would.
 """
 
@@ -29,7 +29,15 @@ K_TARGETS = (100.0, 200.0, 300.0)   # the ladder the diffusion model was conditi
 
 REPAIR_RADII = ()
 
-Prescribed = namedtuple('Prescribed', 'k_target volfrac radius run achieved bracket seconds')
+ERODE_ETA = 0.75
+"""
+The threshold for the eroded design in the robust formulation.
+The loop optimizes the eroded design, so the delivered one is 
+thicker by that margin and holds a length scale the density 
+filter doesn't by itself.
+"""
+
+Prescribed = namedtuple('Prescribed', 'k_target volfrac radius run rho achieved bracket seconds')
 
 def e_circ_for(k_radial):
     """The circumferential modulus a prescribed `K_radial` asks for, MPa."""
@@ -54,8 +62,8 @@ def binding(solved, e_target, floor=AXIAL_FLOOR, p=AGGREGATE_P):
     grad = (w_circ * solved.dE(0) / e_target + w_axial * solved.dE(1) / scale) / total
     return float(lo - np.log(total) / p), grad
 
-def optimize_prescribed(k_target, volfrac, n=None, floor=AXIAL_FLOOR, p=AGGREGATE_P, **kw):
-    """Maximize the binding modulus at a fixed volume fraction."""
+def optimize_prescribed(k_target, volfrac, n=None, floor=AXIAL_FLOOR, p=AGGREGATE_P, eta=ERODE_ETA, **kw):
+    """Maximize the binding modulus at a fixed volume fraction, on the eroded design."""
     n = config.GRID_N if n is None else n
     e_target = e_circ_for(k_target)
     if kw.get('x0') is None:    # Also catches an explicit x0=None warm start
@@ -64,7 +72,19 @@ def optimize_prescribed(k_target, volfrac, n=None, floor=AXIAL_FLOOR, p=AGGREGAT
     def grad_fn(rho):
         return binding(simp.homogenize_density(rho), e_target, floor, p)
 
-    return optimize.optimize(grad_fn, (n, n), volfrac, **kw)
+    return optimize.optimize(grad_fn, (n, n), volfrac, eta=eta, **kw)
+
+def delivered(run, radius=None, n=None, iters=60, beta_max=16.0, mode='wrap'):
+    """
+    The design the baseline hands over.
+
+    Rebuilt from the design variables at eta = 0.5, because `run.rho` is the eroded field
+    the loop was scored on.
+    """
+    radius = optimize.default_radius(config.GRID_N if n is None else n) \
+        if radius is None else radius
+    beta = optimize.beta_at(iters, iters, beta_max)
+    return simp.project(simp.density_filter(run.x, radius, mode), beta, 0.5)
 
 def achieved(rho, k_target, floor=AXIAL_FLOOR, binary=True):
     """What a delivered density field actually got."""
@@ -92,7 +112,7 @@ def matched(record, rtol=MATCH_RTOL):
 
 def min_volume_cell(k_target, bounds=VOLFRAC_BOUNDS, steps=8, n=None, rtol=MATCH_RTOL,
                     floor=AXIAL_FLOOR, binary=True, repair=REPAIR_RADII, progress=False,
-                    **kw):
+                    require_valid=False, volfracs=None, **kw):
     """
     The lightest cell meeting the prescription: bisect the volume fraction.
 
@@ -105,17 +125,23 @@ def min_volume_cell(k_target, bounds=VOLFRAC_BOUNDS, steps=8, n=None, rtol=MATCH
     """
     started = time.perf_counter()
     lo, hi = bounds
+    ladder = list(volfracs) if volfracs is not None else None
     tried, bracket, warm = [], [], None
-    for _ in range(steps):
-        mid = 0.5 * (lo + hi)
+    radius = kw.get('radius') or optimize.default_radius(config.GRID_N if n is None else n)
+    shape = (kw.get('iters', 60), kw.get('beta_max', 16.0))
+    for step in range(steps if ladder is None else len(ladder)):
+        mid = 0.5 * (lo + hi) if ladder is None else ladder[step]
         run = optimize_prescribed(k_target, mid, n=n, floor=floor,
                                   x0=(None if warm is None else warm.x), **kw)
         warm = run
-        record = achieved(run.rho, k_target, floor, binary=binary)
-        ok = matched(record, rtol)
-        # The bisection follows K_radial, NOT `ok`: see the docstring.
+        rho = delivered(run, radius, n, *shape)
+        record = achieved(rho, k_target, floor, binary=binary)
+        ok = matched(record, rtol) and (record['valid'] or not require_valid)
+        # The bisection follows K_radial ALONE, not `ok`: see the docstring. Validity must
+        # stay out of the direction - it is not monotone in volume, so an invalid cell says
+        # nothing about which way to go.
         reached = bool(record['K_radial'] >= k_target * (1.0 - rtol))
-        tried.append((mid, run, record, ok))
+        tried.append((mid, run, rho, record, ok))
         bracket.append({'volfrac': mid, 'g': run.value, 'matched': ok,
                         'reached': reached,
                         **{k: record[k] for k in ('K_radial', 'k_rel_error', 'floor_met',
@@ -124,19 +150,19 @@ def min_volume_cell(k_target, bounds=VOLFRAC_BOUNDS, steps=8, n=None, rtol=MATCH
             print(f'    vf {mid:.4f}  g {run.value:.3f}  K {record["K_radial"]:.1f} '
                   f'({record["k_rel_error"]:+.1%})  ratio {record["ratio"]:.2f}  '
                   f'valid {record["valid"]}  matched {ok}  {run.seconds:.0f}s', flush=True)
-        lo, hi = (lo, mid) if reached else (mid, hi)
+        if ladder is None:
+            lo, hi = (lo, mid) if reached else (mid, hi)
 
-    hits = [t for t in tried if t[3]]
-    mid, run, record, _ = (min(hits, key=lambda t: t[0]) if hits else
-                           min(tried, key=lambda t: abs(t[2]['k_rel_error'])))
-    radius = kw.get('radius') or optimize.default_radius(config.GRID_N if n is None else n)
+    hits = [t for t in tried if t[4]]
+    mid, run, rho, record, _ = (min(hits, key=lambda t: t[0]) if hits else
+                                min(tried, key=lambda t: abs(t[3]['k_rel_error'])))
 
     if repair and not record['valid']:
-        mid, radius, run, record = _repair_length_scale(
+        mid, radius, run, rho, record = _repair_length_scale(
             k_target, mid, radius, repair, n=n, floor=floor, rtol=rtol, binary=binary,
-            bracket=bracket, progress=progress, best=(run, record), **kw)
+            bracket=bracket, progress=progress, best=(run, rho, record), **kw)
 
-    return Prescribed(k_target, mid, radius, run, record, bracket,
+    return Prescribed(k_target, mid, radius, run, rho, record, bracket,
                       time.perf_counter() - started)
 
 def _repair_length_scale(k_target, volfrac, radius, multipliers, n=None, floor=AXIAL_FLOOR,
@@ -153,11 +179,13 @@ def _repair_length_scale(k_target, volfrac, radius, multipliers, n=None, floor=A
     `reasons` carry the failure.
     """
     kw.pop('radius', None)
-    run, record = best
+    run, rho, record = best
     for multiple in multipliers:
         wide = radius * multiple
         trial = optimize_prescribed(k_target, volfrac, n=n, floor=floor, radius=wide, **kw)
-        got = achieved(trial.rho, k_target, floor, binary=binary)
+        trial_rho = delivered(trial, wide, n, kw.get('iters', 60),
+                              kw.get('beta_max', 16.0))
+        got = achieved(trial_rho, k_target, floor, binary=binary)
         if bracket is not None:
             bracket.append({'volfrac': volfrac, 'radius': wide, 'g': trial.value,
                             'repair': True, 'matched': matched(got, rtol),
@@ -168,8 +196,8 @@ def _repair_length_scale(k_target, volfrac, radius, multipliers, n=None, floor=A
                   f'K {got["K_radial"]:.1f} ({got["k_rel_error"]:+.1%})  '
                   f'valid {got["valid"]} {got["reasons"]}  {trial.seconds:.0f}s', flush=True)
         if got['valid'] and matched(got, rtol):
-            return volfrac, wide, trial, got
-    return volfrac, radius, run, record
+            return volfrac, wide, trial, trial_rho, got
+    return volfrac, radius, run, rho, record
 
 # THE CAMPAIGN #
 RESULTS_DIR = config.PROJECT_ROOT / 'baseline' / 'results'
@@ -186,7 +214,11 @@ def campaign(k_targets=K_TARGETS, out_stem='s10_1_prescribed', n=None, steps=8,
     record = {'k_targets': list(k_targets), 'grid_n': config.GRID_N if n is None else n,
               'axial_floor': floor, 'aggregate_p': kw.get('p', AGGREGATE_P),
               'match_rtol': kw.get('rtol', MATCH_RTOL), 'penal': simp.PENAL,
-              'volfrac_bounds': list(kw.get('bounds', VOLFRAC_BOUNDS)), 'targets': []}
+              'erode_eta': kw.get('eta', ERODE_ETA),
+              'volfrac_bounds': list(kw.get('bounds', VOLFRAC_BOUNDS)),
+              'require_valid': bool(kw.get('require_valid', False)),
+              'volfracs': (list(kw['volfracs']) if kw.get('volfracs') is not None
+                           else None), 'targets': []}
     cells, fields = {}, {}
 
     for k_target in k_targets:
@@ -199,10 +231,10 @@ def campaign(k_targets=K_TARGETS, out_stem='s10_1_prescribed', n=None, steps=8,
                'g': got.run.value, 'iterations': len(got.run.history),
                'bracket': got.bracket, 'seconds': got.seconds, **got.achieved}
         record['targets'].append(row)
-        cells[f'k{k_target:g}'] = optimize.to_cell(got.run.rho).to_array()
-        fields[f'k{k_target:g}'] = got.run.rho.astype(np.float32)
+        cells[f'k{k_target:g}'] = optimize.to_cell(got.rho).to_array()
+        fields[f'k{k_target:g}'] = got.rho.astype(np.float32)
         if progress:
-            print(f'  -> volfrac {got.volfrac:.4f}  radius {got.radius:.2f} px  '
+            print(f'  -> eroded volfrac {got.volfrac:.4f}  radius {got.radius:.2f} px  '
                   f'K_radial {row["K_radial"]:.1f} ({row["k_rel_error"]:+.1%})  '
                   f'ratio {row["ratio"]:.3f}  f_metal {row["f_metal"]:.3f}  '
                   f'valid {row["valid"]} {row["reasons"]}', flush=True)
@@ -235,11 +267,19 @@ def main():
     ap.add_argument('--floor', type=float, default=AXIAL_FLOOR,
                     help='E_axial floor as a multiple of the circumferential target')
     ap.add_argument('--iters', type=int, default=60, help='inner OC iterations')
+    ap.add_argument('--eta', type=float, default=ERODE_ETA,
+                    help='projection threshold the loop optimizes; 0.5 is no erosion')
+    ap.add_argument('--require-valid', action='store_true',
+                    help='screened arm: the cell must also pass geom.validity')
+    ap.add_argument('--volfracs', type=float, nargs='+', default=None,
+                    help='explicit volume-fraction ladder instead of the bisection; '
+                         'required with --require-valid, since validity is not monotone')
     ap.add_argument('--out-stem', default='s10_1_prescribed',
                     help='results basename, so a sensitivity arm does not overwrite the run')
     args = ap.parse_args()
     campaign(k_targets=tuple(args.targets), out_stem=args.out_stem, n=args.n,
-             steps=args.steps, floor=args.floor, iters=args.iters)
+             steps=args.steps, floor=args.floor, iters=args.iters, eta=args.eta,
+             require_valid=args.require_valid, volfracs=args.volfracs)
 
 if __name__ == '__main__':
     main()
