@@ -385,3 +385,66 @@ def test_audit_ranks_the_percentile_as_well_as_the_peak():
     assert set(m) == {'A_over_lim', 'eps_a_p99', 'eps_a_max'}
     assert m['eps_a_p99']['rho'] == pytest.approx(1.0) and m['eps_a_p99']['passes']
     assert m['eps_a_max']['rho'] == pytest.approx(-1.0) and not m['eps_a_max']['passes']
+
+# HEAD-TO-HEAD, WHICH SHARES THIS MACHINERY #
+
+def test_a_second_campaign_cannot_overwrite_s9_4s_decks_or_manifest(tmp_path):
+    """The VM workspace is one flat directory."""
+    import numpy as np
+
+    from sim3d import flex
+
+    # A coarser grid than 64 puts 180-degree faces at the seam and the guard rejects it.
+    field = np.zeros((64, 64), bool)
+    field[16:48, :] = True
+    tiny = {'n_circ': None, 'n_axial': 1, 'layers': 2, 'limit': 0.20}
+    m = flex.build(indices=[0], fields=field[None], directory=tmp_path, mesh=tiny,
+                   arms=('bend',), prefix='s10_5_simp',
+                   manifest_name='s10_5_test_manifest.json')
+    assert m['cells'][0]['stem'] == 's10_5_simp00'
+    assert (flex.RESULTS_DIR / 's10_5_test_manifest.json').exists()
+    (flex.RESULTS_DIR / 's10_5_test_manifest.json').unlink()
+    # the default is unchanged, so every S9.4 artifact keeps its name
+    assert flex.STEM_PREFIX == 's9_4_cell'
+    assert flex.MANIFEST_NAME == 's9_4_manifest.json'
+
+def test_the_runner_names_its_jobs_and_its_log_after_the_campaign(tmp_path):
+    from sim3d import flex, headtohead
+
+    manifest = {'cells': [{'stem': 's10_5_simp00'}], 'arms': ('bend', 'comb')}
+    path = flex.write_vm_script(manifest, path=tmp_path / 'run.ps1', label=headtohead.LABEL)
+    text = path.read_text(encoding='utf-8')
+    assert '$jobs = @("s10_5_simp00_bend", "s10_5_simp00_comb")' in text
+    assert 's10_5_timing_' in text and 's9_4_timing_' not in text
+
+def test_the_baseline_cell_is_the_screened_valid_one():
+    from sim3d import headtohead
+
+    field, row = headtohead.simp_cell()
+    assert row['valid'] and field.dtype == bool
+    assert field.mean() == pytest.approx(row['f_metal'], rel=1e-9)
+    assert row['K_radial'] == pytest.approx(320.9, abs=0.1)
+
+def test_an_unscreened_target_is_refused_rather_than_run():
+    from sim3d import headtohead
+
+    with pytest.raises(ValueError, match='not screened-valid'):
+        headtohead.simp_cell(target=300.0)
+
+def test_our_side_of_the_comparison_is_already_solved():
+    from sim3d import headtohead
+
+    got = headtohead.ours()
+    assert [o['shortlist_row'] for o in got] == [6, 8]
+    assert [o['pool_index'] for o in got] == [110, 665]
+    # Row 6 is the stiffness match: 320.1 against the baseline's 320.9
+    assert got[0]['K_radial'] == pytest.approx(320.1, abs=0.1)
+    assert got[0]['f_metal'] < 0.417
+    for o in got:
+        assert o['audit']['bend_converged'] and o['audit']['comb_converged']
+
+def test_a_row_s9_4_never_ran_is_refused():
+    from sim3d import headtohead
+
+    with pytest.raises(ValueError, match='was not audited'):
+        headtohead.ours(rows=(0,))

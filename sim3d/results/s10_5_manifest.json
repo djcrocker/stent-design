@@ -1,0 +1,57 @@
+{
+  "mesh": {
+    "n_circ": null,
+    "n_axial": 4,
+    "layers": 2,
+    "limit": 0.2
+  },
+  "arms": [
+    "bend",
+    "comb"
+  ],
+  "bend_radius_mm": 54.0,
+  "bend_radius_full_excursion_mm": 27.0,
+  "axial_compression": 0.045,
+  "axial_compression_full_excursion": 0.09,
+  "sample_fraction": 0.5,
+  "release": false,
+  "length_mm": 6.283185307179586,
+  "cells": [
+    {
+      "pool_index": 0,
+      "stem": "s10_5_simp00",
+      "f_metal": 0.4169921875,
+      "n_nodes": 276552,
+      "n_hexes": 163968,
+      "entities": 440520,
+      "scaled_jacobian_min": 0.7339365975344285,
+      "max_face_angle_deg": 132.78202820719406,
+      "mesh": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s10_5_simp00_mesh.inp",
+      "decks": {
+        "bend": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s10_5_simp00_bend.inp",
+        "comb": "C:\\Users\\djcro\\Projects\\stent-design\\sim3d\\decks\\flex\\s10_5_simp00_comb.inp"
+      }
+    }
+  ],
+  "baseline": {
+    "run": "s10_1_prescribed_screened",
+    "k_target": 200.0,
+    "K_radial": 320.9150975230999,
+    "f_metal": 0.4169921875,
+    "volfrac": 0.32
+  },
+  "matched": [
+    {
+      "shortlist_row": 6,
+      "pool_index": 110,
+      "K_radial": 320.14959301221256,
+      "f_metal": 0.389404296875
+    },
+    {
+      "shortlist_row": 8,
+      "pool_index": 665,
+      "K_radial": 303.56310004198497,
+      "f_metal": 0.40478515625
+    }
+  ]
+}
