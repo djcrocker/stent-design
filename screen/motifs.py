@@ -2,9 +2,10 @@
 What do the winning topologies do that the conventional families can't?
 
 An embedding can show two clouds that miss each other, but it can't say what the gap is.
-So the result here is a set of named morphological descriptors, measured identically on 
-three populations - the generated pool, the S3 parametric sweep, and the handmade cells - 
-and the finding is which descriptor regions the conventional families never reach.
+So the result here is a set of named morphological descriptors, measured identically on
+the generated pool and on every conventional population - the extended parametric family,
+the handmade cells, and the prescribed-stiffness SIMP baseline - and the finding is which
+descriptor regions the conventional families never reach.
 
 Every descriptor here is shift-invariant, computed on the torus.
 
@@ -21,6 +22,7 @@ import config
 from geom import periodic
 
 RESULTS_DIR = config.PROJECT_ROOT / 'screen' / 'results'
+BASELINE_DIR = config.PROJECT_ROOT / 'baseline' / 'results'
 
 # validity.wraps returns (circumferential, axial) in this order.
 AXIS = {'circ': 1, 'axial': 0}
@@ -179,21 +181,42 @@ def describe_many(fields, progress=True, label=''):
 # Which Pareto layers count as winners. Layer 1 is the actual non-dominated front.
 WINNER_LAYERS = 1
 
+# The prescribed-stiffness baseline's two campaigns.
+SIMP_RUNS = (('s10_1_prescribed_screened', 'simp'),
+             ('s10_1_prescribed_unscreened', 'simp_unscreened'))
+
+def simp_cells(runs=SIMP_RUNS):
+    """The SIMP baseline's cells, each carrying the validity its campaign recorded."""
+    rows = []
+    for stem, family in runs:
+        record = json.loads((BASELINE_DIR / f'{stem}.json').read_text(encoding='utf-8'))
+        blob = np.load(BASELINE_DIR / f'{stem}_cells.npz')
+        for target in record['targets']:
+            key = f'k{target["k_target"]:g}'
+            rows.append({'name': f'{family}_{key}', 'family': family,
+                         'screened': bool(target['valid']),
+                         'field': np.asarray(blob[f'cell_{key}'], bool)})
+    return rows
+
 def conventional():
     """
-    The populations a conventional designer would have produced: the S3 parametric sweep
-    and the handmade cells.
+    The populations a conventional designer would have produced: the extended parametric
+    family, the handmade cells, and the SIMP baseline.
 
-    PENDING, 10.1 SIMP / inverse-homogenization.
+    `screened` is whether the cell passes `geom.validity`. Parametric and handmade cells
+    pass by construction; five of the six SIMP cells do not. The unscreened ones are kept
+    rather than dropped because they change the exclusion result by a lot, so the comparison
+    has to state which conventional set it was measured against.
     """
     from geom import handmade, parametric
 
-    valid, _ = parametric.sweep()
-    rows = [{'name': f'param{i:02d}', 'family': 'parametric', 'field': cell.to_array()}
-            for i, (_, cell) in enumerate(valid)]
+    valid, _ = parametric.extended_sweep()
+    rows = [{'name': f'param{i:02d}', 'family': 'parametric', 'screened': True,
+             'field': cell.to_array()} for i, (_, cell) in enumerate(valid)]
     for label, factory in sorted(handmade.VALID_CELLS.items()):
-        rows.append({'name': label, 'family': 'handmade', 'field': factory().to_array()})
-    return rows
+        rows.append({'name': label, 'family': 'handmade', 'screened': True,
+                     'field': factory().to_array()})
+    return rows + simp_cells()
 
 def _summary(values):
     v = np.asarray([x for x in values if np.isfinite(x)], float)
@@ -333,16 +356,22 @@ def analyze(source_stem='s9_1_generated', out_stem='s10_3_motifs', winner_layers
     conv_rows = describe_many([c['field'] for c in conv], progress, 'conventional')
     for row, meta in zip(conv_rows, conv):
         row['name'], row['family'] = meta['name'], meta['family']
+        row['screened'] = meta['screened']
+    # The primary comparison is against conventional cells that are manufacturable by our
+    # own screen. The full set, unscreened SIMP included, goes in beside it.
+    screened = [r for r in conv_rows if r['screened']]
 
     winners = [r for r in pool_rows if r['pareto_layer'] <= winner_layers]
     rest = [r for r in pool_rows if r['pareto_layer'] > winner_layers]
 
-    mw, mc, match = density_matched(winners, conv_rows)
+    mw, mc, match = density_matched(winners, screened)
+    uw, uc, _ = density_matched(winners, conv_rows)
     report = {
         'source': source_stem,
         'winner_layers': int(winner_layers),
-        'pending': 'The SIMP / inverse-homogenization baseline is not built yet (S10.1). '
-                   'Conventional here means the S3 parametric sweep plus the handmade cells.',
+        'conventional': 'extended parametric family + handmade + SIMP baseline. The primary '
+                        'comparison uses only the cells passing geom.validity; the '
+                        '*_with_unscreened keys add the SIMP cells that do not.',
         'populations': {
             'pool': {'n': len(pool_rows),
                      **{key: _summary([r[key] for r in pool_rows])
@@ -350,15 +379,20 @@ def analyze(source_stem='s9_1_generated', out_stem='s10_3_motifs', winner_layers
             'winners': {'n': len(winners),
                         **{key: _summary([r[key] for r in winners])
                            for key in ('f_metal',) + SHAPE_KEYS}},
-            'conventional': {'n': len(conv_rows),
-                             **{key: _summary([r[key] for r in conv_rows])
+            'conventional': {'n': len(screened),
+                             'n_with_unscreened': len(conv_rows),
+                             'families': {f: sum(1 for r in conv_rows if r['family'] == f)
+                                          for f in sorted({r['family'] for r in conv_rows})},
+                             **{key: _summary([r[key] for r in screened])
                                 for key in ('f_metal',) + SHAPE_KEYS}}},
         'winners_vs_rest_of_pool': compare(winners, rest),
-        'winners_vs_conventional': compare(winners, conv_rows),
+        'winners_vs_conventional': compare(winners, screened),
         'winners_vs_conventional_density_matched': {
             'matching': match, **({} if not mw else {'per_metric': compare(mw, mc)})},
-        'exclusion': exclusion(winners, conv_rows),
+        'exclusion': exclusion(winners, screened),
         'exclusion_density_matched': {} if not mw else exclusion(mw, mc),
+        'exclusion_with_unscreened': exclusion(winners, conv_rows),
+        'exclusion_with_unscreened_density_matched': ({} if not uw else exclusion(uw, uc)),
         'clusters': cluster(pool_rows, k=k),
     }
     # Pareto layer composition per cluster
@@ -404,17 +438,22 @@ def main():
     r = analyze(winner_layers=args.layers, k=args.k)
     pops = r['populations']
     print(f"\npool {pops['pool']['n']}  winners {pops['winners']['n']}  "
-          f"conventional {pops['conventional']['n']}")
+          f"conventional {pops['conventional']['n']} screened "
+          f"({pops['conventional']['n_with_unscreened']} with unscreened SIMP)  "
+          f"{pops['conventional']['families']}")
     print(f"  f_metal  winners {pops['winners']['f_metal']['median']:.3f}  "
           f"conventional {pops['conventional']['f_metal']['median']:.3f}")
 
-    print('\nExclusion - descriptor values the conventional families never reach:')
+    print('\nExclusion - descriptor values the conventional families never reach.')
+    print('  "unscr" is the same fraction once the unscreened SIMP cells are allowed in.')
     ex = r['exclusion_density_matched'] or r['exclusion']
+    unscr = r['exclusion_with_unscreened_density_matched'] or r['exclusion_with_unscreened']
     ranked = sorted((v for v in ex.items() if 'frac_outside' in v[1]), key=lambda kv: -kv[1]['frac_outside'])
     for key, d in ranked[:8]:
         lo, hi = d['conventional_range']
         wlo, whi = d['winner_range']
         print(f"  {key:24s} outside {d['frac_outside']:5.1%}  "
+              f"unscr {unscr.get(key, {}).get('frac_outside', float('nan')):5.1%}  "
               f"(below {d['frac_below']:4.0%} above {d['frac_above']:4.0%})  "
               f"conv [{lo:.3f}, {hi:.3f}]  winners [{wlo:.3f}, {whi:.3f}]")
 

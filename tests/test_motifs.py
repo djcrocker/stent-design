@@ -124,3 +124,31 @@ def test_a_direction_with_no_wrapping_path_reads_nan_not_zero():
     """
     t = motifs.tortuosity(straight_axial(), 1)
     assert np.isnan(t['min']) and np.isnan(t['mean'])
+
+# THE CONVENTIONAL SET #
+
+def test_the_conventional_set_is_the_extended_family_plus_the_simp_baseline():
+    from geom import parametric
+
+    rows = motifs.conventional()
+    families = {r['family'] for r in rows}
+    assert {'parametric', 'handmade', 'simp', 'simp_unscreened'} <= families
+    valid, _ = parametric.extended_sweep()
+    assert sum(1 for r in rows if r['family'] == 'parametric') == len(valid)
+
+def test_only_the_simp_cells_can_be_unscreened():
+    rows = motifs.conventional()
+    assert any(not r['screened'] for r in rows)
+    for row in rows:
+        if row['family'] in ('parametric', 'handmade'):
+            assert row['screened']
+
+def test_allowing_more_conventional_cells_in_can_only_shrink_the_exclusion():
+    """Adding a cell widens the conventional range, so no winner can newly fall outside."""
+    key = motifs.SHAPE_KEYS[0]
+    winners = [{key: v} for v in (0.0, 1.0, 2.0, 3.0, 4.0)]
+    conv = [{key: v} for v in (1.0, 1.5, 2.0)]
+    tight = motifs.exclusion(winners, conv, keys=(key,))[key]
+    wide = motifs.exclusion(winners, conv + [{key: 9.0}], keys=(key,))[key]
+    assert tight['frac_outside'] == pytest.approx(0.6)   # 0.0 below, 3.0 and 4.0 above
+    assert wide['frac_outside'] <= tight['frac_outside']

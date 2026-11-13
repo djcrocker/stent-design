@@ -1,7 +1,7 @@
 {
   "source": "s9_1_generated",
   "winner_layers": 1,
-  "pending": "The SIMP / inverse-homogenization baseline is not built yet (S10.1). Conventional here means the S3 parametric sweep plus the handmade cells, which is the weaker form of the exclusion claim.",
+  "conventional": "extended parametric family + handmade + SIMP baseline. The primary comparison uses only the cells passing geom.validity; the *_with_unscreened keys add the SIMP cells that do not.",
   "populations": {
     "pool": {
       "n": 671,
@@ -350,39 +350,46 @@
       }
     },
     "conventional": {
-      "n": 81,
+      "n": 639,
+      "n_with_unscreened": 644,
+      "families": {
+        "handmade": 5,
+        "parametric": 633,
+        "simp": 3,
+        "simp_unscreened": 3
+      },
       "f_metal": {
-        "n": 81,
-        "min": 0.2060546875,
-        "p25": 0.2890625,
-        "median": 0.3515625,
-        "p75": 0.40673828125,
-        "max": 0.4990234375,
-        "mean": 0.34959129050925924,
-        "std": 0.07975674483344607
+        "n": 639,
+        "min": 0.1982421875,
+        "p25": 0.314697265625,
+        "median": 0.3681640625,
+        "p75": 0.4130859375,
+        "max": 0.5,
+        "mean": 0.365115934321205,
+        "std": 0.06614622463708614
       },
       "skeleton_length": {
-        "n": 81,
+        "n": 639,
         "min": 1.984375,
-        "p25": 2.453125,
-        "median": 2.71875,
-        "p75": 3.40625,
-        "max": 4.40625,
-        "mean": 2.9878472222222223,
-        "std": 0.6531609026401185
+        "p25": 2.75,
+        "median": 3.1875,
+        "p75": 3.375,
+        "max": 5.109375,
+        "mean": 3.1862284820031297,
+        "std": 0.5741376794782577
       },
       "junction_frac": {
-        "n": 81,
+        "n": 639,
         "min": 0.03937007874015748,
-        "p25": 0.0875,
-        "median": 0.10526315789473684,
-        "p75": 0.1320754716981132,
-        "max": 0.16911764705882354,
-        "mean": 0.10948742107349503,
-        "std": 0.02742182683611369
+        "p25": 0.09134615384615384,
+        "median": 0.10152284263959391,
+        "p75": 0.12727272727272726,
+        "max": 0.2018348623853211,
+        "mean": 0.10863932401516099,
+        "std": 0.024565730468645772
       },
       "endpoint_frac": {
-        "n": 81,
+        "n": 639,
         "min": 0.0,
         "p25": 0.0,
         "median": 0.0,
@@ -392,134 +399,134 @@
         "std": 0.0
       },
       "n_junctions": {
-        "n": 81,
+        "n": 639,
         "min": 5.0,
-        "p25": 14.0,
-        "median": 16.0,
+        "p25": 16.0,
+        "median": 20.0,
         "p75": 28.0,
-        "max": 46.0,
-        "mean": 21.77777777777778,
-        "std": 9.250959242888289
+        "max": 66.0,
+        "mean": 22.799687010954617,
+        "std": 8.925211774678045
       },
       "n_pores": {
-        "n": 81,
+        "n": 639,
         "min": 1.0,
         "p25": 2.0,
-        "median": 2.0,
+        "median": 3.0,
         "p75": 4.0,
-        "max": 6.0,
-        "mean": 3.185185185185185,
-        "std": 1.3887654266113092
+        "max": 9.0,
+        "mean": 3.3928012519561817,
+        "std": 1.3533745488294815
       },
       "tortuosity_axial_min": {
-        "n": 81,
+        "n": 639,
         "min": 1.0,
-        "p25": 1.058248782208716,
-        "median": 1.1035533905932733,
-        "p75": 1.2441783905932733,
+        "p25": 1.090609216769114,
+        "median": 1.200634694274467,
+        "p75": 1.2571225644174324,
         "max": 1.3816626073623874,
-        "mean": 1.1500500479944138,
-        "std": 0.10645223839871165
+        "mean": 1.1820270486704565,
+        "std": 0.09546070247370556
       },
       "tortuosity_axial_mean": {
-        "n": 81,
+        "n": 639,
         "min": 1.0,
-        "p25": 1.0954632819531738,
-        "median": 1.1300484963895991,
-        "p75": 1.3181288494222243,
+        "p25": 1.124587673057532,
+        "median": 1.2683984963419013,
+        "p75": 1.3282981699103016,
         "max": 1.5522075695459807,
-        "mean": 1.2082472573274365,
-        "std": 0.14192961634454324
+        "mean": 1.2437418971771301,
+        "std": 0.12100826422094454
       },
       "tortuosity_circ_min": {
-        "n": 81,
+        "n": 639,
         "min": 1.0,
-        "p25": 1.0388325214724774,
-        "median": 1.0970813036811937,
-        "p75": 1.1488579989778303,
-        "max": 1.3300764325160588,
-        "mean": 1.1040328044386123,
-        "std": 0.07626598869450422
+        "p25": 1.0,
+        "median": 1.0,
+        "p75": 1.0809010864009947,
+        "max": 1.4771735194281383,
+        "mean": 1.0473146607654213,
+        "std": 0.07459425553470131
       },
       "tortuosity_circ_mean": {
-        "n": 81,
+        "n": 639,
         "min": 1.0,
-        "p25": 1.0570352659127014,
-        "median": 1.1092164666413429,
-        "p75": 1.1719148086021138,
-        "max": 1.3543467584363573,
-        "mean": 1.1199133880654746,
-        "std": 0.08297734750555565
+        "p25": 1.0,
+        "median": 1.0,
+        "p75": 1.1021376215812557,
+        "max": 1.5147806170764566,
+        "mean": 1.055314426232574,
+        "std": 0.08448081153456918
       },
       "straight_run_axial": {
-        "n": 81,
-        "min": 0.265625,
-        "p25": 0.421875,
-        "median": 0.484375,
-        "p75": 0.53125,
+        "n": 639,
+        "min": 0.234375,
+        "p25": 0.375,
+        "median": 0.453125,
+        "p75": 0.515625,
         "max": 1.0,
-        "mean": 0.4839891975308642,
-        "std": 0.11754319241189909
+        "mean": 0.45322280907668233,
+        "std": 0.10458757201580278
       },
       "straight_run_circ": {
-        "n": 81,
+        "n": 639,
         "min": 0.1875,
-        "p25": 0.28125,
-        "median": 0.40625,
-        "p75": 0.53125,
+        "p25": 0.4375,
+        "median": 1.0,
+        "p75": 1.0,
         "max": 1.0,
-        "mean": 0.4542824074074074,
-        "std": 0.22467421353836076
+        "mean": 0.7491686228482003,
+        "std": 0.3085604766679653
       },
       "thickness_mean": {
-        "n": 81,
-        "min": 2.566462779589323,
-        "p25": 3.023521253143518,
-        "median": 3.7733849125047962,
-        "p75": 4.532966551647851,
+        "n": 639,
+        "min": 2.5595884533401816,
+        "p25": 3.136922099313767,
+        "median": 3.7354815806636394,
+        "p75": 4.344965809836377,
         "max": 6.718896202062456,
-        "mean": 3.855962054889593,
-        "std": 0.8936067607595356
+        "mean": 3.7907192175155924,
+        "std": 0.7214276978298205
       },
       "thickness_cv": {
-        "n": 81,
+        "n": 639,
         "min": 0.05330914358501641,
-        "p25": 0.0717890549806216,
-        "median": 0.08179483583421487,
-        "p75": 0.09552598084486355,
-        "max": 0.1559815382947839,
-        "mean": 0.08555296497237885,
-        "std": 0.02040272767262778
+        "p25": 0.1287791363541757,
+        "median": 0.15660567574380024,
+        "p75": 0.20281178327729238,
+        "max": 0.3240989751532075,
+        "mean": 0.1619251597133846,
+        "std": 0.05184993032082941
       },
       "orient_axial": {
-        "n": 81,
+        "n": 639,
         "min": 0.04285714285714286,
-        "p25": 0.19047619047619047,
-        "median": 0.35185185185185186,
-        "p75": 0.4067796610169492,
-        "max": 0.527027027027027,
-        "mean": 0.30668069125410874,
-        "std": 0.13228011856547958
+        "p25": 0.15348837209302327,
+        "median": 0.21637426900584794,
+        "p75": 0.375,
+        "max": 0.5398773006134969,
+        "mean": 0.2550356503029984,
+        "std": 0.12063354339921235
       },
       "orient_circ": {
-        "n": 81,
+        "n": 639,
         "min": 0.04285714285714286,
-        "p25": 0.12666666666666668,
-        "median": 0.26666666666666666,
-        "p75": 0.38095238095238093,
-        "max": 0.5217391304347826,
-        "mean": 0.26837031419536916,
-        "std": 0.14389392745451293
+        "p25": 0.25987012987012986,
+        "median": 0.39903846153846156,
+        "p75": 0.4799494910844111,
+        "max": 0.5833333333333334,
+        "mean": 0.3617890446242245,
+        "std": 0.13958361594744081
       },
       "orient_diag": {
-        "n": 81,
+        "n": 639,
         "min": 0.030303030303030304,
-        "p25": 0.3220338983050847,
-        "median": 0.41379310344827586,
-        "p75": 0.5087719298245614,
+        "p25": 0.30971786833855797,
+        "median": 0.3853211009174312,
+        "p75": 0.44671658986175117,
         "max": 0.9142857142857143,
-        "mean": 0.4249489945505221,
-        "std": 0.15612832676636443
+        "mean": 0.38317530507277703,
+        "std": 0.1203734134010994
       }
     }
   },
@@ -656,131 +663,131 @@
   "winners_vs_conventional": {
     "skeleton_length": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 2.6796875,
-      "median_b": 2.71875,
-      "p": 0.04387393986540662,
-      "cliffs_delta": -0.19540895061728394
+      "median_b": 3.1875,
+      "p": 1.2698188565971477e-08,
+      "cliffs_delta": -0.4309467918622848
     },
     "junction_frac": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 0.1111111111111111,
-      "median_b": 0.10526315789473684,
-      "p": 0.538398409657692,
-      "cliffs_delta": -0.059799382716049385
+      "median_b": 0.10152284263959391,
+      "p": 0.9791394539149465,
+      "cliffs_delta": -0.0020050860719874803
     },
     "endpoint_frac": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 0.0,
       "median_b": 0.0,
-      "p": 0.0024140440909852915,
+      "p": 4.6985841030261806e-17,
       "cliffs_delta": 0.109375
     },
     "n_junctions": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 19.0,
-      "median_b": 16.0,
-      "p": 0.11056650030267817,
-      "cliffs_delta": -0.15432098765432098
+      "median_b": 20.0,
+      "p": 0.012644950427753364,
+      "cliffs_delta": -0.18838028169014084
     },
     "n_pores": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 3.0,
-      "median_b": 2.0,
-      "p": 0.3173731574575507,
-      "cliffs_delta": -0.09297839506172839
+      "median_b": 3.0,
+      "p": 0.04296311097425671,
+      "cliffs_delta": -0.14742273082942098
     },
     "tortuosity_axial_min": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 1.1650382162580293,
-      "median_b": 1.1035533905932733,
-      "p": 0.15333679890881086,
-      "cliffs_delta": 0.1385030864197531
+      "median_b": 1.200634694274467,
+      "p": 0.1111313016387555,
+      "cliffs_delta": -0.12067194835680752
     },
     "tortuosity_axial_mean": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 1.236079482753903,
-      "median_b": 1.1300484963895991,
-      "p": 0.03381115265556361,
-      "cliffs_delta": 0.20582561728395063
+      "median_b": 1.2683984963419013,
+      "p": 0.9385046094344924,
+      "cliffs_delta": -0.005868544600938967
     },
     "tortuosity_circ_min": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 1.0,
-      "median_b": 1.0970813036811937,
-      "p": 1.241046443433828e-18,
-      "cliffs_delta": -0.8422067901234568
+      "median_b": 1.0,
+      "p": 0.01528521654126946,
+      "cliffs_delta": -0.1665199530516432
     },
     "tortuosity_circ_mean": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 1.0,
-      "median_b": 1.1092164666413429,
-      "p": 1.761306806664193e-18,
-      "cliffs_delta": -0.8389274691358025
+      "median_b": 1.0,
+      "p": 0.01567228534773315,
+      "cliffs_delta": -0.16590864632237873
     },
     "straight_run_axial": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 0.546875,
-      "median_b": 0.484375,
-      "p": 1.0720783948993409e-06,
-      "cliffs_delta": 0.47183641975308643
+      "median_b": 0.453125,
+      "p": 7.192986000895743e-15,
+      "cliffs_delta": 0.5887861893583725
     },
     "straight_run_circ": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 1.0,
-      "median_b": 0.40625,
-      "p": 1.374223777988507e-19,
-      "cliffs_delta": 0.8655478395061729
+      "median_b": 1.0,
+      "p": 0.00788486616782872,
+      "cliffs_delta": 0.182389475743349
     },
     "thickness_mean": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 4.8551663116696755,
-      "median_b": 3.7733849125047962,
-      "p": 1.4105465192035074e-08,
-      "cliffs_delta": 0.5497685185185185
+      "median_b": 3.7354815806636394,
+      "p": 7.832856679044742e-16,
+      "cliffs_delta": 0.6103286384976526
     },
     "thickness_cv": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 0.4270854088836552,
-      "median_b": 0.08179483583421487,
-      "p": 7.422158980543965e-25,
-      "cliffs_delta": 0.9976851851851852
+      "median_b": 0.15660567574380024,
+      "p": 1.3526031188187311e-30,
+      "cliffs_delta": 0.8709898278560251
     },
     "orient_axial": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 0.2186186974789916,
-      "median_b": 0.35185185185185186,
-      "p": 0.000461425646649699,
-      "cliffs_delta": -0.3395061728395062
+      "median_b": 0.21637426900584794,
+      "p": 0.9739907671731606,
+      "cliffs_delta": -0.002494131455399061
     },
     "orient_circ": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 0.37263814616755797,
-      "median_b": 0.26666666666666666,
-      "p": 2.766361094279136e-07,
-      "cliffs_delta": 0.498070987654321
+      "median_b": 0.39903846153846156,
+      "p": 0.9554653211558427,
+      "cliffs_delta": 0.004254694835680751
     },
     "orient_diag": {
       "n_a": 64,
-      "n_b": 81,
+      "n_b": 639,
       "median_a": 0.41149749373433586,
-      "median_b": 0.41379310344827586,
-      "p": 0.11437096278836656,
-      "cliffs_delta": -0.15316358024691357
+      "median_b": 0.3853211009174312,
+      "p": 0.34721648085342827,
+      "cliffs_delta": 0.07122946009389672
     }
   },
   "winners_vs_conventional_density_matched": {
@@ -790,136 +797,136 @@
         0.469970703125
       ],
       "n_a": 64,
-      "n_b": 59
+      "n_b": 556
     },
     "per_metric": {
       "skeleton_length": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 2.6796875,
-        "median_b": 3.125,
-        "p": 0.029835408747346283,
-        "cliffs_delta": -0.227489406779661
+        "median_b": 3.1875,
+        "p": 4.3003014557049886e-10,
+        "cliffs_delta": -0.4760285521582734
       },
       "junction_frac": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 0.1111111111111111,
-        "median_b": 0.10810810810810811,
-        "p": 0.4222879104052919,
-        "cliffs_delta": -0.08421610169491525
+        "median_b": 0.10194174757281553,
+        "p": 0.9225065795075819,
+        "cliffs_delta": -0.00744716726618705
       },
       "endpoint_frac": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 0.0,
         "median_b": 0.0,
-        "p": 0.009393096633200083,
+        "p": 4.721001369058495e-15,
         "cliffs_delta": 0.109375
       },
       "n_junctions": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 19.0,
-        "median_b": 16.0,
-        "p": 0.08592255190648296,
-        "cliffs_delta": -0.1795550847457627
+        "median_b": 21.0,
+        "p": 0.007037299742673874,
+        "cliffs_delta": -0.20503597122302158
       },
       "n_pores": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 3.0,
-        "median_b": 4.0,
-        "p": 0.21877371908731746,
-        "cliffs_delta": -0.12420550847457627
+        "median_b": 3.0,
+        "p": 0.025414909584741168,
+        "cliffs_delta": -0.16305080935251798
       },
       "tortuosity_axial_min": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 1.1650382162580293,
-        "median_b": 1.103553390593273,
-        "p": 0.02253261201986139,
-        "cliffs_delta": 0.2388771186440678
+        "median_b": 1.200634694274467,
+        "p": 0.1376474464394601,
+        "cliffs_delta": -0.11322504496402877
       },
       "tortuosity_axial_mean": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 1.236079482753903,
-        "median_b": 1.1290372328095868,
-        "p": 0.007631824186550399,
-        "cliffs_delta": 0.279396186440678
+        "median_b": 1.26660275926687,
+        "p": 0.9309990838115151,
+        "cliffs_delta": -0.006632194244604317
       },
       "tortuosity_circ_min": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 1.0,
-        "median_b": 1.0970813036811937,
-        "p": 7.81576407235679e-18,
-        "cliffs_delta": -0.8850635593220338
+        "median_b": 1.0,
+        "p": 0.11245465668411424,
+        "cliffs_delta": -0.10721110611510791
       },
       "tortuosity_circ_mean": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 1.0,
-        "median_b": 1.1282282219455766,
-        "p": 1.2734239411299409e-17,
-        "cliffs_delta": -0.880031779661017
+        "median_b": 1.0,
+        "p": 0.1147645122475381,
+        "cliffs_delta": -0.10653664568345324
       },
       "straight_run_axial": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 0.546875,
-        "median_b": 0.484375,
-        "p": 8.829562739505827e-08,
-        "cliffs_delta": 0.5582627118644068
+        "median_b": 0.453125,
+        "p": 3.189078161400572e-16,
+        "cliffs_delta": 0.6220492356115108
       },
       "straight_run_circ": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 1.0,
-        "median_b": 0.40625,
-        "p": 7.64540201927782e-19,
-        "cliffs_delta": 0.9126059322033898
+        "median_b": 1.0,
+        "p": 0.07036910170601758,
+        "cliffs_delta": 0.12221785071942447
       },
       "thickness_mean": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 4.8551663116696755,
-        "median_b": 3.773549748841212,
-        "p": 2.2621866879059902e-07,
-        "cliffs_delta": 0.541843220338983
+        "median_b": 3.7435558056177163,
+        "p": 9.083082923350244e-16,
+        "cliffs_delta": 0.6131407374100719
       },
       "thickness_cv": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 0.4270854088836552,
-        "median_b": 0.08249913274998327,
-        "p": 1.2305835998264336e-21,
-        "cliffs_delta": 1.0
+        "median_b": 0.16346260836079068,
+        "p": 6.846396088279441e-30,
+        "cliffs_delta": 0.8662320143884892
       },
       "orient_axial": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 0.2186186974789916,
-        "median_b": 0.3669724770642202,
-        "p": 0.0005003043072886529,
-        "cliffs_delta": -0.3644067796610169
+        "median_b": 0.21738253680177455,
+        "p": 0.9938262051723572,
+        "cliffs_delta": -0.0006182553956834532
       },
       "orient_circ": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 0.37263814616755797,
-        "median_b": 0.23684210526315788,
-        "p": 1.769244723390114e-07,
-        "cliffs_delta": 0.5466101694915254
+        "median_b": 0.41232227488151657,
+        "p": 0.44585307718419886,
+        "cliffs_delta": -0.058172212230215826
       },
       "orient_diag": {
         "n_a": 64,
-        "n_b": 59,
+        "n_b": 556,
         "median_a": 0.41149749373433586,
-        "median_b": 0.42857142857142855,
-        "p": 0.03676754956417228,
-        "cliffs_delta": -0.21875
+        "median_b": 0.3826919076346994,
+        "p": 0.23719667642198927,
+        "cliffs_delta": 0.09018098021582734
       }
     }
   },
@@ -927,7 +934,7 @@
     "skeleton_length": {
       "conventional_range": [
         1.984375,
-        4.40625
+        5.109375
       ],
       "winner_range": [
         1.8125,
@@ -941,7 +948,7 @@
     "junction_frac": {
       "conventional_range": [
         0.03937007874015748,
-        0.16911764705882354
+        0.2018348623853211
       ],
       "winner_range": [
         0.04132231404958678,
@@ -949,8 +956,8 @@
       ],
       "n_winners": 64,
       "frac_below": 0.0,
-      "frac_above": 0.03125,
-      "frac_outside": 0.03125
+      "frac_above": 0.0,
+      "frac_outside": 0.0
     },
     "endpoint_frac": {
       "conventional_range": [
@@ -969,7 +976,7 @@
     "n_junctions": {
       "conventional_range": [
         5.0,
-        46.0
+        66.0
       ],
       "winner_range": [
         5.0,
@@ -983,7 +990,7 @@
     "n_pores": {
       "conventional_range": [
         1.0,
-        6.0
+        9.0
       ],
       "winner_range": [
         1.0,
@@ -991,8 +998,8 @@
       ],
       "n_winners": 64,
       "frac_below": 0.0,
-      "frac_above": 0.015625,
-      "frac_outside": 0.015625
+      "frac_above": 0.0,
+      "frac_outside": 0.0
     },
     "tortuosity_axial_min": {
       "conventional_range": [
@@ -1025,7 +1032,7 @@
     "tortuosity_circ_min": {
       "conventional_range": [
         1.0,
-        1.3300764325160588
+        1.4771735194281383
       ],
       "winner_range": [
         1.0,
@@ -1039,7 +1046,7 @@
     "tortuosity_circ_mean": {
       "conventional_range": [
         1.0,
-        1.3543467584363573
+        1.5147806170764566
       ],
       "winner_range": [
         1.0,
@@ -1052,7 +1059,7 @@
     },
     "straight_run_axial": {
       "conventional_range": [
-        0.265625,
+        0.234375,
         1.0
       ],
       "winner_range": [
@@ -1080,7 +1087,7 @@
     },
     "thickness_mean": {
       "conventional_range": [
-        2.566462779589323,
+        2.5595884533401816,
         6.718896202062456
       ],
       "winner_range": [
@@ -1095,7 +1102,7 @@
     "thickness_cv": {
       "conventional_range": [
         0.05330914358501641,
-        0.1559815382947839
+        0.3240989751532075
       ],
       "winner_range": [
         0.1361879341587318,
@@ -1103,13 +1110,13 @@
       ],
       "n_winners": 64,
       "frac_below": 0.0,
-      "frac_above": 0.9375,
-      "frac_outside": 0.9375
+      "frac_above": 0.78125,
+      "frac_outside": 0.78125
     },
     "orient_axial": {
       "conventional_range": [
         0.04285714285714286,
-        0.527027027027027
+        0.5398773006134969
       ],
       "winner_range": [
         0.11409395973154363,
@@ -1123,7 +1130,7 @@
     "orient_circ": {
       "conventional_range": [
         0.04285714285714286,
-        0.5217391304347826
+        0.5833333333333334
       ],
       "winner_range": [
         0.3087248322147651,
@@ -1153,7 +1160,7 @@
     "skeleton_length": {
       "conventional_range": [
         1.984375,
-        4.40625
+        5.109375
       ],
       "winner_range": [
         1.8125,
@@ -1167,7 +1174,7 @@
     "junction_frac": {
       "conventional_range": [
         0.03937007874015748,
-        0.16911764705882354
+        0.2018348623853211
       ],
       "winner_range": [
         0.04132231404958678,
@@ -1175,8 +1182,8 @@
       ],
       "n_winners": 64,
       "frac_below": 0.0,
-      "frac_above": 0.03125,
-      "frac_outside": 0.03125
+      "frac_above": 0.0,
+      "frac_outside": 0.0
     },
     "endpoint_frac": {
       "conventional_range": [
@@ -1195,7 +1202,7 @@
     "n_junctions": {
       "conventional_range": [
         5.0,
-        46.0
+        66.0
       ],
       "winner_range": [
         5.0,
@@ -1209,7 +1216,7 @@
     "n_pores": {
       "conventional_range": [
         1.0,
-        6.0
+        9.0
       ],
       "winner_range": [
         1.0,
@@ -1217,13 +1224,13 @@
       ],
       "n_winners": 64,
       "frac_below": 0.0,
-      "frac_above": 0.015625,
-      "frac_outside": 0.015625
+      "frac_above": 0.0,
+      "frac_outside": 0.0
     },
     "tortuosity_axial_min": {
       "conventional_range": [
         1.0,
-        1.2711771728019894
+        1.3542038680986261
       ],
       "winner_range": [
         1.0129441738241591,
@@ -1231,13 +1238,13 @@
       ],
       "n_winners": 64,
       "frac_below": 0.0,
-      "frac_above": 0.046875,
-      "frac_outside": 0.046875
+      "frac_above": 0.0,
+      "frac_outside": 0.0
     },
     "tortuosity_axial_mean": {
       "conventional_range": [
         1.0,
-        1.4602909845830605
+        1.4874084552502764
       ],
       "winner_range": [
         1.014966700984184,
@@ -1251,7 +1258,7 @@
     "tortuosity_circ_min": {
       "conventional_range": [
         1.0,
-        1.3300764325160588
+        1.4771735194281383
       ],
       "winner_range": [
         1.0,
@@ -1265,7 +1272,7 @@
     "tortuosity_circ_mean": {
       "conventional_range": [
         1.0,
-        1.3543467584363573
+        1.5147806170764566
       ],
       "winner_range": [
         1.0,
@@ -1278,7 +1285,7 @@
     },
     "straight_run_axial": {
       "conventional_range": [
-        0.328125,
+        0.234375,
         1.0
       ],
       "winner_range": [
@@ -1306,7 +1313,7 @@
     },
     "thickness_mean": {
       "conventional_range": [
-        2.7534207998035805,
+        2.6101728366548715,
         6.718896202062456
       ],
       "winner_range": [
@@ -1321,7 +1328,7 @@
     "thickness_cv": {
       "conventional_range": [
         0.05330914358501641,
-        0.13110938608944506
+        0.2945413732712494
       ],
       "winner_range": [
         0.1361879341587318,
@@ -1329,13 +1336,13 @@
       ],
       "n_winners": 64,
       "frac_below": 0.0,
-      "frac_above": 1.0,
-      "frac_outside": 1.0
+      "frac_above": 0.796875,
+      "frac_outside": 0.796875
     },
     "orient_axial": {
       "conventional_range": [
         0.04285714285714286,
-        0.527027027027027
+        0.5335570469798657
       ],
       "winner_range": [
         0.11409395973154363,
@@ -1349,7 +1356,459 @@
     "orient_circ": {
       "conventional_range": [
         0.04285714285714286,
-        0.5217391304347826
+        0.5833333333333334
+      ],
+      "winner_range": [
+        0.3087248322147651,
+        0.5082872928176796
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "orient_diag": {
+      "conventional_range": [
+        0.030303030303030304,
+        0.9142857142857143
+      ],
+      "winner_range": [
+        0.24806201550387597,
+        0.5771812080536913
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    }
+  },
+  "exclusion_with_unscreened": {
+    "skeleton_length": {
+      "conventional_range": [
+        1.984375,
+        5.53125
+      ],
+      "winner_range": [
+        1.8125,
+        3.9375
+      ],
+      "n_winners": 64,
+      "frac_below": 0.09375,
+      "frac_above": 0.0,
+      "frac_outside": 0.09375
+    },
+    "junction_frac": {
+      "conventional_range": [
+        0.03937007874015748,
+        0.2018348623853211
+      ],
+      "winner_range": [
+        0.04132231404958678,
+        0.19111111111111112
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "endpoint_frac": {
+      "conventional_range": [
+        0.0,
+        0.0
+      ],
+      "winner_range": [
+        0.0,
+        0.024096385542168676
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.109375,
+      "frac_outside": 0.109375
+    },
+    "n_junctions": {
+      "conventional_range": [
+        5.0,
+        66.0
+      ],
+      "winner_range": [
+        5.0,
+        43.0
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "n_pores": {
+      "conventional_range": [
+        1.0,
+        9.0
+      ],
+      "winner_range": [
+        1.0,
+        7.0
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "tortuosity_axial_min": {
+      "conventional_range": [
+        1.0,
+        1.3816626073623874
+      ],
+      "winner_range": [
+        1.0129441738241591,
+        1.2986359120657507
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "tortuosity_axial_mean": {
+      "conventional_range": [
+        1.0,
+        1.5522075695459807
+      ],
+      "winner_range": [
+        1.014966700984184,
+        1.7929464309022989
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.015625,
+      "frac_outside": 0.015625
+    },
+    "tortuosity_circ_min": {
+      "conventional_range": [
+        1.0,
+        1.4771735194281383
+      ],
+      "winner_range": [
+        1.0,
+        1.0453046083845572
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "tortuosity_circ_mean": {
+      "conventional_range": [
+        1.0,
+        1.5147806170764566
+      ],
+      "winner_range": [
+        1.0,
+        1.061889331096761
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "straight_run_axial": {
+      "conventional_range": [
+        0.234375,
+        1.0
+      ],
+      "winner_range": [
+        0.40625,
+        0.875
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "straight_run_circ": {
+      "conventional_range": [
+        0.1875,
+        1.0
+      ],
+      "winner_range": [
+        0.609375,
+        1.0
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "thickness_mean": {
+      "conventional_range": [
+        2.042390823102291,
+        6.718896202062456
+      ],
+      "winner_range": [
+        3.100072791898821,
+        7.8702096296295485
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.109375,
+      "frac_outside": 0.109375
+    },
+    "thickness_cv": {
+      "conventional_range": [
+        0.05330914358501641,
+        0.5989442291322601
+      ],
+      "winner_range": [
+        0.1361879341587318,
+        0.6260612970616456
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.03125,
+      "frac_outside": 0.03125
+    },
+    "orient_axial": {
+      "conventional_range": [
+        0.04285714285714286,
+        0.5398773006134969
+      ],
+      "winner_range": [
+        0.11409395973154363,
+        0.3416149068322981
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "orient_circ": {
+      "conventional_range": [
+        0.04285714285714286,
+        0.625
+      ],
+      "winner_range": [
+        0.3087248322147651,
+        0.5082872928176796
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "orient_diag": {
+      "conventional_range": [
+        0.030303030303030304,
+        0.9142857142857143
+      ],
+      "winner_range": [
+        0.24806201550387597,
+        0.5771812080536913
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    }
+  },
+  "exclusion_with_unscreened_density_matched": {
+    "skeleton_length": {
+      "conventional_range": [
+        1.984375,
+        5.53125
+      ],
+      "winner_range": [
+        1.8125,
+        3.9375
+      ],
+      "n_winners": 64,
+      "frac_below": 0.09375,
+      "frac_above": 0.0,
+      "frac_outside": 0.09375
+    },
+    "junction_frac": {
+      "conventional_range": [
+        0.03937007874015748,
+        0.2018348623853211
+      ],
+      "winner_range": [
+        0.04132231404958678,
+        0.19111111111111112
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "endpoint_frac": {
+      "conventional_range": [
+        0.0,
+        0.0
+      ],
+      "winner_range": [
+        0.0,
+        0.024096385542168676
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.109375,
+      "frac_outside": 0.109375
+    },
+    "n_junctions": {
+      "conventional_range": [
+        5.0,
+        66.0
+      ],
+      "winner_range": [
+        5.0,
+        43.0
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "n_pores": {
+      "conventional_range": [
+        1.0,
+        9.0
+      ],
+      "winner_range": [
+        1.0,
+        7.0
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "tortuosity_axial_min": {
+      "conventional_range": [
+        1.0,
+        1.3542038680986261
+      ],
+      "winner_range": [
+        1.0129441738241591,
+        1.2986359120657507
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "tortuosity_axial_mean": {
+      "conventional_range": [
+        1.0,
+        1.4874084552502764
+      ],
+      "winner_range": [
+        1.014966700984184,
+        1.7929464309022989
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.015625,
+      "frac_outside": 0.015625
+    },
+    "tortuosity_circ_min": {
+      "conventional_range": [
+        1.0,
+        1.4771735194281383
+      ],
+      "winner_range": [
+        1.0,
+        1.0453046083845572
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "tortuosity_circ_mean": {
+      "conventional_range": [
+        1.0,
+        1.5147806170764566
+      ],
+      "winner_range": [
+        1.0,
+        1.061889331096761
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "straight_run_axial": {
+      "conventional_range": [
+        0.234375,
+        1.0
+      ],
+      "winner_range": [
+        0.40625,
+        0.875
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "straight_run_circ": {
+      "conventional_range": [
+        0.1875,
+        1.0
+      ],
+      "winner_range": [
+        0.609375,
+        1.0
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "thickness_mean": {
+      "conventional_range": [
+        2.6101728366548715,
+        6.718896202062456
+      ],
+      "winner_range": [
+        3.100072791898821,
+        7.8702096296295485
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.109375,
+      "frac_outside": 0.109375
+    },
+    "thickness_cv": {
+      "conventional_range": [
+        0.05330914358501641,
+        0.5989442291322601
+      ],
+      "winner_range": [
+        0.1361879341587318,
+        0.6260612970616456
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.03125,
+      "frac_outside": 0.03125
+    },
+    "orient_axial": {
+      "conventional_range": [
+        0.04285714285714286,
+        0.5335570469798657
+      ],
+      "winner_range": [
+        0.11409395973154363,
+        0.3416149068322981
+      ],
+      "n_winners": 64,
+      "frac_below": 0.0,
+      "frac_above": 0.0,
+      "frac_outside": 0.0
+    },
+    "orient_circ": {
+      "conventional_range": [
+        0.04285714285714286,
+        0.5833333333333334
       ],
       "winner_range": [
         0.3087248322147651,
