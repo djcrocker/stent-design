@@ -2,7 +2,8 @@
 Figure 5 (motifs) - what the winning topologies do that the conventional families cannot.
 
 Panel A - the pool in its own two biggest shape dimensions, by motif cluster, winners ringed
-Panel B - the exclusion plane: the one descriptor pair where the two populations do not meet
+Panel B - the exclusion plane, with the screened and unscreened conventional envelopes
+          drawn separately: the gap between them is what the screen is worth
 Panel C - cluster exemplars beside a conventional cell, tiled 2x2 so the motif is visible
 Panel D - density-matched effect sizes, so the eye-catching panels have their statistics
 
@@ -22,6 +23,7 @@ OUT = config.FIG_DEV_DIR / 's10_3_motifs.png'
 CLUSTER_COLORS = ['#2a78d6', '#eb6834', '#2f9e64', '#7a3fbf']
 WINNER = '#0b0b0b'
 CONV = '#e34948'
+SIMP = '#7a3fbf'                 # Figure 3's SIMP hue, so the baseline reads as one thing
 TEXT_PRIMARY = '#0b0b0b'
 TEXT_SECONDARY = '#52514e'
 GRID = '#dcdcd8'
@@ -58,28 +60,51 @@ def panel_embedding(ax, report, pool_rows):
     ax.set_ylabel(f'PC2 ({v[1]:.0%})', color=TEXT_SECONDARY)
     ax.set_title('A  shape space of the generated pool', color=TEXT_PRIMARY,
                  fontsize=12, loc='left')
-    ax.legend(frameon=False, fontsize=8, labelcolor=TEXT_SECONDARY, loc='lower right')
+    # Upper left: the lower right runs into panel D's descriptor names, which reach
+    # well outside D's own axes.
+    ax.legend(frameon=False, fontsize=8, labelcolor=TEXT_SECONDARY, loc='upper left',
+              handletextpad=0.3, borderaxespad=0.3)
 
 def panel_exclusion(ax, report, pool_rows, conv_rows, x='straight_run_circ', y='thickness_cv'):
+    """The exclusion plane with both conventional envelopes."""
     style(ax)
     layer = np.array([r['pareto_layer'] for r in pool_rows], int)
     win = layer <= report['winner_layers']
     px = np.array([r[x] for r in pool_rows], float)
     py = np.array([r[y] for r in pool_rows], float)
-    cx = np.array([r[x] for r in conv_rows], float)
-    cy = np.array([r[y] for r in conv_rows], float)
+    scr = [r for r in conv_rows if r['screened']]
+    uns = [r for r in conv_rows if not r['screened']]
+    sx = np.array([r[x] for r in scr], float)
+    sy = np.array([r[y] for r in scr], float)
+    ux = np.array([r[x] for r in uns], float)
+    uy = np.array([r[y] for r in uns], float)
+    allx, ally = np.concatenate([sx, ux]), np.concatenate([sy, uy])
 
-    # The box the conventional families live in.
-    ax.add_patch(plt.Rectangle((cx.min(), cy.min()), np.ptp(cx), np.ptp(cy),
+    ax.add_patch(plt.Rectangle((allx.min(), ally.min()), np.ptp(allx), np.ptp(ally),
+                               facecolor='none', edgecolor=SIMP, lw=1.0, ls=':',
+                               zorder=1, label='envelope if unscreened cells count'))
+    ax.add_patch(plt.Rectangle((sx.min(), sy.min()), np.ptp(sx), np.ptp(sy),
                                facecolor=CONV, alpha=0.10, edgecolor=CONV, lw=1.0,
-                               ls='--', zorder=1, label='conventional envelope'))
-    ax.scatter(px[~win], py[~win], s=14, color='#b9c2cc', alpha=0.7, edgecolors='none', zorder=2, label='pool, dominated')
-    ax.scatter(px[win], py[win], s=30, color=WINNER, alpha=0.85, edgecolors='none', zorder=4, label='Pareto front')
-    ax.scatter(cx, cy, s=34, marker='^', color=CONV, edgecolors='none', zorder=3, label='parametric + handmade')
+                               ls='--', zorder=1, label='conventional envelope, screened'))
+    ax.scatter(px[~win], py[~win], s=14, color='#b9c2cc', alpha=0.7, edgecolors='none',
+               zorder=2, label='pool, dominated')
+    ax.scatter(px[win], py[win], s=30, color=WINNER, alpha=0.85, edgecolors='none',
+               zorder=4, label='Pareto front')
+    ax.scatter(sx, sy, s=34, marker='^', color=CONV, edgecolors='none', zorder=3,
+               label=f'conventional, screened (n={len(scr)})')
+    ax.scatter(ux, uy, s=56, marker='s', facecolors='white', edgecolors=SIMP,
+               linewidths=1.4, zorder=5, label=f'SIMP, fails the screen (n={len(uns)})')
+
     ex = (report['exclusion_density_matched'] or report['exclusion'])[y]
-    ax.set_xlabel('straight_run_circ   (1.0 = a complete circumferential band)', color=TEXT_SECONDARY)
-    ax.set_ylabel('thickness_cv   (strut width variation along the member)', color=TEXT_SECONDARY)
-    ax.set_title(f"B  the exclusion plane - {ex['frac_outside']:.0%} of winners lie outside", color=TEXT_PRIMARY, fontsize=12, loc='left')
+    un = (report['exclusion_with_unscreened_density_matched']
+          or report['exclusion_with_unscreened'])[y]
+    ax.set_xlabel('straight_run_circ   (1.0 = a complete circumferential band)',
+                  color=TEXT_SECONDARY)
+    ax.set_ylabel('thickness_cv   (strut width variation along the member)',
+                  color=TEXT_SECONDARY)
+    ax.set_title(f"B  the exclusion plane - {ex['frac_outside']:.0%} of winners outside the "
+                 f"screened envelope, {un['frac_outside']:.0%} if unscreened cells count",
+                 color=TEXT_PRIMARY, fontsize=12, loc='left')
     ax.legend(frameon=False, fontsize=8, labelcolor=TEXT_SECONDARY, loc='upper left')
 
 def panel_exemplars(axes, report, fields, conv_rows):
@@ -125,15 +150,17 @@ def panel_effects(ax, report, top=10):
     m = report['winners_vs_conventional_density_matched']['matching']
     lo, hi = m['overlap']
     ax.set_title(f"D  effect sizes   f_metal {lo:.2f}-{hi:.2f}, "
-                 f"n={m['n_a']} vs {m['n_b']}  (grey: p>=0.05)",
+                 f"n={m['n_a']} vs {m['n_b']}",
                  color=TEXT_PRIMARY, fontsize=12, loc='left')
+    ax.text(1.0, 1.01, 'grey: p >= 0.05', transform=ax.transAxes, ha='right',
+            va='bottom', fontsize=8.5, color=TEXT_SECONDARY)
 
 def main():
     report, table, fields = motifs.load()
     pool_rows, conv_rows = table['pool'], table['conventional']
 
     fig = plt.figure(figsize=(15, 11))
-    gs = fig.add_gridspec(3, 5, height_ratios=[1.25, 1.25, 0.75], hspace=0.32, wspace=0.34)
+    gs = fig.add_gridspec(3, 5, height_ratios=[1.25, 1.25, 0.75], hspace=0.32, wspace=0.46)
     panel_embedding(fig.add_subplot(gs[0, :3]), report, pool_rows)
     panel_effects(fig.add_subplot(gs[0, 3:]), report)
     panel_exclusion(fig.add_subplot(gs[1, :3]), report, pool_rows, conv_rows)
@@ -142,20 +169,28 @@ def main():
     ax_note.axis('off')
     ex = report['exclusion_density_matched'] or report['exclusion']
     lines = ['Descriptor values the conventional', 'families never reach:', '']
+    # Four, not six: the box has to end above the exemplar row.
     ranked = sorted((kv for kv in ex.items() if 'frac_outside' in kv[1]),
-                    key=lambda kv: -kv[1]['frac_outside'])[:6]
+                    key=lambda kv: -kv[1]['frac_outside'])[:4]
     for key, d in ranked:
         lo, hi = d['conventional_range']
         wlo, whi = d['winner_range']
         lines.append(f"{key}")
         lines.append(f"   outside {d['frac_outside']:.0%}   conv [{lo:.2f}, {hi:.2f}]"
                      f"   win [{wlo:.2f}, {whi:.2f}]")
-    lines += ['', 'PENDING: the SIMP / inverse-homogenization',
-              'baseline (S10.1) is not in this comparison,',
-              'so "conventional" is the parametric family',
-              'plus the handmade cells only.']
-    ax_note.text(0, 1, chr(10).join(lines), va='top', ha='left', fontsize=8.6,
-                 color=TEXT_SECONDARY, family='monospace', linespacing=1.55)
+    fam = report['populations']['conventional']['families']
+    n_simp = fam['simp'] + fam['simp_unscreened']
+    collapsed = (report['exclusion_with_unscreened_density_matched']
+                 or report['exclusion_with_unscreened'])['thickness_cv']['frac_outside']
+    lines += ['', f"Conventional = parametric ({fam['parametric']})",
+              f"+ handmade ({fam['handmade']}) + SIMP ({n_simp}, of which 1",
+              'passes geom.validity).',
+              '', 'Measured against cells that PASS the',
+              f"screen. The {n_simp - 1} that fail drop thickness_cv",
+              f"to {collapsed:.0%} (panel B) - high thickness_cv is",
+              'the thin-feature failure restated.']
+    ax_note.text(0, 1, chr(10).join(lines), va='top', ha='left', fontsize=8.3,
+                 color=TEXT_SECONDARY, family='monospace', linespacing=1.45)
 
     panel_exemplars([fig.add_subplot(gs[2, i]) for i in range(5)], report, fields, conv_rows)
 
