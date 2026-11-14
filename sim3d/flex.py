@@ -55,7 +55,7 @@ STEM_PREFIX = 's9_4_cell'
 MANIFEST_NAME = 's9_4_manifest.json'
 
 def build(indices=None, fields=None, directory=None, mesh=None, arms=ARMS,
-          prefix=STEM_PREFIX, manifest_name=MANIFEST_NAME):
+          prefix=STEM_PREFIX, manifest_name=MANIFEST_NAME, solver=None):
     """Mesh each selected cell once and write one deck per load arm against it."""
     from geom.cell import UnitCell
     from screen import shortlist
@@ -88,7 +88,8 @@ def build(indices=None, fields=None, directory=None, mesh=None, arms=ARMS,
             path = directory / f'{out_stem}.inp'
             path.write_text(apdl.flex_cycle(mesh=f'{stem}_mesh', deck_dir='',
                                             out_stem=out_stem, compression=compression,
-                                            release=RELEASE),
+                                            release=RELEASE,
+                                            **(solver or {}).get(arm, {})),
                             encoding='utf-8')
             decks[arm] = str(path)
         built.append({'pool_index': i, 'stem': stem, 'f_metal': float(fields[i].mean()),
@@ -106,6 +107,7 @@ def build(indices=None, fields=None, directory=None, mesh=None, arms=ARMS,
                 'axial_compression_full_excursion': config.FLEX_AXIAL_COMPRESSION,
                 'sample_fraction': apdl.BEND_SAMPLE_FRACTION,
                 'release': RELEASE,
+                'solver': {arm: (solver or {}).get(arm, {}) for arm in arms},
                 'length_mm': mesh['n_axial'] * config.cell_extent_mm()[1],
                 'cells': built}
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -128,7 +130,7 @@ def write_vm_script(manifest, path=None, np_cores=VM_CORES, backup=VM_BACKUP, la
          'Set-Location $dir',
          'Write-Host "Running in $dir" -ForegroundColor Yellow',
          f'$log = Join-Path $dir ("{label}_timing_" + (Get-Date -Format "yyyyMMdd_HHmmss") + ".csv")',
-         '"job,seconds,exit" | Out-File -FilePath $log -Encoding utf8',
+         '"job,seconds,exit,completed" | Out-File -FilePath $log -Encoding utf8',
          f'$jobs = @({", ".join(chr(34) + j + chr(34) for j in jobs)})',
          'foreach ($j in $jobs) {',
          '  if (Test-Path (Join-Path $dir "$j.ok")) {',
@@ -136,14 +138,27 @@ def write_vm_script(manifest, path=None, np_cores=VM_CORES, backup=VM_BACKUP, la
          '    continue',
          '  }',
          '  Write-Host "=== $j ===" -ForegroundColor Cyan',
+         '  Remove-Item (Join-Path $dir "$j*.err") -ErrorAction SilentlyContinue',
          '  $t0 = Get-Date',
          # -o shouldn't collide with the deck's own /OUTPUT,<stem>,txt.
          '  & $exe -b -np ' + str(np_cores) + ' -dir $dir -j $j -i "$j.inp" -o "$j`_run.out"',
          '  $code = $LASTEXITCODE',
          '  $secs = [int]((Get-Date) - $t0).TotalSeconds',
-         '  "$j,$secs,$code" | Out-File -FilePath $log -Append -Encoding utf8',
-         '  if ($code -eq 0) {',
-         '    "exit 0" | Out-File -FilePath (Join-Path $dir "$j.ok") -Encoding utf8',
+         '  $out = Join-Path $dir "$j`_run.out"',
+         '  $errs = @(Get-ChildItem (Join-Path $dir "$j*.err") '
+         '-ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })',
+         '  $died = ($errs.Count -gt 0) -and '
+         '(Select-String -Path $errs -Pattern "Run terminated" -Quiet)',
+         '  $done = (Test-Path $out) -and '
+         '(Select-String -Path $out -Pattern "RUN COMPLETED" -Quiet) -and '
+         '(Test-Path (Join-Path $dir "$j.txt")) -and (-not $died)',
+         '  "$j,$secs,$code,$done" | Out-File -FilePath $log -Append -Encoding utf8',
+         '  if ($done) {',
+         '    "exit $code" | Out-File -FilePath (Join-Path $dir "$j.ok") -Encoding utf8',
+         '    if ($code -ne 0) {',
+         '      Write-Host "    completed, but MAPDL exited $code - '
+         '$($errs.Count) error file(s), read $j*.err" -ForegroundColor Yellow',
+         '    }',
          '    if ($backup -and (Test-Path $backup)) {',
          '      try {',
          '        Copy-Item (Join-Path $dir "$j.txt"), (Join-Path $dir "$j`_amp.txt"), '

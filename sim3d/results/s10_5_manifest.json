@@ -15,6 +15,13 @@
   "axial_compression_full_excursion": 0.09,
   "sample_fraction": 0.5,
   "release": false,
+  "solver": {
+    "bend": {},
+    "comb": {
+      "nsubst": "200,40000,100",
+      "neqit": 50
+    }
+  },
   "length_mm": 6.283185307179586,
   "cells": [
     {

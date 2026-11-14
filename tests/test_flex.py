@@ -353,8 +353,8 @@ def test_runner_backs_each_result_off_the_vm_as_it_lands():
         flex.write_vm_script(man, path=out, backup='')
         none = out.read_text(encoding='utf-8')
     assert 'Test-Path $backup' in s and 'Copy-Item' in s
-    # The copy is inside the exit-0 branch, so a failed job never backs up a bad result.
-    assert s.index('"exit 0" | Out-File') < s.index('Copy-Item') < s.index('} else {')
+    # The copy is inside the completed branch, so a failed job never backs up a bad result.
+    assert s.index('"exit $code" | Out-File') < s.index('Copy-Item') < s.index('} else {')
     assert 'catch' in s                      # non-fatal
     assert '$backup = ""' in none            # opt out cleanly
 
@@ -448,3 +448,55 @@ def test_a_row_s9_4_never_ran_is_refused():
 
     with pytest.raises(ValueError, match='was not audited'):
         headtohead.ours(rows=(0,))
+
+def test_a_run_that_completed_is_kept_even_when_mapdl_exits_nonzero():
+    man = {'cells': [{'stem': 's10_5_simp00'}], 'arms': ['bend']}
+    import tempfile, pathlib as _pl
+    with tempfile.TemporaryDirectory() as d:
+        out = _pl.Path(d) / 'run.ps1'
+        flex.write_vm_script(man, path=out)
+        s = out.read_text(encoding='utf-8')
+    assert 'RUN COMPLETED' in s
+    assert 'if ($done) {' in s and 'if ($code -eq 0) {' not in s
+    assert '"$j,$secs,$code,$done"' in s and '"exit $code"' in s
+    assert '$j*.err' in s and '$j.err' not in s
+
+def test_an_abandoned_solve_is_not_certified_by_the_run_completed_banner():
+    man = {'cells': [{'stem': 's10_5_simp00'}], 'arms': ['comb']}
+    import tempfile, pathlib as _pl
+    with tempfile.TemporaryDirectory() as d:
+        out = _pl.Path(d) / 'run.ps1'
+        flex.write_vm_script(man, path=out)
+        s = out.read_text(encoding='utf-8')
+    assert 'Run terminated' in s and '(-not $died)' in s
+    assert s.index('Remove-Item (Join-Path $dir "$j*.err")') < s.index('& $exe')
+
+def test_the_baseline_cell_carries_both_of_its_stiffness_measurements():
+    from sim3d import headtohead
+
+    _, row = headtohead.simp_cell()
+    assert row['binary']['K_radial'] != pytest.approx(row['K_radial'], rel=1e-3)
+    assert row['binary']['K_radial'] == pytest.approx(331.5, abs=0.5)
+
+def test_a_solver_override_reaches_one_arm_and_leaves_the_tolerances_alone():
+    plain = apdl.flex_cycle(mesh='m', deck_dir='', out_stem='t', compression=0.045)
+    tuned = apdl.flex_cycle(mesh='m', deck_dir='', out_stem='t', compression=0.045, nsubst='200,40000,100', neqit=50)
+    assert 'NEQIT' not in plain and 'NEQIT,50' in tuned
+    assert 'NSUBST,100,2000,50' in plain and 'NSUBST,200,40000,100' in tuned
+    tol = lambda d: [l for l in d.splitlines() if l.startswith('CNVTOL')]
+    assert tol(plain) == tol(tuned) and tol(plain)
+
+def test_the_manifest_records_which_arm_was_retuned(tmp_path):
+    import numpy as np
+
+    field = np.zeros((64, 64), bool)
+    field[16:48, :] = True
+    tiny = {'n_circ': None, 'n_axial': 1, 'layers': 2, 'limit': 0.20}
+    m = flex.build(indices=[0], fields=field[None], directory=tmp_path, mesh=tiny,
+                   arms=('bend', 'comb'), prefix='s10_5_simp',
+                   manifest_name='s10_5_test_manifest.json',
+                   solver={'comb': {'neqit': 50}})
+    (flex.RESULTS_DIR / 's10_5_test_manifest.json').unlink()
+    assert m['solver'] == {'bend': {}, 'comb': {'neqit': 50}}
+    assert 'NEQIT' not in (tmp_path / 's10_5_simp00_bend.inp').read_text(encoding='utf-8')
+    assert 'NEQIT,50' in (tmp_path / 's10_5_simp00_comb.inp').read_text(encoding='utf-8')

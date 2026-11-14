@@ -56,11 +56,14 @@ def ours(rows=MATCHED_ROWS):
                     'audit': by_row[row]})
     return out
 
-def build(stage=True, arms=flex.ARMS):
+SOLVER = {'comb': {'nsubst': '200,40000,100', 'neqit': 50}}
+
+def build(stage=True, arms=flex.ARMS, solver=None):
     """Mesh the baseline cell and write its decks."""
     field, row = simp_cell()
     manifest = flex.build(indices=[0], fields=field[None], arms=arms,
-                          prefix=STEM, manifest_name=MANIFEST_NAME)
+                          prefix=STEM, manifest_name=MANIFEST_NAME,
+                          solver=SOLVER if solver is None else solver)
     manifest['baseline'] = {'run': SIMP_RUN, 'k_target': SIMP_TARGET,
                             'K_radial': row['K_radial'], 'f_metal': row['f_metal'],
                             'volfrac': row['volfrac']}
@@ -82,12 +85,12 @@ def analyze(manifest_path=None, results_dir=None, out_stem='s10_5_headtohead'):
         else pathlib.Path(manifest_path)
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
 
-    field, _ = simp_cell()
+    field, row = simp_cell()
     mesh = manifest['mesh']
     points, hexes, _ = mesh3d.tube_hex_mesh(UnitCell(field), n_circ=mesh['n_circ'],
                                             n_axial=mesh['n_axial'],
                                             layers=mesh['layers'], limit=mesh['limit'])
-    base = dict(manifest['baseline'], stem=STEM + '00', source='simp')
+    base = dict(manifest['baseline'], stem=STEM + '00', source='simp', K_radial_binary=row['binary']['K_radial'])
     for arm in manifest['arms']:
         stem = f'{STEM}00_{arm}'
         status, amp = results_dir / f'{stem}.txt', results_dir / f'{stem}_amp.txt'

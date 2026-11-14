@@ -837,7 +837,7 @@ def bend_displacement(y, zeta, radius_mm, compression=0.0):
 
 def flex_cycle(mesh, deck_dir=None, out_stem='s9_4_flex', radius_mm=None,
                compression=0.0, outres='ALL,LAST', nsubst='100,2000,50',
-               sample_fraction=BEND_SAMPLE_FRACTION, release=False):
+               neqit=None, sample_fraction=BEND_SAMPLE_FRACTION, release=False):
     """
     Bending (or combined bending + axial compression) cycle on a full ring.
 
@@ -854,6 +854,7 @@ def flex_cycle(mesh, deck_dir=None, out_stem='s9_4_flex', radius_mm=None,
     radius_mm = config.FLEX_BEND_AMPLITUDE_RADIUS_MM if radius_mm is None else radius_mm
     mode = 'combined bending + axial' if compression else 'bending only'
     half = 0.5 * sample_fraction
+    neqit_line = f'NEQIT,{neqit}' + chr(10) if neqit else ''
 
     ls2 = f"""
 ! ---- LS2: release to straight.
@@ -936,7 +937,7 @@ ANTYPE,STATIC
 NLGEOM,ON                      ! curvature of 1/{radius_mm:.0f} mm over this length is finite rotation
 LNSRCH,ON
 AUTOTS,ON
-OUTRES,{outres}
+{neqit_line}OUTRES,{outres}
 CNVTOL,F,,0.005,,1.0E-4
 CNVTOL,U,,0.05,,1.0E-6
 
